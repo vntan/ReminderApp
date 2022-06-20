@@ -1,10 +1,17 @@
 const express = require('express');
-const usersController = require('../controllers/usersController')
+const accountController = require('../controllers/accountController');
+
 
 const router = express.Router();
 
 const initRoutesApp = (app) => {
-    router.get('/', usersController.getAllUsers)
+    router.post('/accounts/login', accountController.login)
+    router.post('/accounts/register', accountController.register)
+    router.post('/accounts/checkUserExist', accountController.checkUserExist)
+
+
+    
+
 
 
     return app.use("/", router);
