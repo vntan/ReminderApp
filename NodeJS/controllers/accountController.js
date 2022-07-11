@@ -1,6 +1,6 @@
 var acccount = require('../models/accountModels')
 
-let login = (req, res) =>{
+const login = (req, res) =>{
     console.log(req.body)
 
     const email = req.body["email"];
@@ -8,15 +8,18 @@ let login = (req, res) =>{
     if ( email && password  ){
         acccount.login(email, password, (err,rows)=>{
             
-            if(err) res.json({onSuccess: false, result: err});
-            else  res.json({onSuccess: true, result: rows});
+            if(err) res.json({onSuccess: false, error: err});
+            else  {
+                if (rows.length <= 0) res.json({onSuccess: false, error: "Can't find the account"});
+                else res.json({onSuccess: true, result: rows});
+            }
 
         });
     }
-    else res.json({onSuccess: false, result: "Cannot receive the data"});
+    else res.json({onSuccess: false, error: "Can't receive the data"});
 }
 
-let register = (req, res) => {
+const loginWithGoogle = (req, res) => {
     console.log(req.body)
 
     const name = req.body["name"];
@@ -27,10 +30,86 @@ let register = (req, res) => {
     user = {name, email, password, urlImage}
     
     if (user){
-        acccount.register(user, (err, count)=>{
+
+        acccount.checkUserExist(email, (err,rows)=>{
             if(err) res.json({onSuccess: false, result: err});
-            else res.json({onSuccess: true, result: count["affectedRows"]});
+            else {
+                if (rows[0]["countUser"] > 0) {
+                    acccount.getUserInformation(email, (err,rows)=>{
+                        if(err) res.json({onSuccess: false, error: err});
+                        else  {
+                            if (rows.length <= 0) res.json({onSuccess: false, error: "Can't get the account"});
+                            else res.json({onSuccess: true, result: rows});
+                        }
+                    });
+                    return;
+                }
+
+                acccount.register(user, (err, count)=>{
+
+                    if(err) res.json({onSuccess: false, error: err});
+                    else  {
+                        if (rows.length <= 0) res.json({onSuccess: false, error: "Can't register the account"});
+                        else {
+                            acccount.getUserInformation(email, (err,rows)=>{
+                                if(err) res.json({onSuccess: false, error: err});
+                                else  {
+                                    if (rows.length <= 0) res.json({onSuccess: false, error: "Can't get the account"});
+                                    else res.json({onSuccess: true, result: rows});
+                                }
+                            });
+                            
+                        }
+                    }
+                });
+            }
         });
+
+
+    }
+    else res.json({onSuccess: false, result: "Cannot receive the data"});
+}
+
+const register = (req, res) => {
+    console.log(req.body)
+
+    const name = req.body["name"];
+    const email = req.body["email"];
+    const password = req.body["password"];
+    const urlImage = req.body["urlImage"];
+
+    user = {name, email, password, urlImage}
+    
+    if (user){
+
+        acccount.checkUserExist(email, (err,rows)=>{
+            if(err) res.json({onSuccess: false, result: err});
+            else {
+                if (rows[0]["countUser"] > 0) {
+                    res.json({onSuccess: false, result: "User has already existed!"});
+                    return;
+                }
+                acccount.register(user, (err, count)=>{
+
+                    if(err) res.json({onSuccess: false, error: err});
+                    else  {
+                        if (rows.length <= 0) res.json({onSuccess: false, error: "Can't register the account"});
+                        else {
+                            acccount.getUserInformation(email, (err,rows)=>{
+                                if(err) res.json({onSuccess: false, error: err});
+                                else  {
+                                    if (rows.length <= 0) res.json({onSuccess: false, error: "Can't get the account"});
+                                    else res.json({onSuccess: true, result: rows});
+                                }
+                            });
+                            
+                        }
+                    }
+                });
+            }
+        });
+
+
     }
     else res.json({onSuccess: false, result: "Cannot receive the data"});
 }
@@ -64,6 +143,7 @@ let checkUserExist = (req, res)=> {
 
 module.exports = {
     login, 
+    loginWithGoogle,
     register,
     checkUserExist,
 

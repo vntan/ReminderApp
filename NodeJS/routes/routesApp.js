@@ -6,6 +6,7 @@ const router = express.Router();
 
 const initRoutesApp = (app) => {
     router.post('/accounts/login', accountController.login)
+    router.post('/accounts/loginGoogle', accountController.loginWithGoogle)
     router.post('/accounts/register', accountController.register)
     router.post('/accounts/checkUserExist', accountController.checkUserExist)
 

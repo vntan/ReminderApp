@@ -5,7 +5,7 @@ var account ={
     //     return db.query("Select * from account", cb);
     // }, 
     login: function(email, password, cb){
-        return db.query("select * from account where email like ? and password = ?", [email, password], cb)
+        return db.query("select `idAccount`,`name`,`email`, `urlImage` from account where email like ? and password = ?", [email, password], cb)
     },
 
     register: function(user, cb){
@@ -16,6 +16,10 @@ var account ={
     checkUserExist: function(email, cb){
         return db.query("select count(*) as 'countUser' from account where email like ?",  [email], cb)
     },
+
+    getUserInformation: function(email, cb){
+        return db.query("select `idAccount`,`name`,`email`, `urlImage` from account where email like ?",  [email], cb)
+    }
 
 }
 
