@@ -1,0 +1,1 @@
+export const KEY_ACCOUNT_STATE = "ACCOUNT_STATE"
