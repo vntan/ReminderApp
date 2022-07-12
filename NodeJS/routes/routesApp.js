@@ -10,11 +10,6 @@ const initRoutesApp = (app) => {
     router.post('/accounts/register', accountController.register)
     router.post('/accounts/checkUserExist', accountController.checkUserExist)
 
-
-    
-
-
-
     return app.use("/", router);
 }
 
