@@ -9,14 +9,14 @@ import "./LoginForm.css"
 
 import { connect } from 'react-redux';
 
-
+import { MD5 } from "crypto-js";
 import { validEmail } from '../../Utilities/rules'
 import { signInWithGoogle } from '../../Helper/firebase'
-import { register } from '../../Models/accountReducer'
-import { useNavigate, useLocation, Navigate, } from "react-router-dom";
+import { login, loginGoogle } from '../../Models/accountReducer'
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-
-const LoginForm = props => {
+const LoginForm = ({ login, loginGoogle }) => {
 
     const [isLoading, setLoading] = useState(false)
     let navigate = useNavigate();
@@ -27,7 +27,7 @@ const LoginForm = props => {
 
         if (user == null) {
             setLoading(false);
-            message.error('Login failed! Please login this account again!');
+            message.error('Login failed! Please login this account again!', 3);
             return;
         }
 
@@ -36,36 +36,38 @@ const LoginForm = props => {
         const password = "";
         const urlImage = user.photoURL;
 
-        props.register({ name, email, password, urlImage }, (result) =>{
+        loginGoogle({ name, email, password, urlImage }, (result) => {
             console.log(result);
             if (result) {
-                message.success('Login successfully!');
+                message.success('Login successfully!', 3);
                 navigate('/', { replace: true });
             }
-            else message.error('Login failed! Please login this account again!');
+            else message.error('Login failed! Please login this account again!', 3);
         });
         setLoading(false);
-       
+
     }
 
-    const onSubmitFinish = async (values) => {
+    const onFinish = async (values) => {
+        values.password = MD5(values.password).toString();
 
-        props.onFinish(values, (result) => {
+        console.log('Received values of form: ', values);
+        const isLogin = await login(values, (result) => {
             if (result) {
-                message.success('Login successfully!');
+                message.success('Login successfully!', 3);
                 navigate('/', { replace: true });
             }
-            else message.error('Login failed! Please check your account!');
-        })
+            else message.error('Login failed! Please check your account!', 3);
+        });
 
-    }
+    };
 
     return (
         <div>
             <Form
                 name="form_login"
                 className="login-form"
-                onFinish={onSubmitFinish}
+                onFinish={onFinish}
             >
                 <Form.Item
                     name="email"
@@ -135,14 +137,16 @@ const LoginForm = props => {
 
             </Button>
 
-            <div className='mt-3'> Don't have an account! <a href="">Sign Up</a>
+
+            <div className='mt-3'> Don't have an account! <Link to="/register">Sign Up</Link>
             </div>
         </div >
     );
 };
 
 const mapActionToProps = {
-    register
+    login,
+    loginGoogle
 }
 
 export default connect(null, mapActionToProps)(LoginForm);

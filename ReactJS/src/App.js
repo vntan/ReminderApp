@@ -10,6 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from './Pages/LoginPage/LoginPage';
 import MainPage from './Pages/MainPage/MainPage';
 import ProvideAuth from './middleware/ProvideAuth';
+import RegisterPage from './Pages/RegisterPage/RegisterPage';
 
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
         <div className="App">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route
               path="/"
               element={

@@ -22,11 +22,16 @@ const accountSlice = createSlice({
             state.isLogin = true;
             state.account = action.payload.data;
         },
+
+        logoutSuccess(state){
+            state.isLogin = false;
+            state.account = null;
+        },
     }
 });
 
 
-const { loginSuccess, registerSuccess } = accountSlice.actions
+const { loginSuccess, registerSuccess, logoutSuccess } = accountSlice.actions
 
 export const login = ({ email, password }, cb) => async dispatch => {
     axios.post('/accounts/login', { email, password })
@@ -44,7 +49,7 @@ export const login = ({ email, password }, cb) => async dispatch => {
         });
 }
 
-export const register = (userInfo, cb) => async dispatch => {
+export const loginGoogle = (userInfo, cb) => async dispatch => {
 
     axios.post('/accounts/loginGoogle', userInfo)
         .then((response) => {
@@ -61,6 +66,29 @@ export const register = (userInfo, cb) => async dispatch => {
         });
 
 }
+
+export const register = (userInfo, cb) => async dispatch => {
+
+    axios.post('/accounts/register', userInfo)
+        .then((response) => {
+            console.log(response.data);
+            if (response.data.onSuccess) {
+                localStorage.setItem(KEY_ACCOUNT_STATE, JSON.stringify({ isLogin: true, account: response.data.result[0] }));
+                dispatch(registerSuccess({ data: response.data.result[0] }))
+            }
+            cb(response.data.onSuccess);
+        })
+        .catch(function (error) {
+            console.log(error);
+            cb(false);
+        });
+
+}
+
+export const logout =() => async dispatch => {
+    localStorage.removeItem(KEY_ACCOUNT_STATE);
+    dispatch(logoutSuccess());
+};    
 
 
 export default accountSlice.reducer;

@@ -3,13 +3,13 @@ import React, { useEffect } from 'react';
 import { Col, Row } from 'antd';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../Helper/WHResponsive.css"
-import "./LoginPage.css";
-import LoginForm from '../../Components/LoginForm/LoginForm';
+import "./RegisterPage.css";
+import RegisterForm from '../../Components/RegisterForm/RegisterForm'
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { KEY_ACCOUNT_STATE } from '../../Utilities/Constants'
 
-function LoginPage() {
+function RegisterPage() {
 
     let location = useLocation();
     let from = location.state?.from?.pathname || "/";
@@ -33,11 +33,11 @@ function LoginPage() {
                 </Col>
                 <Col xs={{ span: 24 }} md={{ span: 15 }} className="d-flex flex-column justify-content-center p-3">
                     <h1>Reminder</h1>
-                    <LoginForm></LoginForm>
+                    <RegisterForm></RegisterForm>
                 </Col>
             </Row >
         </section >
     );
 }
 
-export default LoginPage;
+export default RegisterPage;
