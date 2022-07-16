@@ -9,6 +9,44 @@ const initialState = {
     account: null
 };
 
+/*
+    Action(NameAction, Payload) --> reducer (state = initState, Action)
+ */
+
+/* Kiến trúc Redux: Data --> prediction --> ko chấp nhận aync, random..... */
+
+//Reducer
+// const accountT = createSlice({
+//     name: "AccountLoginIn",
+//     initialState: initialState,
+//     reducers: {
+//             userUpdate(state, action){
+//                 state.data = action.data;
+//             },
+//             //reducer(state, {NameAction: Login, PayloadL actionData})
+//             // logIn(state, actionData){
+//             //     const user = actionData.user
+//             //     // kiểm tra user có tồn tại trên DB
+//             //     // axios.post(user). then(....) --> ayncnochrous --> ko cho phép
+//             // }
+//     }
+// })
+
+// const {userUpdate} = accountT.actions
+// dispatch(userUpdate({id: 10, name: "NVA"}))
+
+
+//Question: làm sao để lấy data và đưa nó vào reducer mà ko vi phạm
+// Get data -->  dispatch (cập nhật dữ liệu qua action) dữ liệu:
+// export const toDo = ({ email, password }) => async dispatch =>{
+//     axios.post('/accounts/login', { email, password }). then((response)=>{
+//         const data = response;
+//         dispatch(userUpdate(data))
+//     })
+// }
+
+
+//Reducer
 const accountSlice = createSlice({
     name: 'account',
     initialState: JSON.parse(localStorage.getItem(KEY_ACCOUNT_STATE)) || initialState,
