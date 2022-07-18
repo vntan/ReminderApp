@@ -1,0 +1,8 @@
+.status {
+    border: none; 
+    background-color: inherit;
+    padding : 0; 
+    text-align: center;
+    width: 8vw;
+    max-width: 102px;
+}

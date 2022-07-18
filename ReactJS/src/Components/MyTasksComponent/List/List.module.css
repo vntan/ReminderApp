@@ -1,0 +1,12 @@
+.tableList {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.tableList > :not(:first-child) {
+    border-top: 0;
+}
+
+.tableHeader {
+    box-shadow: 0px 2px 2px 0px #c3c3c3;
+}

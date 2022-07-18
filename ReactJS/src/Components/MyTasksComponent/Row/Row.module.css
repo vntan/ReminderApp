@@ -1,0 +1,11 @@
+.taskList {
+    text-align: start !important;
+}
+
+.actionList {
+    font-size: 1.4rem;
+}
+
+.actionElement {
+    vertical-align: middle;
+}
