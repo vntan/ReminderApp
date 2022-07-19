@@ -1,0 +1,13 @@
+.alert {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    border: hidden;
+    border-radius: 50px;
+    height: 32px;
+    max-width: 95%;
+    vertical-align: middle;
+    margin: 0;
+    padding: 5px 10px;
+    margin-bottom: 2px;
+}

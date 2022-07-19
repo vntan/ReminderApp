@@ -1,10 +1,13 @@
 import styles from "./ListSelector.module.css";
+
 import { Select } from "antd";
+
 const { Option } = Select;
 
-const ListSelector = () => {
+const ListSelector = (props) => {
     const handleOnChange = (value) => { 
         console.log(value);
+        if (props.handleChangeList) props.handleChangeList(value);
     }
 
   return (

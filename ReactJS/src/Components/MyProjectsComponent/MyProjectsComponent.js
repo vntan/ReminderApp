@@ -2,22 +2,27 @@ import { useState } from "react";
 
 import styles from "./MyProjectsComponent.module.css";
 
-import { Menu } from "antd";
-import List from "./List/List";
-import Calendar from "./Calendar/Calendar";
 import ProjectSelector from "../ProjectSelector/ProjectSelector";
-
+import { Menu } from "antd";
 import { InfoCircleTwoTone } from "@ant-design/icons";
 
+import { useNavigate, Outlet } from "react-router-dom";
+
 const MyProjectsComponent = () => {
-  const [isList, setList] = useState(true);
+  const [project, setProject] = useState("- All Projects -");
+
+  const handleChangeProject = (project) => {
+    setProject(project);
+  };
+
+  const navigate = useNavigate();
 
   const showList = () => {
-    setList(true);
+    navigate("./list");
   };
 
   const showCalendar = () => {
-    setList(false);
+    navigate("./calendar");
   };
 
   const showInfo = () => {
@@ -27,13 +32,14 @@ const MyProjectsComponent = () => {
     <>
       <div className={styles.subnav}>
         <div className={styles.project}>
-          <ProjectSelector/>
+          <ProjectSelector
+            handleChangeProject={(project) => handleChangeProject(project)}
+          />
           <InfoCircleTwoTone className={styles.info} onClick={showInfo} />
         </div>
         <Menu
           theme="light"
           mode="horizontal"
-          defaultSelectedKeys={["list"]}
           className={styles.menu}
           items={[
             { label: "List", key: "list", onClick: showList },
@@ -45,8 +51,7 @@ const MyProjectsComponent = () => {
           ]}
         />
       </div>
-      {isList && <List />}
-      {!isList && <Calendar />}
+      <Outlet context={project} />
     </>
   );
 };

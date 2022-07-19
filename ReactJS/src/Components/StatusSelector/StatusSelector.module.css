@@ -4,5 +4,6 @@
     padding : 0; 
     text-align: center;
     width: 8vw;
+    min-width: 84px;
     max-width: 102px;
 }

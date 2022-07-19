@@ -1,17 +1,24 @@
-import './App.css';
+import "./App.css";
 
-import 'antd/dist/antd.css';
+import "antd/dist/antd.css";
 
-import { Provider } from 'react-redux'
-import store from './Models/store'
+import { Provider } from "react-redux";
+import store from "./Models/store";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import LoginPage from './Pages/LoginPage/LoginPage';
-import MainPage from './Pages/MainPage/MainPage';
-import ProvideAuth from './middleware/ProvideAuth';
-import RegisterPage from './Pages/RegisterPage/RegisterPage';
+import LoginPage from "./Pages/LoginPage/LoginPage";
+import MainPage from "./Pages/MainPage/MainPage";
+import ProvideAuth from "./middleware/ProvideAuth";
+import RegisterPage from "./Pages/RegisterPage/RegisterPage";
 
+import MyProjectsComponent from "./Components/MyProjectsComponent/MyProjectsComponent";
+import ProjectList from "./Components/MyProjectsComponent/ProjectList/ProjectList";
+import ProjectCalendar from "./Components/MyProjectsComponent/ProjectCalendar/ProjectCalendar";
+
+import MyTasksComponent from "./Components/MyTasksComponent/MyTasksComponent";
+import TaskList from "./Components/MyTasksComponent/TaskList/TaskList";
+import TaskCalendar from "./Components/MyTasksComponent/TaskCalendar/TaskCalendar";
 
 const App = () => {
   return (
@@ -28,15 +35,22 @@ const App = () => {
                   <MainPage />
                 </ProvideAuth>
               }
-            />
+            >
+              <Route path="/mytask" element={<MyTasksComponent />}>
+                <Route path="/mytask/list" element={<TaskList />} />
+                <Route path="/mytask/calendar" element={<TaskCalendar />} />
+              </Route>
 
+              <Route path="/project" element={<MyProjectsComponent />}>
+                <Route path="/project/list" element={<ProjectList />} />
+                <Route path="/project/calendar" element={<ProjectCalendar />} />
+              </Route>
+            </Route>
           </Routes>
         </div>
       </BrowserRouter>
-
-    </Provider >
-
+    </Provider>
   );
-}
+};
 
 export default App;

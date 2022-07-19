@@ -1,7 +1,4 @@
-import React, { useState } from "react";
-import { connect } from "react-redux";
-import { logout } from "../../Models/accountReducer";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 
 import styles from "./MainPage.module.css";
 import "./MainPageGlobal.css";
@@ -9,42 +6,51 @@ import "./MainPageGlobal.css";
 import { Layout, Menu, Avatar, Dropdown } from "antd";
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 
-import MyTasksComponent from "../../Components/MyTasksComponent/MyTasksComponent.js";
-import MyProjectsComponent from "../../Components/MyProjectsComponent/MyProjectsComponent.js";
+import { connect } from "react-redux";
+import { logout } from "../../Models/accountReducer";
+import { useNavigate, Outlet } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
 const MainPage = ({ state, logout }) => {
   const navigate = useNavigate();
 
-  const [isMyTasks, setIsMyTasks] = useState(true);
-
   const showMyTasks = () => {
-    setIsMyTasks(true);
+    navigate('/mytask', {replace: true});
   };
 
   const showMyProject = () => {
-    setIsMyTasks(false);
+    navigate('/project', {replace: true});
   };
 
   const showInformation = () => {
     console.log("Show information");
-  }
+  };
 
   const handleLogout = () => {
     console.log("Log out");
-  }
+  };
 
   const menu = (
     <Menu
       items={[
         {
-          key: "1",
-          label: <div onClick={showInformation}><UserOutlined /> User Information</div>,
+          key: "Information",
+          label: (
+            <div className={styles.inforDiv} onClick={showInformation}>
+              <UserOutlined style={{ fontSize: "22px" }} />
+              <p style={{ margin: 0, paddingLeft: "10px" }}>User Information</p>
+            </div>
+          ),
         },
         {
-          key: "2",
-          label: <div onClick={handleLogout}><LogoutOutlined /> Sign out</div>,
+          key: "SignOut",
+          label: (
+            <div className={styles.inforDiv} onClick={handleLogout}>
+              <LogoutOutlined style={{ fontSize: "22px" }} />
+              <p style={{ margin: 0, paddingLeft: "10px" }}>Sign out</p>
+            </div>
+          ),
         },
       ]}
     />
@@ -54,36 +60,35 @@ const MainPage = ({ state, logout }) => {
     <>
       <Layout>
         <Header className={styles.header}>
-          <Dropdown overlay={menu} trigger='click'>
-          <div className={styles.profile}>
-            <Avatar
-              size={48}
-              src="https://www.partyanimalsgame.com/static/avatars-07_Carrot.png"
-              style={{ marginRight: "8%" }}
-            />
-            {true && "Carrot"}
-          </div>
-          </Dropdown>
+          <div style={{width: '24vw', maxWidth: '160px'}}></div>
           <Menu
             theme="light"
             mode="horizontal"
-            defaultSelectedKeys={["my-tasks"]}
             className={styles.menu}
             items={[
               { label: "My tasks", key: "my-tasks", onClick: showMyTasks },
               {
                 label: "Projects",
                 key: "my-projects",
-                style: { marginLeft: "20%" },
+                style: { marginLeft: "8%" },
                 onClick: showMyProject,
               },
             ]}
           />
+          <Dropdown overlay={menu} trigger="click">
+            <div className={styles.profile}>
+              {true && "Carrot"}
+              <Avatar
+                size={42}
+                src="https://www.partyanimalsgame.com/static/avatars-07_Carrot.png"
+                style={{ marginLeft: "8%" }}
+              />
+            </div>
+          </Dropdown>
         </Header>
         <Content></Content>
       </Layout>
-      {isMyTasks && <MyTasksComponent />}
-      {!isMyTasks && <MyProjectsComponent />}
+      <Outlet/>
     </>
   );
 };

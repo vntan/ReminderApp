@@ -1,39 +1,45 @@
-import { useState } from "react";
-
 import styles from "./MyTasksComponent.module.css";
 
 import { Menu } from "antd";
-import List from "./List/List";
-import Calendar from "./Calendar/Calendar";
+import { FilterOutlined } from "@ant-design/icons";
+
+import { useNavigate, Outlet } from "react-router-dom";
 
 const MyTasksComponent = () => {
-  const [isList, setList] = useState(true);
+  const navigate = useNavigate();
 
   const showList = () => {
-    setList(true);
+    navigate("./list");
   };
 
   const showCalendar = () => {
-    setList(false);
+    navigate("./calendar");
+  };
+
+  const handleFilter = () => {
+    console.log("Filter");
   };
   return (
     <>
-      <Menu
-        theme="light"
-        mode="horizontal"
-        defaultSelectedKeys={["list"]}
-        className={styles.menu}
-        items={[
-          { label: "List", key: "list", onClick: showList },
-          {
-            label: "Calendar",
-            key: "calendar",
-            onClick: showCalendar,
-          },
-        ]}
-      />
-      {isList && <List />}
-      {!isList && <Calendar />}
+      <div className={styles.subnav}>
+        <Menu
+          theme="light"
+          mode="horizontal"
+          className={styles.menu}
+          items={[
+            { label: "List", key: "list", onClick: showList },
+            {
+              label: "Calendar",
+              key: "calendar",
+              onClick: showCalendar,
+            },
+          ]}
+        />
+        <div onClick={handleFilter} className={styles.filter}>
+          <FilterOutlined style={{ verticalAlign: "middle" }} />
+        </div>
+      </div>
+      <Outlet />
     </>
   );
 };

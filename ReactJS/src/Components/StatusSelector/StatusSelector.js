@@ -1,7 +1,10 @@
+import { useState } from "react";
+
 import styles from "./StatusSelector.module.css";
 import { completeColor, onGoingColor, toDoColor } from "../../Utilities/Color";
-import { useState } from "react";
+
 import { Select } from "antd";
+
 const { Option } = Select;
 
 const StatusSelector = (props) => {

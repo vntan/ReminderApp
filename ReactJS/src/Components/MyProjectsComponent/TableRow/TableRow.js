@@ -1,11 +1,13 @@
+import styles from "./TableRow.module.css";
+import "../../../Helper/DisableResponsive.css";
+
 import StatusSelector from "../../StatusSelector/StatusSelector";
 import { FormOutlined, DeleteOutlined } from "@ant-design/icons";
-
 import { Avatar } from "antd";
 
-import styles from "./Row.module.css";
 
-const Row = (props) => {
+const TableRow = (props) => {
+  const task = props.task;
   const dateToColor = (deadline) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -17,61 +19,43 @@ const Row = (props) => {
     else return "red";
   };
 
-  const handleViewTask = () => {
-    console.log("View task");
-  };
-
-  const handleEditStatus = (e) => {
-    e.stopPropagation();
-  };
-
-  const handleEditTask = (e) => {
-    e.stopPropagation();
-    console.log("Edit task");
-  };
-
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    console.log("Delete");
-  };
-
   return (
-    <tr onClick={handleViewTask}>
-      <td className={styles.taskList}>{props.task}</td>
-      <td style={{ color: dateToColor(props.deadline) }}>{props.deadline}</td>
-      <td>{props.notification || "-"}</td>
-      <td onClick={handleEditStatus}>
-        <StatusSelector status={props.status} />
+    <tr onClick={props.handleViewTask}>
+      <td className={styles.taskList}>{task.taskname}</td>
+      <td style={{ color: dateToColor(task.deadline) }}>{task.deadline}</td>
+      <td className="tablet">{task.notification || "-"}</td>
+      <td onClick={props.handleEditStatus}>
+        <StatusSelector status={task.status} />
       </td>
-      <td>
-        {props.assignees ? (
+      <td className="mobile">
+        {task.assignees ? (
           <Avatar.Group
             style={{ verticalAlign: "middle" }}
             maxCount={3}
             maxStyle={{ color: "#000000", backgroundColor: "#D9D9D9" }}
           >
-            {props.assignees.map((assignee) => 
-              {return <Avatar key={assignee} src={assignee} />}
-            )}
+            {task.assignees.map((assignee) => {
+              return <Avatar key={assignee} src={assignee} />;
+            })}
           </Avatar.Group>
         ) : (
           "-"
         )}
       </td>
-      <td>{props.subtask || "-"}</td>
+      <td className="tablet">{task.subtask || "-"}</td>
       <td className={styles.actionList}>
         <FormOutlined
           className={styles.actionElement}
-          onClick={handleEditTask}
+          onClick={props.handleEditTask}
           style={{ paddingRight: "8%" }}
         />
         <DeleteOutlined
           className={styles.actionElement}
-          onClick={handleDelete}
+          onClick={props.handleDelete}
         />
       </td>
     </tr>
   );
 };
 
-export default Row;
+export default TableRow;
