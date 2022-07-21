@@ -52,7 +52,7 @@ const LoginForm = ({ login, loginGoogle }) => {
         values.password = MD5(values.password).toString();
 
         console.log('Received values of form: ', values);
-        const isLogin = await login(values, (result) => {
+        await login(values, (result) => {
             if (result) {
                 message.success('Login successfully!', 3);
                 navigate('/', { replace: true });

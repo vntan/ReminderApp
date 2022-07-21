@@ -6,10 +6,43 @@ import ProjectSelector from "../ProjectSelector/ProjectSelector";
 import { Menu } from "antd";
 import { InfoCircleTwoTone } from "@ant-design/icons";
 
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, useLocation, useParams, Outlet } from "react-router-dom";
 
 const MyProjectsComponent = () => {
+  const location = useLocation();
+  const paramsURL = useParams();
+
   const [project, setProject] = useState("- All Projects -");
+
+  const menuProjectsView = [
+    {
+      label: "List",
+      key: "list",
+      onClick: ()=> {
+        const ID = paramsURL.projectID;
+        navigate(ID+'/list')
+      },
+    },
+    {
+      label: "Calendar",
+      key: "calendar",
+      onClick: ()=> {
+        const ID = paramsURL.projectID;
+        navigate(ID+'/calendar')
+      },
+    },
+  ]
+
+  const selectedKey = () => {
+    const url = location.pathname.toLowerCase();
+
+    for (const item of menuProjectsView)
+      if (url.includes(item.key.toLowerCase()))
+        return item.key;
+
+    return '';
+  }
+
 
   const handleChangeProject = (project) => {
     setProject(project);
@@ -17,17 +50,10 @@ const MyProjectsComponent = () => {
 
   const navigate = useNavigate();
 
-  const showList = () => {
-    navigate("./list");
-  };
-
-  const showCalendar = () => {
-    navigate("./calendar");
-  };
-
   const showInfo = () => {
     console.log("showInfo");
   };
+  
   return (
     <>
       <div className={styles.subnav}>
@@ -41,17 +67,12 @@ const MyProjectsComponent = () => {
           theme="light"
           mode="horizontal"
           className={styles.menu}
-          items={[
-            { label: "List", key: "list", onClick: showList },
-            {
-              label: "Calendar",
-              key: "calendar",
-              onClick: showCalendar,
-            },
-          ]}
+          selectedKeys={[selectedKey()]}
+          items={menuProjectsView}
         />
+        
       </div>
-      <Outlet context={project} />
+      <Outlet/>
     </>
   );
 };

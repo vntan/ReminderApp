@@ -1,24 +1,45 @@
 import styles from "./MyTasksComponent.module.css";
 
-import { Menu } from "antd";
-import { FilterOutlined } from "@ant-design/icons";
+import { Menu, Popover, Button } from "antd";
+import { FilterOutlined, AppstoreOutlined } from "@ant-design/icons";
 
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
-const MyTasksComponent = () => {
+import SelectColumnsMenu from '../MenuSelectColumns/MenuSelectColumns'
+import {connect} from 'react-redux'
+import { updateVisibleColumns} from '../../Models/columnsListTasksReducer'
+
+
+const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const showList = () => {
-    navigate("./list");
+  const menuTasksView = [
+    {
+      label: "List",
+      key: "list",
+      onClick: () => navigate("list"),
+    },
+    {
+      label: "Calendar",
+      key: "calendar",
+      onClick: () => navigate("calendar"),
+    },
+  ]
+
+  const selectedKey = () => {
+    const url = location.pathname.toLowerCase();
+
+    for (const item of menuTasksView)
+      if (url.includes(item.key.toLowerCase())) return item.key;
+
+    return '';
+  }
+
+  const handleAddTask = () => {
+    console.log('Add Task');
   };
 
-  const showCalendar = () => {
-    navigate("./calendar");
-  };
-
-  const handleFilter = () => {
-    console.log("Filter");
-  };
   return (
     <>
       <div className={styles.subnav}>
@@ -26,22 +47,38 @@ const MyTasksComponent = () => {
           theme="light"
           mode="horizontal"
           className={styles.menu}
-          items={[
-            { label: "List", key: "list", onClick: showList },
-            {
-              label: "Calendar",
-              key: "calendar",
-              onClick: showCalendar,
-            },
-          ]}
+          selectedKeys={[selectedKey()]}
+          items={menuTasksView}
         />
-        <div onClick={handleFilter} className={styles.filter}>
-          <FilterOutlined style={{ verticalAlign: "middle" }} />
+        <div className={styles.groupControl}>
+          <FilterOutlined className={styles.icon} />
+          <Popover content={<SelectColumnsMenu columnsTable={columnsTable} updateVisibleColumns={updateVisibleColumns} />}
+            trigger="click"
+            placement="bottomLeft">
+            <AppstoreOutlined className={styles.icon}
+              style={{ display: selectedKey() !== 'list' ? 'none' : '' }} />
+          </Popover>
         </div>
       </div>
+
       <Outlet />
+
+      <Button className={styles.button} onClick={handleAddTask}>+</Button>
     </>
   );
 };
 
-export default MyTasksComponent;
+
+const mapStateToProps = (state) => {
+  return {
+      columnsTable: state.columnsListTask
+  }
+}
+
+const mapActionToProps = {
+  updateVisibleColumns
+}
+
+
+export default connect(mapStateToProps, mapActionToProps)(MyTasksComponent);
+

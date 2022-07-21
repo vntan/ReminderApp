@@ -24,3 +24,14 @@
 .tableHeader {
     box-shadow: 0px 2px 2px 0px #c3c3c3;
 }
+
+.groupControl {
+    font-size: 30px;
+    vertical-align: middle;
+    transform: translateY(-3px);
+    padding: 0 2%;
+}
+
+.groupControl .icon:last-child{
+    margin-left: 28px;
+}

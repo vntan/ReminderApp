@@ -8,20 +8,38 @@ import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 
 import { connect } from "react-redux";
 import { logout } from "../../Models/accountReducer";
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
 const MainPage = ({ state, logout }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const showMyTasks = () => {
-    navigate('/mytask', {replace: true});
-  };
 
-  const showMyProject = () => {
-    navigate('/project', {replace: true});
-  };
+  const mainMenuItem = [
+    {
+      label: "My tasks",
+      key: "mytasks",
+      onClick: () => { navigate('mytasks'); }
+    },
+    {
+      label: "Projects",
+      key: "projects",
+      style: { marginLeft: "8%" },
+      onClick: () => { navigate('projects'); },
+    },
+  ]
+
+  const selectedKey = () => {
+    const url = location.pathname.toLowerCase();
+    console.log(url);
+    for (const item of mainMenuItem)
+      if (url.includes(item.key.toLowerCase()))
+        return item.key;
+
+    return '';
+  }
 
   const showInformation = () => {
     console.log("Show information");
@@ -31,7 +49,7 @@ const MainPage = ({ state, logout }) => {
     console.log("Log out");
   };
 
-  const menu = (
+  const userMenu = (
     <Menu
       items={[
         {
@@ -60,22 +78,15 @@ const MainPage = ({ state, logout }) => {
     <>
       <Layout>
         <Header className={styles.header}>
-          <div style={{width: '24vw', maxWidth: '160px'}}></div>
+          <div style={{ width: '24vw', maxWidth: '160px' }}></div>
           <Menu
             theme="light"
             mode="horizontal"
             className={styles.menu}
-            items={[
-              { label: "My tasks", key: "my-tasks", onClick: showMyTasks },
-              {
-                label: "Projects",
-                key: "my-projects",
-                style: { marginLeft: "8%" },
-                onClick: showMyProject,
-              },
-            ]}
+            selectedKeys={[selectedKey()]}
+            items={mainMenuItem}
           />
-          <Dropdown overlay={menu} trigger="click">
+          <Dropdown overlay={userMenu} trigger="click">
             <div className={styles.profile}>
               {true && "Carrot"}
               <Avatar
@@ -86,9 +97,11 @@ const MainPage = ({ state, logout }) => {
             </div>
           </Dropdown>
         </Header>
-        <Content></Content>
+        <Content style={{ backgroundColor: '#fff' }}>
+          <Outlet />
+        </Content>
       </Layout>
-      <Outlet/>
+
     </>
   );
 };

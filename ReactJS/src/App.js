@@ -5,12 +5,14 @@ import "antd/dist/antd.css";
 import { Provider } from "react-redux";
 import store from "./Models/store";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import LoginPage from "./Pages/LoginPage/LoginPage";
 import MainPage from "./Pages/MainPage/MainPage";
 import ProvideAuth from "./middleware/ProvideAuth";
+import PrivateProject from "./middleware/ProvideIDProject";
 import RegisterPage from "./Pages/RegisterPage/RegisterPage";
+
 
 import MyProjectsComponent from "./Components/MyProjectsComponent/MyProjectsComponent";
 import ProjectList from "./Components/MyProjectsComponent/ProjectList/ProjectList";
@@ -28,24 +30,28 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route
-              path="/"
-              element={
-                <ProvideAuth>
-                  <MainPage />
-                </ProvideAuth>
-              }
-            >
-              <Route path="/mytask" element={<MyTasksComponent />}>
-                <Route path="/mytask/list" element={<TaskList />} />
-                <Route path="/mytask/calendar" element={<TaskCalendar />} />
+
+            <Route path="/" element={<ProvideAuth>  <MainPage /> </ProvideAuth>}>
+              <Route path="" element={<Navigate to="mytasks" />} />
+              <Route path="mytasks" element={<MyTasksComponent />}>
+                <Route path="" element={<Navigate to="list" />} />
+                <Route path="list" element={<TaskList />} />
+                <Route path="calendar" element={<TaskCalendar />} />
               </Route>
 
-              <Route path="/project" element={<MyProjectsComponent />}>
-                <Route path="/project/list" element={<ProjectList />} />
-                <Route path="/project/calendar" element={<ProjectCalendar />} />
+              <Route path="projects" element={<PrivateProject> <MyProjectsComponent /> </PrivateProject>} >
+                <Route path=":projectID">
+                  <Route path="" element={<Navigate to="list" />} />
+                  <Route path="list" element={<ProjectList />} />
+                  <Route path="calendar" element={<ProjectCalendar />} />
+                </Route>
+
+
+
               </Route>
             </Route>
+
+
           </Routes>
         </div>
       </BrowserRouter>

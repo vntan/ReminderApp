@@ -27,6 +27,7 @@ const signInWithGoogle = async () => {
   try {
     const res = await signInWithPopup(auth, googleProvider);
     const user = res.user;
+    signOut(auth);
     return user;
   } catch (err) {
     return null;
@@ -46,6 +47,7 @@ const registerWithEmailAndPassword = async (name, email, password) => {
   try {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     const user = res.user;
+    return user;
   } catch (err) {
     console.error(err);
     alert(err.message);

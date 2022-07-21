@@ -7,7 +7,7 @@ import {
   toDoColor,
 } from "../../../Utilities/Color";
 
-import { Calendar } from "antd";
+import { Button, Calendar } from "antd";
 import Alert from "react-bootstrap/Alert";
 
 import moment from "moment";
@@ -45,15 +45,18 @@ const TaskCalendar = () => {
   };
 
   const [value, setValue] = useState(moment());
-  const [selectedValue, setSelectedValue] = useState(moment());
-
+ 
   const onSelect = (newValue) => {
     setValue(newValue);
-    setSelectedValue(newValue);
   };
 
-  const handleOnClick = () => {
-    console.log(Math.random());
+  const handleOnClickTask = (e, task) => {
+    e.stopPropagation();
+    console.log('on Click', task);
+  };
+
+  const handleAddTask = () => {
+    console.log('Add Task');
   };
 
   const onPanelChange = (newValue) => {
@@ -62,7 +65,7 @@ const TaskCalendar = () => {
 
   const getListData = (value) => {
     const filteredTasks = tasks.filter(
-      (task) => task.deadline == value.format("DD/MM/YYYY")
+      (task) => task.deadline === value.format("DD/MM/YYYY")
     );
     return filteredTasks;
   };
@@ -71,13 +74,14 @@ const TaskCalendar = () => {
     const listTask = getListData(value);
     if (listTask.length > 0) {
       return (
-        <div onClick={handleOnClick} style={{ width: "100%", height: "100%" }}>
+        <div style={{ width: "100%", height: "100%" }}>
           {listTask.map((task, index) => {
             return (
               <Alert
                 key={index}
                 className={styles.alert}
                 style={{ backgroundColor: statusToColor[task.status] }}
+                onClick={(e) => handleOnClickTask(e, task)}
               >
                 {task.taskname}
               </Alert>
@@ -89,14 +93,19 @@ const TaskCalendar = () => {
   };
 
   return (
-    <>
-      <Calendar
-        value={value}
-        onSelect={onSelect}
-        onPanelChange={onPanelChange}
-        dateCellRender={dateCellRender}
-      />
-    </>
+    <div >
+      <div className={styles.calendar}>
+        <Calendar
+          value={value}
+          onSelect={onSelect}
+          onPanelChange={onPanelChange}
+          dateCellRender={dateCellRender}
+
+        />
+
+      </div>
+      <Button className={styles.button} onClick={handleAddTask}>+</Button>
+    </div>
   );
 };
 

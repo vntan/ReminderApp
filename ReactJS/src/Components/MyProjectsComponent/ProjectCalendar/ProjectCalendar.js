@@ -10,12 +10,10 @@ import {
 import { Calendar } from "antd";
 import Alert from "react-bootstrap/Alert";
 
-import { useOutletContext } from "react-router-dom";
 import moment from "moment";
 
 const ProjectCalendar = () => {
-  const project = useOutletContext();
-
+ 
   const tasks = [
     {
       taskname: "Tìm hiểu kiến thức",
@@ -45,7 +43,7 @@ const ProjectCalendar = () => {
     },
     {
       taskname: "Phát triển sản phẩm",
-      deadline: "02/05/2022",
+      deadline: "01/05/2022",
       notification: "29/04/2022",
       status: "To do",
       assignees: [
@@ -66,16 +64,18 @@ const ProjectCalendar = () => {
   };
 
   const [value, setValue] = useState(moment());
-  const [selectedValue, setSelectedValue] = useState(moment());
+  //const [selectedValue, setSelectedValue] = useState(moment());
 
   const onSelect = (newValue) => {
     setValue(newValue);
-    setSelectedValue(newValue);
+    //setSelectedValue(newValue);
   };
 
-  const handleOnClick = () => {
-    console.log(Math.random());
+  const handleOnClickTask = (e, task) => {
+    e.stopPropagation();
+    console.log('on Click', task);
   };
+
 
   const onPanelChange = (newValue) => {
     setValue(newValue);
@@ -83,7 +83,7 @@ const ProjectCalendar = () => {
 
   const getListData = (value) => {
     const filteredTasks = tasks.filter(
-      (task) => task.deadline == value.format("DD/MM/YYYY")
+      (task) => task.deadline === value.format("DD/MM/YYYY")
     );
     return filteredTasks;
   };
@@ -92,13 +92,14 @@ const ProjectCalendar = () => {
     const listTask = getListData(value);
     if (listTask.length > 0) {
       return (
-        <div onClick={handleOnClick} style={{ width: "100%", height: "100%" }}>
+        <div style={{ width: "100%", height: "100%" }}>
           {listTask.map((task, index) => {
             return (
               <Alert
                 key={index}
                 className={styles.alert}
                 style={{ backgroundColor: statusToColor[task.status] }}
+                onClick={(e) => handleOnClickTask(e, task)}
               >
                 {task.taskname}
               </Alert>
@@ -110,14 +111,19 @@ const ProjectCalendar = () => {
   };
 
   return (
-    <>
-      <Calendar
-        value={value}
-        onSelect={onSelect}
-        onPanelChange={onPanelChange}
-        dateCellRender={dateCellRender}
-      />
-    </>
+    <div >
+      <div className={styles.calendar}>
+        <Calendar
+          value={value}
+          onSelect={onSelect}
+          onPanelChange={onPanelChange}
+          dateCellRender={dateCellRender}
+
+        />
+
+      </div>
+      
+    </div>
   );
 };
 

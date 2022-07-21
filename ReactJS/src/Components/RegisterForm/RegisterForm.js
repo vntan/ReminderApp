@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { MailOutlined } from '@ant-design/icons';
 
-import { Form, Input, Button, Divider, message } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import "../../Helper/WHResponsive.css"
 import "./RegisterForm.css"
 
@@ -13,46 +13,17 @@ import { connect } from 'react-redux';
 
 import { MD5 } from "crypto-js";
 import { validEmail } from '../../Utilities/rules'
-import { signInWithGoogle } from '../../Helper/firebase'
 import { register } from '../../Models/accountReducer'
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const RegisterForm = ({ register }) => {
 
-    const [isLoading, setLoading] = useState(false)
     let navigate = useNavigate();
-
-    const signInGoogleClick = async () => {
-        // setLoading(true);
-        // const user = await signInWithGoogle();
-
-        // if (user == null) {
-        //     setLoading(false);
-        //     message.error('Login failed! Please login this account again!', 3);
-        //     return;
-        // }
-
-        // const name = user.displayName;
-        // const email = user.email;
-        // const password = "";
-        // const urlImage = user.photoURL;
-
-        // register({ name, email, password, urlImage }, (result) => {
-        //     console.log(result);
-        //     if (result) {
-        //         message.success('Login successfully!', 3);
-        //         navigate('/', { replace: true });
-        //     }
-        //     else message.error('Login failed! Please login this account again!', 3);
-        // });
-        // setLoading(false);
-
-    }
 
     const onFinish = async (values) => {
 
-        if (values.password != values.repassword) {
+        if (values.password !== values.repassword) {
             message.error('Retype password is not correct! Please check it again!', 3);
             return;
         }

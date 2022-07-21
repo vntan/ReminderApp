@@ -4,7 +4,7 @@ import { KEY_ACCOUNT_STATE } from '../Utilities/Constants'
 
 function PrivateRoute({ children, ...rest }) {
     let location = useLocation();
-    
+
     if (localStorage.getItem(KEY_ACCOUNT_STATE) != null){
         const isLogin = JSON.parse(localStorage.getItem(KEY_ACCOUNT_STATE)).isLogin
         if (isLogin) return children;

@@ -11,3 +11,46 @@
     padding: 5px 10px;
     margin-bottom: 2px;
 }
+
+.calendar {
+    width: 100%;
+    height: calc(100vh - 104px);
+    overflow-y: scroll;
+    padding: 10px;
+}
+
+
+.button {
+
+    position: fixed;
+    bottom: 52px;
+    right: 64px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 2em;
+    font-weight: bold;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.calendar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+
+}
+
+.calendar::-webkit-scrollbar {
+    width: 10px;
+    background-color: #F5F5F5;
+}
+
+.calendar::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(49, 49, 49, 0.3);
+    background-color: #555;
+}

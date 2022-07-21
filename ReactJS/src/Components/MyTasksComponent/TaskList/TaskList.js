@@ -1,10 +1,11 @@
 import styles from "./TaskList.module.css";
-import "../../../Helper/DisableResponsive.css";
 
 import Table from "react-bootstrap/Table";
 import TableRow from "../TableRow/TableRow";
 
-const TaskList = () => {
+import {connect} from 'react-redux'
+
+const TaskList = ({columnsTable}) => {
   const tasks = [
     {
       taskname: "Học",
@@ -30,46 +31,45 @@ const TaskList = () => {
     },
   ];
 
-  const handleViewTask = () => {
-    console.log("View task");
+  const handleViewTask = (task) => {
+    console.log("View task", task);
   };
 
-  const handleEditStatus = (e) => {
-    e.stopPropagation();
+  const handleEditStatus = (task, newStatus) => {
+    console.log("Edit Status", task, newStatus);
   };
 
-  const handleEditTask = (e) => {
-    e.stopPropagation();
-    console.log("Edit task");
+  const handleEditTask = (task) => {
+    console.log("Edit task", task);
   };
 
-  const handleDelete = (e) => {
-    e.stopPropagation();
-    console.log("Delete");
+  const handleDelete = (task) => {
+    console.log("Delete", task);
   };
+
 
   return (
     <Table className={styles.tableList} hover>
       <thead className={styles.tableHeader}>
         <tr>
-          <th>Task</th>
-          <th>Deadline</th>
-          <th className="tablet">Notification</th>
-          <th>Status</th>
-          <th className="mobile">Project</th>
-          <th className="mobile">List</th>
-          <th className="tablet">Subtask</th>
-          <th>Action</th>
+          {
+            columnsTable.map((columns, index) => {
+              return (
+                <th style={{...columns.style, display: columns.isVisible ? "": "none" }} key={index} >{columns.nameColumns}</th>
+              );
+            })
+          }
+
         </tr>
       </thead>
       <tbody>
         {tasks.map((task, index) => {
           return (
             <TableRow
-              handleViewTask={() => handleViewTask()}
-              handleEditStatus={(e) => handleEditStatus(e)}
-              handleEditTask={(e) => handleEditTask(e)}
-              handleDelete={(e) => handleDelete(e)}
+              handleViewTask={handleViewTask}
+              handleEditStatus={handleEditStatus}
+              handleEditTask={handleEditTask}
+              handleDelete={handleDelete}
               key={index}
               task={task}
             />
@@ -80,4 +80,11 @@ const TaskList = () => {
   );
 };
 
-export default TaskList;
+const mapStateToProps = (state)=>{
+    return {
+        columnsTable: state.columnsListTask
+    }
+}
+
+
+export default connect(mapStateToProps, null)(TaskList);
