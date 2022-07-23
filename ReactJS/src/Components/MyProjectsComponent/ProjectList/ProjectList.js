@@ -83,9 +83,9 @@ const ProjectList = ({ columnsTable, updateVisibleColumns }) => {
     console.log("Delete", task);
   };
 
-  const clickFilter = (key) => {
-    console.log(key)
-  }
+  const onChangeValue = (task, status) => {
+    console.log(task, status);
+  };
 
   return (
     <>
@@ -96,7 +96,7 @@ const ProjectList = ({ columnsTable, updateVisibleColumns }) => {
 
         <div className={styles.groupControl}>
           <Popover
-            content={<FilterSelector clickFilter={clickFilter} />}
+            content={<FilterSelector onChangeValue={onChangeValue} />}
             trigger="click"
             placement="bottomLeft"
           >

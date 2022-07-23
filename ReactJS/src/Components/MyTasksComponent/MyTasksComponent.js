@@ -1,6 +1,6 @@
 import styles from "./MyTasksComponent.module.css";
 
-import { Menu, Popover, Button} from "antd";
+import { Menu, Popover, Button } from "antd";
 import { FilterOutlined, AppstoreOutlined } from "@ant-design/icons";
 
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
@@ -27,10 +27,6 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
     },
   ];
 
-  const clickFilter = (key) => {
-    console.log(key);
-  };
-
   const selectedKey = () => {
     const url = location.pathname.toLowerCase();
 
@@ -42,6 +38,10 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
 
   const handleAddTask = () => {
     console.log("Add Task");
+  };
+
+  const onChangeValue = (task, status) => {
+    console.log(task, status);
   };
 
   return (
@@ -56,9 +56,7 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
         />
         <div className={styles.groupControl}>
           <Popover
-            content={
-              <FilterSelector clickFilter={clickFilter}/>
-            }
+            content={<FilterSelector onChangeValue={onChangeValue} />}
             trigger="click"
             placement="bottomLeft"
           >

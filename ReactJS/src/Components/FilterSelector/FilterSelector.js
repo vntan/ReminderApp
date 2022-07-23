@@ -1,47 +1,56 @@
-import styles from './FilterSelector.module.css';
+import { Checkbox, Row, Col } from "antd";
+import styles from './FilterSelector.module.css'
 
-import { Menu, Popover } from "antd";
+import { updateVisibleStatus } from "../../Models/statusTasksReducer";
 
-const FilterSelector = (props) => {
-  const menuFilter = [
-    {
-      key: "name",
-      label: <div>Task</div>,
-    },
-    {
-      key: "duaDate",
-      label: <div>Deadline</div>,
-    },
-    {
-      key: "notification",
-      label: <div>Notification</div>,
-    },
-    {
-      key: "status",
-      label: <div>Status</div>,
-    },
-    {
-      key: "nameProject",
-      label: <div>Project</div>,
-    },
-    {
-      key: "nameList",
-      label: <div>List</div>,
-    },
-  ];
+import { connect } from "react-redux";
 
-  const clickFilter = (e) => {
-    console.log(e)
-    props.clickFilter(e.key)
-  }
 
-  return (
-    <Menu
-      items={menuFilter}
-      onSelect={(e) => clickFilter(e)}
-      style={{ border: "none" }}
-    />
-  );
+const FilterSelector = ({ filterStatus, updateVisibleStatus }) => {
+
+    const getStatusVisible = () => {
+        return filterStatus.map((status) => {
+            if (status.isVisible) return status.nameStatus;
+        })
+    }
+
+    const onChange = (checkedValues) => {
+        updateVisibleStatus({ "statusVisible": checkedValues });
+
+    };
+
+    return (
+        <Checkbox.Group defaultValue={getStatusVisible} onChange={onChange}>
+                <Col>
+                    {
+                        filterStatus.map((status, index) => {
+                            return (
+                                <Row style={{ marginBottom: "12px" }} key={index}>
+                                    <Checkbox value={status.nameStatus} style={status.style}>
+                                        {status.nameStatus}
+                                    </Checkbox>
+                                </Row>
+                            )
+
+                        })
+
+                    }
+                </Col>
+
+
+
+
+        </Checkbox.Group>
+    )
 };
 
-export default FilterSelector;
+
+const mapStateToProps = (state) => ({
+  filterStatus: state.statusTask
+})
+
+const mapActionToProps = {
+  updateVisibleStatus, 
+}
+
+export default connect(mapStateToProps, mapActionToProps)(FilterSelector);
