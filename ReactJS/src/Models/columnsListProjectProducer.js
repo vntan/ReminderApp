@@ -9,7 +9,7 @@ const initialState = [
     { nameColumns: "Status", isVisible: true, style: {} },
     { nameColumns: "Project", isVisible: true, style: {} },
     { nameColumns: "List", isVisible: true, style: {} },
-    { nameColumns: "Assignee", isVisible: true, style: {} },
+    { nameColumns: "Assignees", isVisible: true, style: {} },
     { nameColumns: "Subtask", isVisible: true, style: {} },
     { nameColumns: "Action", isVisible: true, style: { width: '4%' } },
 ]

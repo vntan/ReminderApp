@@ -65,7 +65,7 @@ const TaskCalendar = () => {
 
   const getListData = (value) => {
     const filteredTasks = tasks.filter(
-      (task) => task.deadline === value.format("DD/MM/YYYY")
+      (task) => task.dueDate === value.format("DD/MM/YYYY")
     );
     return filteredTasks;
   };
@@ -75,15 +75,15 @@ const TaskCalendar = () => {
     if (listTask.length > 0) {
       return (
         <div style={{ width: "100%", height: "100%" }}>
-          {listTask.map((task, index) => {
+          {listTask.map((task) => {
             return (
               <Alert
-                key={index}
+                key={task.idTask}
                 className={styles.alert}
                 style={{ backgroundColor: statusToColor[task.status] }}
                 onClick={(e) => handleOnClickTask(e, task)}
               >
-                {task.taskname}
+                {task.name}
               </Alert>
             );
           })}

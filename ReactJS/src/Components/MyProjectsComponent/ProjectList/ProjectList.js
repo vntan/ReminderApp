@@ -108,14 +108,14 @@ const ProjectList = ({columnsTable, updateVisibleColumns }) => {
           </tr>
         </thead>
         <tbody>
-          {tasks.map((task, index) => {
+          {tasks.map((task) => {
             return (
               <TableRow
                 handleViewTask={handleViewTask}
                 handleEditStatus={handleEditStatus}
                 handleEditTask={handleEditTask}
                 handleDelete={handleDelete}
-                key={index}
+                key={task.idTask}
                 task={task}
               />
             );

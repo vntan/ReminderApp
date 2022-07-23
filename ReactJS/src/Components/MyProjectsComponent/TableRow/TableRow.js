@@ -11,10 +11,11 @@ import { connect } from "react-redux";
 const TableRow = (props) => {
   const task = props.task;
 
-  const dateToColor = (deadline) => {
+  const dateToColor = (dueDate) => {
+    if (!dueDate) return "black";
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    var date = deadline.split("/");
+    var date = dueDate.split("/");
     date = date[2] + "-" + date[1] + "-" + date[0];
     const deadlineDate = new Date(date);
     deadlineDate.setHours(0, 0, 0, 0);
@@ -46,8 +47,8 @@ const TableRow = (props) => {
 
   return (
     <tr onClick={(e) => handleViewTask(e, task)}>
-      {props.columnsTable[0].isVisible && <td className={styles.taskList}>{task.taskname}</td>}
-      {props.columnsTable[1].isVisible && <td style={{ color: dateToColor(task.deadline) }}>{task.deadline}</td>}
+      {props.columnsTable[0].isVisible && <td className={styles.taskList}>{task.name}</td>}
+      {props.columnsTable[1].isVisible && <td style={{ color: dateToColor(task.dueDate) }}>{task.dueDate}</td>}
       {props.columnsTable[2].isVisible && <td>{task.notification || "-"}</td>}
       {props.columnsTable[3].isVisible &&
         <td onClick={(e) => e.stopPropagation()}>
@@ -55,8 +56,8 @@ const TableRow = (props) => {
         </td>
       }
       
-      {props.columnsTable[4].isVisible && <td>{task.project || '-'}</td>}
-      {props.columnsTable[5].isVisible && <td>{task.list || '-'}</td>}
+      {props.columnsTable[4].isVisible && <td>{task.nameProject || '-'}</td>}
+      {props.columnsTable[5].isVisible && <td>{task.nameList || '-'}</td>}
 
       {props.columnsTable[6].isVisible && <td>
         {task.assignees ? (
@@ -73,7 +74,7 @@ const TableRow = (props) => {
           "-"
         )}
       </td>}
-      {props.columnsTable[7].isVisible && <td className="tablet">{task.subtask || "-"}</td>}
+      {props.columnsTable[7].isVisible && <td>{task.subtasks || "-"}</td>}
       {props.columnsTable[8].isVisible && <td className={styles.actionList}>
         <FormOutlined className={styles.actionElement} onClick={(e) => handleEditTask(e, task)} style={{ paddingRight: '8%' }} />
         <DeleteOutlined className={styles.actionElement} onClick={(e) => handleDelete(e, task)} />
