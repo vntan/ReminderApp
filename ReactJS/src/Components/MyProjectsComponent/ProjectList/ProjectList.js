@@ -8,12 +8,16 @@ import { FilterOutlined, AppstoreOutlined } from "@ant-design/icons";
 import { Popover } from "antd";
 import Table from "react-bootstrap/Table";
 
-import SelectColumnsMenu from '../../MenuSelectColumns/MenuSelectColumns'
-import { updateVisibleColumns, updateStyleColumns} from '../../../Models/columnsListProjectProducer'
+import FilterSelector from "../../FilterSelector/FilterSelector";
+import SelectColumnsMenu from "../../MenuSelectColumns/MenuSelectColumns";
+import {
+  updateVisibleColumns,
+  updateStyleColumns,
+} from "../../../Models/columnsListProjectProducer";
 
-import {connect} from 'react-redux'
+import { connect } from "react-redux";
 
-const ProjectList = ({columnsTable, updateVisibleColumns }) => {
+const ProjectList = ({ columnsTable, updateVisibleColumns }) => {
   const [list, setList] = useState("- All Lists -");
 
   const handleChangeList = (list) => {
@@ -79,6 +83,10 @@ const ProjectList = ({columnsTable, updateVisibleColumns }) => {
     console.log("Delete", task);
   };
 
+  const clickFilter = (key) => {
+    console.log(key)
+  }
+
   return (
     <>
       <div className={styles.listSubnav}>
@@ -87,10 +95,23 @@ const ProjectList = ({columnsTable, updateVisibleColumns }) => {
         </div>
 
         <div className={styles.groupControl}>
-          <FilterOutlined className={styles.icon} />
-          <Popover content={<SelectColumnsMenu columnsTable={columnsTable} updateVisibleColumns={updateVisibleColumns} />}
+          <Popover
+            content={<FilterSelector clickFilter={clickFilter} />}
             trigger="click"
-            placement="bottomLeft">
+            placement="bottomLeft"
+          >
+            <FilterOutlined className={styles.icon} />
+          </Popover>
+          <Popover
+            content={
+              <SelectColumnsMenu
+                columnsTable={columnsTable}
+                updateVisibleColumns={updateVisibleColumns}
+              />
+            }
+            trigger="click"
+            placement="bottomLeft"
+          >
             <AppstoreOutlined className={styles.icon} />
           </Popover>
         </div>
@@ -98,13 +119,19 @@ const ProjectList = ({columnsTable, updateVisibleColumns }) => {
       <Table className={styles.tableList} hover>
         <thead className={styles.tableHeader}>
           <tr>
-            {
-              columnsTable.map((columns, index) => {
-                return (
-                  <th style={{...columns.style, display: columns.isVisible ? "": "none" }} key={index} >{columns.nameColumns}</th>
-                );
-              })
-            }
+            {columnsTable.map((columns, index) => {
+              return (
+                <th
+                  style={{
+                    ...columns.style,
+                    display: columns.isVisible ? "" : "none",
+                  }}
+                  key={index}
+                >
+                  {columns.nameColumns}
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
@@ -126,15 +153,15 @@ const ProjectList = ({columnsTable, updateVisibleColumns }) => {
   );
 };
 
-const mapStateToProps = (state)=>{
+const mapStateToProps = (state) => {
   return {
-      columnsTable: state.columnsListProject
-  }
-}
+    columnsTable: state.columnsListProject,
+  };
+};
 
 const mapActionToProps = {
-  updateVisibleColumns, 
-  updateStyleColumns
-}
+  updateVisibleColumns,
+  updateStyleColumns,
+};
 
 export default connect(mapStateToProps, mapActionToProps)(ProjectList);

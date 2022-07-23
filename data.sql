@@ -243,5 +243,3 @@ BEGIN
 END//
 
 
-call addParticipantsToTasks(1, 'admin@gmail.com')
-

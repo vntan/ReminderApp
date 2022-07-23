@@ -1,14 +1,14 @@
 import styles from "./MyTasksComponent.module.css";
 
-import { Menu, Popover, Button } from "antd";
+import { Menu, Popover, Button} from "antd";
 import { FilterOutlined, AppstoreOutlined } from "@ant-design/icons";
 
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
-import SelectColumnsMenu from '../MenuSelectColumns/MenuSelectColumns'
-import {connect} from 'react-redux'
-import { updateVisibleColumns} from '../../Models/columnsListTasksReducer'
-
+import SelectColumnsMenu from "../MenuSelectColumns/MenuSelectColumns";
+import FilterSelector from "../FilterSelector/FilterSelector";
+import { connect } from "react-redux";
+import { updateVisibleColumns } from "../../Models/columnsListTasksReducer";
 
 const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
   const navigate = useNavigate();
@@ -25,7 +25,11 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
       key: "calendar",
       onClick: () => navigate("calendar"),
     },
-  ]
+  ];
+
+  const clickFilter = (key) => {
+    console.log(key);
+  };
 
   const selectedKey = () => {
     const url = location.pathname.toLowerCase();
@@ -33,11 +37,11 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
     for (const item of menuTasksView)
       if (url.includes(item.key.toLowerCase())) return item.key;
 
-    return '';
-  }
+    return "";
+  };
 
   const handleAddTask = () => {
-    console.log('Add Task');
+    console.log("Add Task");
   };
 
   return (
@@ -51,34 +55,54 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
           items={menuTasksView}
         />
         <div className={styles.groupControl}>
-          <FilterOutlined className={styles.icon} />
-          <Popover content={<SelectColumnsMenu columnsTable={columnsTable} updateVisibleColumns={updateVisibleColumns} />}
+          <Popover
+            content={
+              <FilterSelector clickFilter={clickFilter}/>
+            }
             trigger="click"
-            placement="bottomLeft">
-            <AppstoreOutlined className={styles.icon}
-              style={{ display: selectedKey() !== 'list' ? 'none' : '' }} />
+            placement="bottomLeft"
+          >
+            <FilterOutlined
+              className={styles.icon}
+              style={{ display: selectedKey() !== "list" ? "none" : "" }}
+            />
+          </Popover>
+
+          <Popover
+            content={
+              <SelectColumnsMenu
+                columnsTable={columnsTable}
+                updateVisibleColumns={updateVisibleColumns}
+              />
+            }
+            trigger="click"
+            placement="bottomLeft"
+          >
+            <AppstoreOutlined
+              className={styles.icon}
+              style={{ display: selectedKey() !== "list" ? "none" : "" }}
+            />
           </Popover>
         </div>
       </div>
 
       <Outlet />
 
-      <Button className={styles.button} onClick={handleAddTask}>+</Button>
+      <Button className={styles.button} onClick={handleAddTask}>
+        +
+      </Button>
     </>
   );
 };
 
-
 const mapStateToProps = (state) => {
   return {
-      columnsTable: state.columnsListTask
-  }
-}
+    columnsTable: state.columnsListTask,
+  };
+};
 
 const mapActionToProps = {
-  updateVisibleColumns
-}
-
+  updateVisibleColumns,
+};
 
 export default connect(mapStateToProps, mapActionToProps)(MyTasksComponent);
-
