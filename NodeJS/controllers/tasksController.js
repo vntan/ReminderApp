@@ -7,7 +7,7 @@ const getTasks = (req, res) => {
     if (userID) {
         tasks.getTasks(userID, (err, rows) => {
             if (err) res.json({ onSuccess: false, error: err });
-            else res.json({ onSuccess: true, result: rows });
+            else res.json({ onSuccess: true, result: rows[0] });
         });
     }
     else res.json({ onSuccess: false, error: "Can't receive the data" });

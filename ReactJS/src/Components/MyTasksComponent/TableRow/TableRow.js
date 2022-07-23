@@ -8,6 +8,7 @@ const TableRow = (props) => {
   const task = props.task
 
   const dateToColor = (deadline) => {
+    if (!deadline) return "black";
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     var date = deadline.split("/");
@@ -40,8 +41,8 @@ const TableRow = (props) => {
 
   return (
     <tr onClick={(e)=>handleViewTask(e, task)}>
-      {props.columnsTable[0].isVisible && <td className={styles.taskList}>{task.taskname}</td>}
-      {props.columnsTable[1].isVisible && <td style={{ color: dateToColor(task.deadline) }}>{task.deadline}</td>}
+      {props.columnsTable[0].isVisible && <td className={styles.taskList}>{task.nameTask}</td>}
+      {props.columnsTable[1].isVisible && <td style={{ color: dateToColor(task.dueDate) }}>{task.dueDate}</td>}
 
 
       {props.columnsTable[2].isVisible && <td>{task.notification || '-'}</td>}

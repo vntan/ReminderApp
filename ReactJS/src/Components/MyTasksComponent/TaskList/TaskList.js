@@ -5,31 +5,17 @@ import TableRow from "../TableRow/TableRow";
 
 import {connect} from 'react-redux'
 
-const TaskList = ({columnsTable}) => {
-  const tasks = [
-    {
-      taskname: "Học",
-      deadline: "08/08/2022",
-      status: "Complete",
-    },
-    {
-      taskname: "Kiểm thử sản phẩm",
-      deadline: "01/05/2022",
-      notification: "30/04/2022",
-      status: "On going",
-      project: "Project 1",
-      subtask: "3/5",
-    },
-    {
-      taskname: "Phát triển sản phẩm",
-      deadline: "02/05/2022",
-      notification: "29/04/2022",
-      status: "To do",
-      project: "Project 1",
-      list: "List 1",
-      subtask: "0/3",
-    },
-  ];
+import {getTasks} from '../../../Models/tasksReducer'
+import { useEffect } from "react";
+
+const TaskList = ({columnsTable, idAccount, tasks, getTasks}) => {
+
+
+  useEffect(()=>{
+    getTasks(idAccount);
+    console.log(tasks);
+  }, []);
+
 
   const handleViewTask = (task) => {
     console.log("View task", task);
@@ -63,7 +49,9 @@ const TaskList = ({columnsTable}) => {
         </tr>
       </thead>
       <tbody>
-        {tasks.map((task, index) => {
+        {
+        tasks &&
+        tasks.map((task, index) => {
           return (
             <TableRow
               handleViewTask={handleViewTask}
@@ -82,9 +70,15 @@ const TaskList = ({columnsTable}) => {
 
 const mapStateToProps = (state)=>{
     return {
-        columnsTable: state.columnsListTask
+        columnsTable: state.columnsListTask,
+        idAccount: state.account.account.idAccount,
+        tasks: state.taskReducer.taskInfo
     }
 }
 
+const mapActionToProps = {
+    getTasks,
+}
 
-export default connect(mapStateToProps, null)(TaskList);
+
+export default connect(mapStateToProps, mapActionToProps)(TaskList);

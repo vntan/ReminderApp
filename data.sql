@@ -2,12 +2,11 @@ create database reminder;
 
 use reminder;
 
+
 create table project(
 	idProject int not null AUTO_INCREMENT,
     name varchar(100),
     description varchar(100),
-    startDate date,
-    endDate date,
     
     CONSTRAINT PK_PROJECT PRIMARY KEY (idProject)
 );
@@ -49,7 +48,6 @@ create table task(
 create table taskParticipant(
 	idTask int,
    	idUser int,
-    role varchar(100),
     CONSTRAINT PK_TaskParticipant PRIMARY KEY (idTask, idUser)
 );
 
@@ -165,26 +163,26 @@ begin
     
 end//
 
-create view taskInfomation
-as
-select t.*, p.name as 'nameProject', l.name as 'nameList', a.idAccount, a.name as 'nameUser', role, 
-	(SELECT notification.reminderTime FROM notification WHERE notification.idTask = tp.idTask and notification.reminderTime < CURDATE() ORDER BY notification.reminderTime DESC LIMIT 1) AS 'notification', 
-	(SELECT COUNT(case when subtasks.status = 1 then 1 else 0 end) + '/'+ COUNT(subtasks.status)  FROM subtasks WHERE subtasks.idTask = tp.idTask group by subtasks.idTask) as 'subtasks'
-from taskparticipant as tp 
-left join task as t on t.idTask = tp.idTask
-left join project as p on p.idProject = t.idProject
-left join listtask as l on l.idList = t.idList and l.idProject = p.idProject
-left join account as a on a.idAccount = tp.idUser;
-
 delimiter //
 create procedure addTask
 (in userID int(11), in idProjectTask int(11), in idListTask int(11), in nameTask varchar(100), in statusTask varchar(100), in descriptionTask varchar(100),
 in dueDateTask datetime)
 begin
 	declare id int(11)  DEFAULT 0;
-	insert task values (idProjectTask, idListTask, null, nameTask, statusTask, descriptionTask, dueDateTask);
-    select max(task.idTask) into id  from task where name = nameTask;
-    insert taskparticipant values (id, userID, "editor");
+    
+    if not exists (select * from account where idAccount = userID)
+    then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
+    
+    end if;
+    
+    if (idProjectTask IS NULL or exists(select * from projectparticipant where idUser = userID and idProject = idProjectTask)) then
+		insert task values (idProjectTask, idListTask, null, nameTask, statusTask, descriptionTask, dueDateTask);
+		select max(task.idTask) into id  from task where name = nameTask;
+		insert taskparticipant values (id, userID, "editor");
+	else
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User is not in this project';
+    end if;
+	
 end//
 
 delimiter //
@@ -196,5 +194,54 @@ begin
     dueDate = dueDateTask where task.idTask = idTask;
 end//
 
-delimiter ;
+
+select * from task;
+
+delimiter //
+create procedure getTasks
+(in userID int(11))
+begin
+	select task.*, project.idProject, project.name as 'nameProject', listtask.idList, listtask.name as 'nameList',
+		(SELECT notification.reminderTime FROM notification WHERE notification.idTask = task.idTask and notification.reminderTime < CURDATE() 
+			ORDER BY notification.reminderTime DESC LIMIT 1) AS 'notification', 
+		(SELECT COUNT(case when subtasks.status = 1 then 1 else 0 end) + '/'+ COUNT(subtasks.status)  FROM subtasks 
+			WHERE subtasks.idTask = task.idTask group by subtasks.idTask) as 'subtasks'
+	from task 
+	left join project on task.idProject = project.idProject
+	left join listtask on task.idList = listtask.idList
+    where exists(select * from taskparticipant where idTask = task.idTask and idUser = userID);
+    
+end//
+
+delimiter //
+create procedure addParticipantsToTasks(in idTaskAdd int(11), in emailaccount varchar(100))
+BEGIN
+	declare idProjectTask int(11)  DEFAULT 0;
+    declare idUserInTask int(11)  DEFAULT 0;
+    
+    select idProject into idProjectTask from task where idTask = idTaskAdd;
+    
+    if not exists(select * from account where email like emailaccount)
+	then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find account from this email';
+	end if;
+    
+	select idAccount into idUserInTask from account where email like emailaccount;
+    
+    if (exists(select * from taskparticipant where idUser = idUserInTask and idTask = idtask))
+	then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This email is the member of this task';
+	end if;
+    
+	IF idProjectTask is not null and not exists(select * from projectparticipant where idUser = idUserInTask and idProject = idProjectTask) 
+    then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account is not in this project';
+	end if;
+   
+	insert into taskparticipant values (idTaskAdd, idUserInTask);
+    
+END//
+
+
+call addParticipantsToTasks(1, 'admin@gmail.com')
 

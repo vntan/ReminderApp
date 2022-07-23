@@ -5,12 +5,14 @@ import  reducerAccount from './accountReducer'
 import  columnListTask from './columnsListTasksReducer'
 import  columnListProject from './columnsListProjectProducer'
 
+import  taskReducer from './tasksReducer'
 
 const reducer = combineReducers({
     /* get reducers*/
     account: reducerAccount,
     columnsListTask: columnListTask,
     columnsListProject: columnListProject,
+    taskReducer: taskReducer,
 }
 );
 

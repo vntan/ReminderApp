@@ -15,7 +15,13 @@ const initRoutesApp = (app) => {
     router.post('/tasks/updateTasks', tasksController.updateTasks)
     router.post('/tasks/updateTaskProjectList', tasksController.updateTaskProjectList)
     router.post('/tasks/updateTaskStatus', tasksController.updateTaskStatus)
-
+    
+    var db = require('../models/connectDB');
+    router.post('/tasks/test', (req, res)=>{
+        db.query("call selectTest(); ", (err, rows)=>{
+            res.json({ onSuccess: true, rows: rows});
+        })
+    })
     return app.use("/", router);
 }
 

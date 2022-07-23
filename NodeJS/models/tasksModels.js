@@ -2,7 +2,7 @@ var db = require('./connectDB')
 
 var tasks ={
     getTasks: function(userID, cb){
-        return db.query("select * from taskInfomation where idAccount = ?; ", [userID], cb)
+        return db.query("call getTasks(?);", [userID], cb)
     },
 
     addTasks: function(taskInfo, cb){
@@ -17,7 +17,7 @@ var tasks ={
 
     updateTasks: function(taskInfo, cb){
         return db.query("CALL updateTask(?,?,?,?,?,?,?)", [
-            taskInfo.userID, taskInfo.idProject, taskInfo.idList, taskInfo.name, taskInfo.status, taskInfo.description, taskInfo.dueDate 
+            taskInfo.taskID, taskInfo.idProject, taskInfo.idList, taskInfo.name, taskInfo.status, taskInfo.description, taskInfo.dueDate 
         ], cb)
     },
 
