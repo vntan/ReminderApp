@@ -1,47 +1,58 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import styles from "./StatusSelector.module.css";
-
-import { completeColor, onGoingColor, toDoColor } from "../../Utilities/Color";
-
 import { connect } from "react-redux";
+import { Select, message } from "antd";
 
-import { Select } from "antd";
 
 const { Option } = Select;
+var onChange = false;
 
 const StatusSelector = (props) => {
-  const [status, setStatus] = useState(props.task.status);
+  const [status, setStatus] = useState("");
 
-  const statusToColor = {
-    Complete: completeColor,
-    "On going": onGoingColor,
-    "To do": toDoColor,
+  const statusToColor = (status) => {
+    const findStatus = props.filterStatus.find(s => s.nameStatus === status);
+    return findStatus ? { ...findStatus.style } : { color: "000" };
   };
+
+  useEffect(() => {
+    if (!onChange) setStatus(props.task.status);
+    else onChange = false;
+  });
 
   return (
     <Select
       className={styles.status}
       onChange={(value) => {
-        setStatus(value);
-        if (value !== props.task.status) props.onChangeValue(props.task, value);
+        onChange = true;
+        if (value !== props.task.status && props.onChangeValue) 
+        {
+            if (props.onChangeValue(props.task, value)) setStatus(value); 
+            else message.error("Cannot update the status of this task!");
+            
+        }
+        
+        else setStatus(value);
       }}
-      defaultValue={props.task.status}
-      style={{ color: statusToColor[status] }}
+      value={status}
+      style={statusToColor(status)}
       showArrow={false}
       bordered={false}
     >
-      {props.filterStatus.map((status, index) => {
-        return (
-          <Option
-            key={index}
-            value={status.nameStatus}
-            style={{ textAlign: "center", ...status.style }}
-          >
-            {status.nameStatus}
-          </Option>
-        );
-      })}
+      {
+        props.filterStatus.map((status, index) => {
+          return (
+            <Option
+              key={index}
+              value={status.nameStatus}
+              style={{ textAlign: "center", ...status.style }}
+            >
+              {status.nameStatus}
+            </Option>
+          );
+        })
+      }
     </Select>
   );
 };

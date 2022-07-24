@@ -23,8 +23,12 @@ export const getTasks = (userID , cb) => async dispatch => {
     axios.post('/tasks/getTasks', {userID})
     .then((response)=>{
         const data  = response.data;
-        if (data["onSuccess"]) dispatch(getTasksSuccess({data: data["result"]}));
+        if (data["onSuccess"]) {
+            dispatch(getTasksSuccess({data: data["result"]}));
+            cb && cb();
+        }
         else console.log(data["error"]);
+        
     })
     .catch((error)=>{
         console.log(error);

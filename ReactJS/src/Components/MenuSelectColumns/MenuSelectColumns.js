@@ -6,13 +6,22 @@ const SelectColumnsMenu = ({ columnsTable, updateVisibleColumns }) => {
 
     const getColumnsVisible = () => {
         return columnsTable.map((columns) => {
-            if (columns.isVisible) return columns.nameColumns;
+            if (columns.isVisible) return columns.title;
         })
     }
 
     const onChange = (checkedValues) => {
-        updateVisibleColumns({ "columnsVisible": checkedValues });
+        //updateVisibleColumns({ "columnsVisible": checkedValues });
+        for(const columns of columnsTable) columns.isVisible = false;
 
+        for(const nameColumn of checkedValues){
+            const index = columnsTable.findIndex(column => column.title === nameColumn)
+            if (index >= 0 ) columnsTable[index].isVisible = true;
+        }
+
+        console.log("hello");
+
+        updateVisibleColumns(columnsTable)
     };
 
     return (
@@ -21,17 +30,17 @@ const SelectColumnsMenu = ({ columnsTable, updateVisibleColumns }) => {
                 <Col>
                     {
                         columnsTable.map((columns, index) => {
-                            if (columns.nameColumns.toLowerCase() === 'action') {
+                            if (columns.title.toLowerCase() === 'action') {
                                 return <Row style={{ marginBottom: "12px" }} key={index}>
-                                    <Checkbox value={columns.nameColumns} disabled >
-                                        {columns.nameColumns}
+                                    <Checkbox value={columns.title} disabled >
+                                        {columns.title}
                                     </Checkbox>
                                 </Row>
                             }
                             return (
                                 <Row style={{ marginBottom: "12px" }} key={index}>
-                                    <Checkbox value={columns.nameColumns} >
-                                        {columns.nameColumns}
+                                    <Checkbox value={columns.title} >
+                                        {columns.title}
                                     </Checkbox>
                                 </Row>
                             )

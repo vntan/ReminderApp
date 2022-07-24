@@ -22,24 +22,28 @@ const ListSelector = (props) => {
       size='large'
     >
       <Option
+        key={"All"}
         value="- All Lists -"
         style={{ textAlign: "center" }}
       >
         - All Lists -
       </Option>
       <Option
+      key={"List 1"}
         value="List 1"
         style={{ textAlign: "center" }}
       >
         List 1
       </Option>
       <Option
+      key={"List 2"}
         value="List 2"
         style={{ textAlign: "center" }}
       >
         List 2
       </Option>
       <Option
+      key={"List 3"}
         value="List 3"
         style={{ textAlign: "center" }}
       >

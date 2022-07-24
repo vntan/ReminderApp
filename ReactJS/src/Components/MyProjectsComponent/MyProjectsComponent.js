@@ -12,6 +12,8 @@ const MyProjectsComponent = () => {
   const location = useLocation();
   const paramsURL = useParams();
 
+  const [columnsTable, setColumnsTable] = useState([]);
+
   const [project, setProject] = useState("- All Projects -");
 
   const menuProjectsView = [
@@ -72,7 +74,7 @@ const MyProjectsComponent = () => {
         />
         
       </div>
-      <Outlet/>
+      <Outlet context={[columnsTable, setColumnsTable]}/>
     </>
   );
 };

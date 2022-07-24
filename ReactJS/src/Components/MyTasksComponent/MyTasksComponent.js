@@ -1,19 +1,22 @@
 import styles from "./MyTasksComponent.module.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Menu, Popover, Button } from "antd";
-import { FilterOutlined, AppstoreOutlined } from "@ant-design/icons";
+import { AppstoreOutlined } from "@ant-design/icons";
 
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-
 import SelectColumnsMenu from "../MenuSelectColumns/MenuSelectColumns";
-import FilterSelector from "../FilterSelector/FilterSelector";
-import { connect } from "react-redux";
-import { updateVisibleColumns } from "../../Models/columnsListTasksReducer";
 
-const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
+import { useState } from "react";
+
+
+const MyTasksComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [columnsTable, setColumnsTable] = useState([]);
+
+ 
   const menuTasksView = [
     {
       label: "List",
@@ -40,9 +43,6 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
     console.log("Add Task");
   };
 
-  const onChangeValue = (task, status) => {
-    console.log(task, status);
-  };
 
   return (
     <>
@@ -56,21 +56,10 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
         />
         <div className={styles.groupControl}>
           <Popover
-            content={<FilterSelector onChangeValue={onChangeValue} />}
-            trigger="click"
-            placement="bottomLeft"
-          >
-            <FilterOutlined
-              className={styles.icon}
-              style={{ display: selectedKey() !== "list" ? "none" : "" }}
-            />
-          </Popover>
-
-          <Popover
             content={
               <SelectColumnsMenu
                 columnsTable={columnsTable}
-                updateVisibleColumns={updateVisibleColumns}
+                updateVisibleColumns={(columnsTable)=>{ setColumnsTable([...columnsTable]) }}
               />
             }
             trigger="click"
@@ -84,23 +73,16 @@ const MyTasksComponent = ({ columnsTable, updateVisibleColumns }) => {
         </div>
       </div>
 
-      <Outlet />
 
-      <Button className={styles.button} onClick={handleAddTask}>
-        +
-      </Button>
+      <Outlet context={[columnsTable, setColumnsTable]}/>
+
+
+      <div className={styles.button} onClick={handleAddTask}>
+        <span>+</span>
+      </div>
+
     </>
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    columnsTable: state.columnsListTask,
-  };
-};
-
-const mapActionToProps = {
-  updateVisibleColumns,
-};
-
-export default connect(mapStateToProps, mapActionToProps)(MyTasksComponent);
+export default MyTasksComponent;
