@@ -8,15 +8,18 @@ import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import SelectColumnsMenu from "../MenuSelectColumns/MenuSelectColumns";
 
 import { useState } from "react";
+import CreateTask from "../TaskCommon/CreateTask/CreateTask";
 
 
 const MyTasksComponent = () => {
+  const [showCreateTask, setShowCreateTask] = useState(false)
+
   const navigate = useNavigate();
   const location = useLocation();
 
   const [columnsTable, setColumnsTable] = useState([]);
 
- 
+
   const menuTasksView = [
     {
       label: "List",
@@ -40,9 +43,19 @@ const MyTasksComponent = () => {
   };
 
   const handleAddTask = () => {
+    setShowCreateTask(true)
     console.log("Add Task");
   };
 
+  const closeCreateTask = () => {
+    setShowCreateTask(false)
+  }
+
+  const addNewTask = (taskInfo) => {
+    // Call api
+    setShowCreateTask(false)
+    console.log('Add new task: ', taskInfo)
+  }
 
   return (
     <>
@@ -59,7 +72,7 @@ const MyTasksComponent = () => {
             content={
               <SelectColumnsMenu
                 columnsTable={columnsTable}
-                updateVisibleColumns={(columnsTable)=>{ setColumnsTable([...columnsTable]) }}
+                updateVisibleColumns={(columnsTable) => { setColumnsTable([...columnsTable]) }}
               />
             }
             trigger="click"
@@ -73,14 +86,18 @@ const MyTasksComponent = () => {
         </div>
       </div>
 
-
-      <Outlet context={[columnsTable, setColumnsTable]}/>
+      <Outlet context={[columnsTable, setColumnsTable]} />
 
 
       <div className={styles.button} onClick={handleAddTask}>
         <span>+</span>
       </div>
 
+      {showCreateTask && <CreateTask
+        showCreateTask={showCreateTask}
+        closeCreateTask={closeCreateTask}
+        addNewTask={addNewTask}
+      />}
     </>
   );
 };

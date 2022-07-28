@@ -14,20 +14,21 @@ import moment from "moment";
 import { connect } from "react-redux";
 
 import { getTasks } from '../../../Models/tasksReducer'
+import CreateTask from "../../TaskCommon/CreateTask/CreateTask";
 
 
 const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
-
+  const [showCreateTask, setShowCreateTask] = useState(false)
   const [loading, setLoading] = useState(false);
 
 
   useEffect(() => {
     setLoading(true);
-    
+
     getTasks(idAccount, () => {
       setLoading(false);
     });
-    
+
     console.log(tasks);
   }, []);
 
@@ -48,6 +49,7 @@ const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
   };
 
   const handleAddTask = () => {
+    setShowCreateTask(true)
     console.log('Add Task');
   };
 
@@ -91,6 +93,16 @@ const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
     };
   }
 
+  const closeCreateTask = () => {
+    setShowCreateTask(false)
+  }
+
+  const addNewTask = (taskInfo) => {
+    // Call api
+    setShowCreateTask(false)
+    console.log('Add new task: ', taskInfo)
+  }
+
   return (
     <div >
       {
@@ -109,12 +121,19 @@ const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
               />
 
             </div>
-            
+
             <div className={styles.button} onClick={handleAddTask}>
               <span>+</span>
             </div>
           </>
       }
+
+      {showCreateTask &&
+        <CreateTask
+          showCreateTask={showCreateTask}
+          closeCreateTask={closeCreateTask}
+          addNewTask={addNewTask}
+        />}
     </div>
   );
 };
