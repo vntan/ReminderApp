@@ -1,23 +1,68 @@
 var db = require('./connectDB')
 
 var tasks ={
-    getTasks: function(userID, cb){
-        return db.query("call getTasks(?);", [userID], cb)
+    showUserTasks: function(userID, cb){
+        return db.query("call showUserTasks(?);", [userID], cb)
+    },
+    
+    showProjectTasks: function(userID, projectID, listID, cb){
+        return db.query("call showProjectTasks(?, ?, ?);", [userID, projectID, listID], cb)
     },
 
-    addTasks: function(taskInfo, cb){
-        return db.query("CALL addTask(?,?,?,?,?,?,?)", [
-            taskInfo.userID, taskInfo.idProject, taskInfo.idList, taskInfo.name, taskInfo.status, taskInfo.description, taskInfo.dueDate 
+    addTasks: function(userID, taskInfo, cb){
+        return db.query("CALL addTask(?,?,?,?,?,?,?);", [
+            userID, taskInfo.projectID, taskInfo.listID, taskInfo.nameTask, taskInfo.status, taskInfo.descriptionTask, taskInfo.dueDateTask 
         ], cb)
     },
 
-    deleteTasks: function(taskID, cb){
-        return db.query("delete from task where idTask = ?; ", [taskID], cb)
+    addNotification: function(taskID, userID, reminder, cb){
+        return db.query("CALL addNotification(?,?,?);", 
+                    [taskID, userID, reminder], cb)
     },
+
+    addTag: function(taskID, nameTag, cb){
+        return db.query("CALL nameTag(?,?);", [taskID, nameTag], cb)
+    },
+
+    addTaskParticipant: function(taskID, userID, cb){
+        return db.query("CALL addTaskParticipant(?,?);", [taskID, userID], cb)
+    },
+    
+    addSubtasks: function(taskID, nameSubTask, statusSubtask, cb){
+        return db.query("CALL addSubtasks(?,?,?);", 
+                    [taskID, nameSubTask, statusSubtask], cb)
+    },
+
+
+    deleteTasks: function(taskID, cb){
+        return db.query("call deleteTask(?); ", [taskID], cb)
+    },
+
+    deleteNotification: function(taskID, userID, reminder, cb){
+        return db.query("CALL deleteNotification(?,?,?);", [taskID, userID, reminder], cb)
+    },
+
+    deleteTag: function(tagID, cb){
+        return db.query("call deleteTag(?); ", [tagID], cb)
+    },
+
+    deleteAllTag: function(taskID, cb){
+        return db.query("delete from tag where idTask = taskID; ", [taskID], cb)
+    },
+
+
+    deleteTaskParticipant: function(taskID, userID, cb){
+        return db.query("call deleteTaskParticipant(?, ?); ", [taskID, userID], cb)
+    },
+
+    deleteSubtasks: function(subTaskID, cb){
+        return db.query("call deleteSubtasks(?); ", [subTaskID], cb)
+    },
+
 
     updateTasks: function(taskInfo, cb){
         return db.query("CALL updateTask(?,?,?,?,?,?,?)", [
-            taskInfo.taskID, taskInfo.idProject, taskInfo.idList, taskInfo.name, taskInfo.status, taskInfo.description, taskInfo.dueDate 
+            taskInfo.taskID, taskInfo.projectID, taskInfo.listID, taskInfo.nameTask, taskInfo.status, taskInfo.descriptionTask, taskInfo.dueDateTask 
         ], cb)
     },
 
