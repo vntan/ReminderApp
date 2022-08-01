@@ -2,12 +2,10 @@ create database reminder;
 
 use reminder;
 
-
 create table project(
 	idProject int not null AUTO_INCREMENT,
     name varchar(100),
     description varchar(100),
-    
     CONSTRAINT PK_PROJECT PRIMARY KEY (idProject)
 );
 
@@ -29,10 +27,13 @@ create table account(
 
 create table listTask(
     idProject int,
+    idUser int,
 	idList int not null AUTO_INCREMENT,
     name varchar(100),
     CONSTRAINT PK_LIST PRIMARY KEY(idList)
 );
+
+
 
 create table task(
     idProject int,
@@ -52,22 +53,24 @@ create table taskParticipant(
 );
 
 create table notification(
-	idTask int,
+    idTask int,
    	idUser int,
    	reminderTime datetime,
     
     CONSTRAINT PK_TaskParticipant PRIMARY KEY (idTask, idUser)
 );
 
-create table subTasks(
+create table subTask(
+	idSubTask int not null AUTO_INCREMENT PRIMARY KEY,
 	idTask int,
-    nameSubtask varchar(100),
+    name varchar(100),
     status bool
 );
 
 create table tag(
+	idTag int not null AUTO_INCREMENT PRIMARY KEY,
 	idTask int,
-   	nameTag int
+   	nameTag varchar(100)
 );
 
 ALTER TABLE projectParticipant
@@ -84,6 +87,11 @@ ON DELETE CASCADE;
 ALTER TABLE listTask
 ADD CONSTRAINT FK_ListTask_Project
 FOREIGN KEY (idProject) REFERENCES project(idProject)
+ON DELETE CASCADE;
+
+ALTER TABLE listTask
+ADD CONSTRAINT FK_ListTask_Account
+FOREIGN KEY (idUser) REFERENCES account(idAccount)
 ON DELETE CASCADE;
 
 ALTER TABLE task
@@ -116,8 +124,8 @@ ADD CONSTRAINT FK_Notification_Account
 FOREIGN KEY (idUser) REFERENCES account(idAccount)
 ON DELETE CASCADE;
 
-ALTER TABLE subTasks
-ADD CONSTRAINT FK_SubTasks_Task
+ALTER TABLE subTask
+ADD CONSTRAINT FK_SubTask_Task
 FOREIGN KEY (idTask) REFERENCES task(idTask)
 ON DELETE CASCADE;
 
@@ -127,6 +135,9 @@ ADD CONSTRAINT FK_Tag_Task
 FOREIGN KEY (idTask) REFERENCES task(idTask)
 ON DELETE CASCADE;
 
+/*
+----------------------------- Account -------------------------------------------
+*/
 
 delimiter //
 create procedure login(in emailAccount varchar(100), in passwordAccount nvarchar(100))
@@ -151,7 +162,6 @@ begin
     
 end//
 
-
 delimiter //
 create procedure loginWithGoogle(in nameAccount varchar(100), in emailAccount varchar(100), in passwordAccount varchar(500), in urlImageAccount varchar(500))
 begin
@@ -164,82 +174,371 @@ begin
 end//
 
 delimiter //
-create procedure addTask
-(in userID int(11), in idProjectTask int(11), in idListTask int(11), in nameTask varchar(100), in statusTask varchar(100), in descriptionTask varchar(100),
-in dueDateTask datetime)
+create procedure updateAccountInformation(in accountID int, in nameUser varchar(100), in passwordUser varchar(500), in urlImageUser varchar(500))
 begin
-	declare id int(11)  DEFAULT 0;
-    
-    if not exists (select * from account where idAccount = userID)
-    then SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
-    
-    end if;
-    
-    if (idProjectTask IS NULL or exists(select * from projectparticipant where idUser = userID and idProject = idProjectTask)) then
-		insert task values (idProjectTask, idListTask, null, nameTask, statusTask, descriptionTask, dueDateTask);
-		select max(task.idTask) into id  from task where name = nameTask;
-		insert taskparticipant values (id, userID, "editor");
+	if exists (select * from account where idAccount = accountID) then
+		update account set name = nameUser, password = passwordUser, urlImage = urlImageUser
+        where idAccount = accountID;
 	else
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User is not in this project';
-    end if;
-	
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the account to update';
+	end if;
+		
 end//
+
+delimiter //
+create procedure deleteUser(in accountID int)
+begin
+	delete from account where idAccount = accountID;
+end//
+
+
+/*
+----------------------------- Project -------------------------------------------
+*/
+
+delimiter //
+create procedure showAllProject(in userID int)
+begin
+	select * from project 
+    where idProject in (
+		select idProject from projectparticipant where idUser = userID
+    );
+end//
+
+
+delimiter //
+create procedure getProjectInformation(in userID int, in projectID int)
+begin
+    if (not exists(select * from projectparticipant where IDproject = projectID and  idUser = userID)) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account is denied!';
+	end if;
+    
+	select * from project where idProject = projectID;
+    
+    select p.*, a.name, a.email, a.urlImage from projectparticipant as p
+		left join account as a on a.idAccount = p.idUser
+		where idProject = projectID;
+        
+	select l.*, 
+			getCountTasksStatusInfomation(projectID, l.idList, null) as 'Tasks',
+            getCountTasksStatusInfomation(projectID, l.idList, "Complete") as 'Tasks'
+    
+    from listtask as l where idProject = projectID;
+end//
+
+
+
+delimiter //
+create function getCountTasksStatusInfomation(projectID int, listID int, statusTask varchar(100))
+returns int
+begin
+	declare countTasks int default 0;
+	if ISNULL(statusTask) then
+		select count(*) into countTasks from task as t
+			left join listTask as l using (idList)
+			left join project as p on t.idProject = p.idProject
+		where t.idList = listID and t.idProject = projectID
+		group by t.idList, t.idProject;
+		return countTasks;
+    else
+		select count(*) into countTasks from task as t
+		left join listTask as l using (idList)
+        left join project as p on t.idProject = p.idProject
+		where t.idList = listID and t.idProject = projectID and t.status like statusTask
+		group by t.idList, t.idProject;
+		return countTasks;
+    end if;
+end//
+
+delimiter //
+create procedure addProject(in userID int, in nameProject varchar(100), in description varchar(100))
+begin
+	declare projectID int;
+    
+	if (not exists(select * from account where idAccount = userID)) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
+	end if;
+    
+	insert project(name, description) values (nameProject, description);
+    
+    select max(idProject) into projectID from project where name = nameProject;
+
+	-- set  projectIDR = projectID;
+	
+    insert projectparticipant values (projectID, userID, "admin");
+    
+    select projectID;
+end//
+
+delimiter //
+create procedure addParticipantToProject(in projectID int, in userIDAdmin int, in userIDAdd int, roleUser varchar(100))
+begin
+
+	if (not exists(select * from projectparticipant where IDproject = projectID and  idUser = userIDAdmin and role like 'admin')) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the project or this account have not permission!';
+	end if;
+    
+	if (not exists(select * from account where idAccount = userIDAdd)) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
+	end if;
+    
+	if (exists(select * from projectparticipant where IDproject = projectID and  idUser = userIDAdd)) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account already in the project';
+	end if;
+    
+    insert projectparticipant values (projectID, userIDAdd, roleUser);
+    
+end//
+
+delimiter //
+create procedure deleteProject(in userID int, in projectID int)
+begin
+	if (not exists(select * from projectparticipant where IDproject = projectID and  idUser = userID and role like 'admin')) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the project or this account have not permission!';
+	end if;
+	delete from project where idProject = projectID;
+end//
+
+delimiter //
+create procedure editProject(in userID int, in projectID int, nameProject varchar(100), descriptionProject varchar(100))
+begin
+	if (not exists(select * from projectparticipant where IDproject = projectID and  idUser = userID and role like 'admin')) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the project or this account have not permission!';
+	end if;
+	update project set name = nameProject, description = descriptionProject
+    where idProject = projectID;
+end//
+
+
+
+/*
+----------------------------- List -------------------------------------------
+*/
+
+delimiter //
+create procedure showList(in userID int)
+begin
+	select * from listtask where idUser = userID or
+				idProject in (select idProject from projectparticipant where idUser = userID);
+
+end//
+
+
+delimiter //
+create procedure addList(in projectID int, in userID int, in nameList varchar(100))
+begin
+	if ISNULL(projectID) and ISNULL(userID) THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'List must belong to project or created by user';
+    END IF;
+    
+    if ISNULL(userID) then
+		if (not exists(select * from project where idProject = projectID)) then
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the project';
+        end if;
+		insert listtask(idProject, name) values (projectID, nameList);
+	else
+		if (not exists(select * from account where idAccount = userID)) then
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
+        end if;
+		insert listtask(idUser, name) values (userID, nameList);
+    end if;
+end//
+
+delimiter //
+create procedure deleteList(in listID int)
+begin
+	delete from listtask where idList = listID;
+end//
+
+delimiter //
+create procedure editList(in listID int, in nameList varchar(100))
+begin
+	update listtask set name = nameList where idList = listID;
+end//
+
+/*
+----------------------------- Tasks -------------------------------------------
+*/
+
+delimiter //
+create function getCountSubTasksStatus(taskID int, statusTask varchar(100))
+returns int
+begin
+	declare countTasks int default 0;
+	if ISNULL(statusTask) then
+		select count(*) into countTasks from subtask where idTask = taskID;
+    else
+		select count(*) into countTasks from subtask where idTask = taskID and status = statusTask;
+    end if;
+    return countTasks;
+end//
+
+delimiter //
+create function getNearestNotification(taskID int, idUser int)
+returns datetime
+begin
+	declare dateNotification datetime default null;
+    select min(reminderTime) into dateNotification from notification where reminderTime > date(now());
+    return dateNotification;
+end//
+
+delimiter //
+create procedure showUserTasks(in userID int)
+begin
+	select task.*, project.*, listtask.*,
+			getNearestNotification(task.idTask, userID) as 'notification',
+			getCountSubTasksStatus(task.idTask, null) as 'countTasks',
+            getCountSubTasksStatus(task.idTask, 'Complete') as 'countCompleteTasks'  
+	from task 
+    left join project on project.idProject = task.idProject
+    left join listtask on listtask.idList = task.idList
+    where idProject in (select idProject from projectparticipant where idUser = userID)
+	  or idList in (select idList from listtask where idUser = userID);
+end//
+
+delimiter //
+create procedure showProjectTasks(in userID int, in projectID int, in listID int)
+begin
+	if (not exists(select * from projectparticipant where projectID = IDproject and  idUser = userID)) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Your permission is denied';
+	end if;
+
+	if listID = -1 then
+			select task.*, project.*, listtask.*,
+				getNearestNotification(task.idTask, userID) as 'notification',
+				getCountSubTasksStatus(task.idTask, null) as 'countTasks',
+				getCountSubTasksStatus(task.idTask, 'Complete') as 'countCompleteTasks'  
+			from task 
+			left join project on project.idProject = task.idProject
+			left join listtask on listtask.idList = task.idList
+			where idProject = projectID;
+    else
+			select task.*, project.*, listtask.*,
+				getNearestNotification(task.idTask, userID) as 'notification',
+				getCountSubTasksStatus(task.idTask, null) as 'countTasks',
+				getCountSubTasksStatus(task.idTask, 'Complete') as 'countCompleteTasks'  
+			from task 
+			left join project on project.idProject = task.idProject
+			left join listtask on listtask.idList = task.idList
+			where idProject = projectID and idList = listID;
+    end if;
+
+
+end//
+
+delimiter //
+create procedure addTask
+(in userID int, in projectID int, in listID int, nameTask varchar(100), statusTask varchar(100), descriptionTask varchar(100), dueDateTask datetime)
+begin
+	declare taskID int;
+    
+	if (not exists(select * from account where idAccount = userID)) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
+	end if;
+    
+    if (not exists (select * from projectparticipant where idProject = projectID and idUser = userID)) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account have not permission';
+    end if;
+    
+	insert task(idProject, idList, name, status, description, dueDate)
+	values (projectID, listID, nameTask, statusTask, descriptionTask, dueDateTask);
+    
+    select max(idTask) into taskID from task where name = nameTask and dueDate = dueDateTask;
+    call addTaskParticipant(taskID, userID);
+end//
+
+delimiter //
+create procedure addNotification(in taskID int, in userID int, in reminder datetime)
+begin
+	if (exists(select * from notification where idTask = taskID and idUser = userID and reminderTime = reminder)) then
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Notification existed';
+	end if;
+	insert notification values (taskID, userID, reminderTime);
+end//
+
+delimiter //
+create procedure addTag(in taskID int, in nameTag varchar(100))
+begin
+	insert tag values (taskID, nameTag);
+end//
+
+delimiter //
+create procedure addTaskParticipant(in taskID int, in userID int)
+begin
+	insert taskparticipant values (taskID, userID);
+end//
+
+delimiter //
+create procedure addSubtasks(in taskID int, nameSubTask varchar(100), statusSubtask bool)
+begin
+	insert subtasks values (taskID, nameSubTask, statusSubtask);
+end//
+
+
+
+delimiter //
+create procedure deleteTask(in taskID int)
+begin
+	delete from task where idTask = taskID;
+end//
+
+delimiter //
+create procedure deleteNotification(in taskID int, in userID int, in reminder datetime)
+begin
+	delete from notification where idTask = taskID and idUser = userID and reminderTime = reminder;
+end//
+
+delimiter //
+create procedure deleteTag(in tagID int)
+begin
+	delete from tag where idTag = tagID;
+end//
+
+delimiter //
+create procedure deleteTaskParticipant(in taskID int, in userID int)
+begin
+	delete from taskparticipant where idTask = taskID and idUser = userID;
+end//
+
+delimiter //
+create procedure deleteSubtasks(in subTaskID int)
+begin
+	delete from subtasks where idSubTask = subTaskID;
+end//
+
 
 delimiter //
 create procedure updateTask
-(in idTask int(11), in idProjectTask int(11), in idListTask int(11), in nameTask varchar(100), in statusTask varchar(100), in descriptionTask varchar(100),
-in dueDateTask datetime)
+(in taskID int, in projectID int, in listID int, nameTask varchar(100), statusTask varchar(100), descriptionTask varchar(100), dueDateTask datetime)
 begin
-	UPDATE task SET idProject = idProjectTask, idList = idListTask, name = nameTask, status = statusTask, description = descriptionTask,
-    dueDate = dueDateTask where task.idTask = idTask;
+	update task set idProject = projectID, idList = listID, name = nameTask, status = statusTask, description = descriptionTask, dueDate=dueDateTask
+    where idTask = taskID;
 end//
 
+-- delimiter ;
+-- call loginWithGoogle('admin1', 'admin1@gmail.com', '202cb962ac59075b964b07152d234b70', 'https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg');
+-- call loginWithGoogle('admin2', 'admin2@gmail.com', '202cb962ac59075b964b07152d234b70', 'https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png');
 
-select * from task;
+-- call addProject(1, 'Project 1', 'This is project 1', @projectID);
+-- call addProject(1, 'Project 2', 'This is project 2', @projectID);
 
-delimiter //
-create procedure getTasks
-(in userID int(11))
-begin
-	select task.*, project.idProject, project.name as 'nameProject', listtask.idList, listtask.name as 'nameList',
-		(SELECT notification.reminderTime FROM notification WHERE notification.idTask = task.idTask and notification.reminderTime < CURDATE() 
-			ORDER BY notification.reminderTime DESC LIMIT 1) AS 'notification', 
-		(SELECT COUNT(case when subtasks.status = 1 then 1 else 0 end) + '/'+ COUNT(subtasks.status)  FROM subtasks 
-			WHERE subtasks.idTask = task.idTask group by subtasks.idTask) as 'subtasks'
-	from task 
-	left join project on task.idProject = project.idProject
-	left join listtask on task.idList = listtask.idList
-    where exists(select * from taskparticipant where idTask = task.idTask and idUser = userID);
-    
-end//
+-- call addProject(2, 'Project 1', 'This is project 1', @projectID);
+-- call addProject(2, 'Project 2', 'This is project 2', @projectID);
 
-delimiter //
-create procedure addParticipantsToTasks(in idTaskAdd int(11), in emailaccount varchar(100))
-BEGIN
-	declare idProjectTask int(11)  DEFAULT 0;
-    declare idUserInTask int(11)  DEFAULT 0;
-    
-    select idProject into idProjectTask from task where idTask = idTaskAdd;
-    
-    if not exists(select * from account where email like emailaccount)
-	then
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find account from this email';
-	end if;
-    
-	select idAccount into idUserInTask from account where email like emailaccount;
-    
-    if (exists(select * from taskparticipant where idUser = idUserInTask and idTask = idtask))
-	then
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This email is the member of this task';
-	end if;
-    
-	IF idProjectTask is not null and not exists(select * from projectparticipant where idUser = idUserInTask and idProject = idProjectTask) 
-    then
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account is not in this project';
-	end if;
-   
-	insert into taskparticipant values (idTaskAdd, idUserInTask);
-    
-END//
+-- call addList(2, null, 'Project 2 - List 1');
+-- call addList(2, null, 'Project 2 - List 2');
+
+-- call addList(1, null, 'Project 1 - List 1');
+-- call addList(1, null, 'Project 1 - List 2');
+
+
+
+-- select * from project;
+-- select * from listtask;
+-- select * from task;
+
+
+
+
 
 

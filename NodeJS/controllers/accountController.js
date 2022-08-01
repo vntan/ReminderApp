@@ -1,4 +1,4 @@
-const account = require('../models/accountModels');
+const account = require('../models/accountModel');
 
 const login = (req, res) =>{
     console.log(req.body)
@@ -53,10 +53,47 @@ const register = (req, res) => {
 }
 
 
+const updateUserInformation = (req, res) => {
+    console.log(req.body)
+
+    const id = req.body["id"];
+    const name = req.body["name"];
+    const password = req.body["password"];
+    const urlImage = req.body["urlImage"];
+
+    user = {id, name, password, urlImage}
+    
+    if (user){
+        account.updateUserInformation(user, (err)=>{
+            if(err) res.json({onSuccess: false, error: err.sqlMessage});
+            else res.json({onSuccess: true});
+        });
+    }
+    else res.json({onSuccess: false, result: "Cannot receive the data"});
+}
+
+const deleteUser = (req, res) => {
+    console.log(req.body)
+
+    const idUser = req.body["id"];
+
+    
+    if (idUser){
+        account.deleteUser(idUser, (err)=>{
+            if(err) res.json({onSuccess: false, error: err.sqlMessage});
+            else res.json({onSuccess: true});
+        });
+    }
+    else res.json({onSuccess: false, result: "Cannot receive the data"});
+}
+
+
 
 
 module.exports = {
     login, 
     loginWithGoogle,
     register,
+    updateUserInformation,
+    deleteUser
 }
