@@ -186,6 +186,18 @@ begin
 end//
 
 delimiter //
+create procedure updateAccountPassword(in emailAccount varchar(100), in passwordUser varchar(500))
+begin
+	if exists (select * from account where email = emailAccount) then
+		update account set password = passwordUser
+        where email = emailAccount;
+	else
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the account to update';
+	end if;
+		
+end//
+
+delimiter //
 create procedure deleteUser(in accountID int)
 begin
 	delete from account where idAccount = accountID;

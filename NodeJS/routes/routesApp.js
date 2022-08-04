@@ -11,6 +11,7 @@ const initRoutesApp = (app) => {
     router.post('/accounts/loginGoogle', accountController.loginWithGoogle)
     router.post('/accounts/register', accountController.register)
     router.post('/accounts/updateUser', accountController.updateUserInformation)
+    router.post('/accounts/updateUserPassword', accountController.updateUserPassword)
     router.post('/accounts/deleteUser', accountController.deleteUser)
     
 

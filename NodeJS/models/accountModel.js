@@ -20,6 +20,10 @@ var account ={
                 [user.id, user.name, user.password, user.urlImage], cb)
     },
 
+    updateUserPassword: function(email, password, cb){
+        return db.query("CALL updateAccountPassword(?,?); ", [email, password], cb)
+    },
+
     deleteUser: function(userID, cb){
         return db.query("CALL deleteUser (?)", [userID], cb)
     }
