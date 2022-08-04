@@ -28,8 +28,6 @@ var account ={
         return db.query("CALL deleteUser (?)", [userID], cb)
     }
 
-    
-
     // getUserInformation: function(email, cb){
     //     return db.query("select `idAccount`,`name`,`email`, `urlImage` from account where email like ?",  [email], cb)
     // }
