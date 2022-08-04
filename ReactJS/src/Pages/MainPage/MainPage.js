@@ -47,6 +47,8 @@ const MainPage = ({ state, logout }) => {
 
   const handleLogout = () => {
     console.log("Log out");
+    logout();
+    navigate('/login', {replace: true});
   };
 
   const userMenu = (

@@ -86,11 +86,22 @@ export const register = (userInfo, cb) => async dispatch => {
 
 }
 
+export const updatePassword = ({ email, password }, cb) => async dispatch => {
+    axios.post('/accounts/updateUserPassword', { email, password })
+        .then((response) => {
+            console.log(response.data);
+            cb(response.data.onSuccess);
+        })
+        .catch(function (error) {
+            console.log(error);
+            cb(false);
+        });
+}
+
 export const logout =() => async dispatch => {
     localStorage.removeItem(KEY_ACCOUNT_STATE);
     dispatch(logoutSuccess());
-};    
-
+};   
 
 export default accountSlice.reducer;
 

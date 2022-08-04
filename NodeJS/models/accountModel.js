@@ -20,9 +20,15 @@ var account ={
                 [user.id, user.name, user.password, user.urlImage], cb)
     },
 
+    updateUserPassword: function(email, password, cb){
+        return db.query("CALL updateAccountPassword(?,?); ", [email, password], cb)
+    },
+
     deleteUser: function(userID, cb){
         return db.query("CALL deleteUser (?)", [userID], cb)
     }
+
+    
 
     // getUserInformation: function(email, cb){
     //     return db.query("select `idAccount`,`name`,`email`, `urlImage` from account where email like ?",  [email], cb)
