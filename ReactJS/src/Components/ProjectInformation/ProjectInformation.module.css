@@ -1,0 +1,83 @@
+.ant-modal-body{
+    padding:0;
+}
+.project_information{
+    height: 550px;
+    max-height: 550px;
+    overflow: auto;
+    direction: ltr;
+}
+.name_project{
+    font-size: 30px;
+    font-weight: bold;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.participant{
+    font-size: 20px;
+    margin-bottom: 15px;
+    margin-left: 20px;
+}
+.participant_icon{
+    font-size: 30px;
+}
+.project_description{
+    font-size: 20px;
+    margin-bottom: 40px;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+.participant_email{
+    width: 400px;
+}
+
+.participant_email:hover{
+    border-color:none;
+}
+
+.participant_role{
+    
+}
+.button_add{
+    width: 80px;
+    margin-top: -85px;
+    margin-left: 450px;
+    border-radius: 15px;
+}
+.delete_button{
+    color: black;
+    font-size:20px ;
+}
+.change_name_list{
+    color: black;
+    font-size:20px ;
+}
+.list{
+    margin-top: 30px;
+    font-size: 20px;
+    margin-left: 20px;
+}
+.list_icon{
+    padding-bottom: 5px;
+    font-size: 30px;
+}
+.name_list{
+    width: 400px;
+}
+.button_add_list{
+    width: 80px;
+    margin-top: -50px;
+    margin-left: 450px;
+    border-radius: 15px;
+}
+
+.delete_project{
+    margin-top: 40px;
+    margin-bottom:30px;
+    border-radius: 20px;
+    background-color: red;
+    color: white;
+    width: 200px;
+    margin-left: 400px;
+}

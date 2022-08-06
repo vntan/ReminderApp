@@ -1,0 +1,36 @@
+
+.Full_name{
+    display: flex;
+    border: 1px solid #d9d9d9;
+    border-radius: 17px;
+    padding: 8px;
+    font-size: 15px;
+}
+.Full_name:hover{
+    border-width: thin;
+    border: 1px solid #1791fff0;
+}
+.user_icon{
+    font-size: 15px;
+    padding-right: 10px;
+    padding-left: 5px;
+    padding-top: 3px;
+}
+
+.Email{
+    display: flex;
+    border: 1px solid #d9d9d9;
+    border-radius: 17px;
+    padding: 8px;
+    font-size: 15px;
+}
+.Email:hover{
+    border-width: thin;
+    border: 1px solid #1791fff0;
+}
+.email_icon{
+    font-size: 15px;
+    padding-right: 10px;
+    padding-left: 5px;
+    padding-top: 4px;
+}
