@@ -35,19 +35,16 @@ const App = () => {
               <Route path="" element={<Navigate to="mytasks" />} />
               <Route path="mytasks" element={<MyTasksComponent />}>
                 <Route path="" element={<Navigate to="list" />} />
-                <Route path="list" element={<TaskList />} />
-                <Route path="calendar" element={<TaskCalendar />} />
+                <Route path="list" />
+                <Route path="calendar" />
               </Route>
 
               <Route path="projects" element={<PrivateProject> <MyProjectsComponent /> </PrivateProject>} >
                 <Route path=":projectID">
                   <Route path="" element={<Navigate to="list" />} />
-                  <Route path="list" element={<ProjectList />} />
-                  <Route path="calendar" element={<ProjectCalendar />} />
+                  <Route path="list" />
+                  <Route path="calendar"  />
                 </Route>
-
-
-
               </Route>
             </Route>
 

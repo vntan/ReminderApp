@@ -8,18 +8,20 @@ import { InfoCircleTwoTone } from "@ant-design/icons";
 
 import { useNavigate, useLocation, useParams, Outlet } from "react-router-dom";
 
+import ProjectList from './ProjectList/ProjectList'
+import ProjectCalendar from './ProjectCalendar/ProjectCalendar'
+
 const MyProjectsComponent = () => {
   const location = useLocation();
   const paramsURL = useParams();
 
-  const [columnsTable, setColumnsTable] = useState([]);
-
-  const [project, setProject] = useState("- All Projects -");
+  const [projectID, setProject] = useState(-1);
 
   const menuProjectsView = [
     {
       label: "List",
       key: "list",
+      component: <ProjectList projectID =  {projectID}/>,
       onClick: ()=> {
         const ID = paramsURL.projectID;
         navigate(ID+'/list')
@@ -28,6 +30,7 @@ const MyProjectsComponent = () => {
     {
       label: "Calendar",
       key: "calendar",
+      component: <ProjectCalendar projectID =  {projectID}/>,
       onClick: ()=> {
         const ID = paramsURL.projectID;
         navigate(ID+'/calendar')
@@ -46,8 +49,8 @@ const MyProjectsComponent = () => {
   }
 
 
-  const handleChangeProject = (project) => {
-    setProject(project);
+  const handleChangeProject = (projectID) => {
+    setProject(projectID);
   };
 
   const navigate = useNavigate();
@@ -61,7 +64,7 @@ const MyProjectsComponent = () => {
       <div className={styles.subnav}>
         <div className={styles.project}>
           <ProjectSelector
-            handleChangeProject={(project) => handleChangeProject(project)}
+            handleChangeProject={(projectID) => handleChangeProject(projectID)}
           />
           <InfoCircleTwoTone className={styles.info} onClick={showInfo} />
         </div>
@@ -74,7 +77,15 @@ const MyProjectsComponent = () => {
         />
         
       </div>
-      <Outlet context={[columnsTable, setColumnsTable]}/>
+      <Outlet/>
+
+      {
+          menuProjectsView.find(menu => menu.key === selectedKey()) ?
+          menuProjectsView.find(menu => menu.key === selectedKey()).component 
+            : null
+      }
+
+
     </>
   );
 };

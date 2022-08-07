@@ -9,8 +9,13 @@ import SelectColumnsMenu from "../MenuSelectColumns/MenuSelectColumns";
 
 import { useState } from "react";
 
+import TaskList from "./TaskList/TaskList";
+import TaskCalendar from "./TaskCalendar/TaskCalendar";
 
-const MyTasksComponent = () => {
+import { updateVisibleColumns } from "../../Models/columnsTableReducer";
+import { connect } from "react-redux";
+
+const MyTasksComponent = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,11 +26,13 @@ const MyTasksComponent = () => {
     {
       label: "List",
       key: "list",
+      component: <TaskList />,
       onClick: () => navigate("list"),
     },
     {
       label: "Calendar",
       key: "calendar",
+      component: <TaskCalendar />,
       onClick: () => navigate("calendar"),
     },
   ];
@@ -57,10 +64,8 @@ const MyTasksComponent = () => {
         <div className={styles.groupControl}>
           <Popover
             content={
-              <SelectColumnsMenu
-                columnsTable={columnsTable}
-                updateVisibleColumns={(columnsTable)=>{ setColumnsTable([...columnsTable]) }}
-              />
+              <SelectColumnsMenu columnsTable={props.columnsTable}
+                         updateVisibleColumns={props.updateVisibleColumns}/>
             }
             trigger="click"
             placement="bottomLeft"
@@ -72,9 +77,14 @@ const MyTasksComponent = () => {
           </Popover>
         </div>
       </div>
+          
+      <Outlet></Outlet>
 
-
-      <Outlet context={[columnsTable, setColumnsTable]}/>
+      {
+          menuTasksView.find(menu => menu.key === selectedKey()) ?
+            menuTasksView.find(menu => menu.key === selectedKey()).component 
+            : null
+      }
 
 
       <div className={styles.button} onClick={handleAddTask}>
@@ -85,4 +95,14 @@ const MyTasksComponent = () => {
   );
 };
 
-export default MyTasksComponent;
+const mapStateToProps = (state) => {
+  return {
+      columnsTable: state.columnsTable,
+  }
+}
+
+const mapActionToProps = {
+  updateVisibleColumns,
+}
+
+export default connect(mapStateToProps, mapActionToProps)(MyTasksComponent);

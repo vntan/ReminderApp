@@ -8,17 +8,16 @@ import { getTasks } from '../../Models/tasksReducer'
 import { FormOutlined, DeleteOutlined, SearchOutlined, ConsoleSqlOutlined } from "@ant-design/icons";
 import StatusSelector from "../StatusSelector/StatusSelector";
 import { useEffect, useRef, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+
+
+import { resetColumns } from "../../Models/columnsTableReducer";
 
 import moment from 'moment';
 
 import { Button, Input, } from 'antd';
 import Highlighter from 'react-highlight-words';
 
-const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask, handleEditStatusTask, handleDeleteTask }) => {
-
-    // const [data, setData] = useState([]);
-    const [columnsTable, setColumnsTable] = useOutletContext();
+const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask, handleEditStatusTask, handleDeleteTask, resetColumns, columnsTable }) => {
 
 
     const handleClickTask = (task) => {
@@ -49,12 +48,16 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
         {
             title: "Deadline", width: "12%", isVisible: true, ellipsis: true, dataIndex: "dueDate",
             defaultSortOrder: 'ascend',
-            sorter: (task1, task2) => new moment(task1.dueDate, 'DD/MM/YYYY') - new moment(task2.dueDate, 'DD/MM/YYYY')
+            sorter: (task1, task2) => {
+                return new moment(task1.dueDate, 'DD/MM/YYYY') - new moment(task2.dueDate, 'DD/MM/YYYY')
+            }
         },
 
         {
             title: "Notification", width: "12%", isVisible: true, ellipsis: true, dataIndex: "notification",
-            sorter: (task1, task2) => new moment(task1.notification, 'DD/MM/YYYY') - new moment(task2.notification, 'DD/MM/YYYY')
+            sorter: (task1, task2) => {
+                return new moment(task1.notification, 'DD/MM/YYYY') - new moment(task2.notification, 'DD/MM/YYYY')
+            }
         },
         {
             title: "Status", isVisible: true, width: "10%", dataIndex: "status", ellipsis: true,
@@ -105,24 +108,9 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
 
 
     useEffect(() => {
-        setColumnsTable(columns);
-
-        // const task = [];
-        // for (var i = 0; i < 3; i++) {
-        //     task.push({
-        //         nameTask: 'Task ' + (i + 1),
-        //         status: (i % 3 == 0 ? 'Complete' : (i % 3 == 1 ? 'To do' : 'On going')),
-        //         dueDate: new moment().add(100 + i + 1, 'days').format("DD/MM/YYYY"),
-        //         notification: new moment().subtract(100 + i + 1, 'days').format("DD/MM/YYYY")
-
-        //     });
-        // }
-
-        // // setData([...task]);
-
-
+        console.log("Hello", columns)
+        if (columnsTable.length === 0) resetColumns(columns);
     }, []);
-
 
 
     return (
@@ -148,8 +136,13 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
 
 const mapStateToProps = (state) => {
     return {
+        columnsTable: state.columnsTable,
         statusInfo: state.statusTask,
     }
 }
 
-export default connect(mapStateToProps, null)(TableTasks);
+const mapActionToProps = {
+    resetColumns,
+}
+
+export default connect(mapStateToProps, mapActionToProps)(TableTasks);

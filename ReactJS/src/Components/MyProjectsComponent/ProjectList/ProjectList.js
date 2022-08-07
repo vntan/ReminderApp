@@ -6,21 +6,18 @@ import ListSelector from "../../ListSelector/ListSelector";
 import { AppstoreOutlined } from "@ant-design/icons";
 import { Popover } from "antd";
 import SelectColumnsMenu from "../../MenuSelectColumns/MenuSelectColumns";
-
-
-import { connect } from "react-redux";
 import TableTasks from "../../TableTasks/TableTasks";
-import { useOutletContext } from "react-router-dom";
 
-const ProjectList = () => {
+
+const ProjectList = (props) => {
   const [list, setList] = useState("- All Lists -");
   const [loading, setLoading] = useState(false);
-  const [columnsTable, setColumnsTable] = useOutletContext();
 
 
   useEffect(()=>{
     setLoading(false);
-  }, []);
+    console.log(props);
+  });
 
   const handleChangeList = (list) => {
     setList(list);
@@ -53,10 +50,7 @@ const ProjectList = () => {
         <div className={styles.groupControl}>
           <Popover
             content={
-              <SelectColumnsMenu
-                columnsTable={columnsTable}
-                updateVisibleColumns={(columnsTable) => { setColumnsTable([...columnsTable]) }}
-              />
+              <SelectColumnsMenu />
             }
             trigger="click"
             placement="bottomLeft"

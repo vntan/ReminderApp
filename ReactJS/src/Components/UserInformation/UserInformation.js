@@ -15,11 +15,6 @@ import { MD5 } from "crypto-js";
 import { changePassword } from '../../Models/accountReducer';
 
 
-
-
-
-
-
 const UserInformation = (props) => {
     const [form] = Form.useForm();
 

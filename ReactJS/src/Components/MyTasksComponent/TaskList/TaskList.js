@@ -53,7 +53,6 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
 
 const mapStateToProps = (state) => {
   return {
-    columnsTable: state.columnsListTask,
     idAccount: state.account.account.idAccount,
     tasks: state.taskReducer.taskInfo
   }
