@@ -1,10 +1,9 @@
 import axios from "axios";
 import { createSlice } from '@reduxjs/toolkit'
-import updateListSuccess from './listReducer'
+import {addListFromProject} from './listReducer'
 
 const initState = {
-    listProject : null,
-    projectInfo: null
+
 }
 
 const projectSlice = createSlice({
@@ -26,14 +25,14 @@ const projectSlice = createSlice({
     }
 })
 
-const {getAllProjectSuccess,showProjectInformationSuccess,editProjectSuccess,addParticipantSuccess} = projectSlice.actions
+const {getAllProjectSuccess, showProjectInformationSuccess, editProjectSuccess, addParticipantSuccess} = projectSlice.actions
 
 
-export const getAllProject = (projectInfo) => async dispacth => {
+export const getAllProject = (projectInfo) => async dispatch => {
     axios.post('/projects/showAllProject',projectInfo)
     .then((res)=>{
         if(res.data.onSuccess){
-            dispacth(getAllProjectSuccess({data:res.data.result}))
+            dispatch(getAllProjectSuccess({data:res.data.result}))
         }
     })
     .catch(function (error) {
@@ -41,13 +40,13 @@ export const getAllProject = (projectInfo) => async dispacth => {
     });
 }
 
-export const showProjectInformation = (projectInfo,cb) => async dispacth => {
+export const showProjectInformation = (projectInfo) => async dispatch => {
     axios.post('/projects/showProjectInfomation',projectInfo)
     .then((res) => {
         console.log(res.data)
         if(res.data.onSuccess){
-            dispacth(showProjectInformationSuccess({data:{projectInfo:res.data.result.projectInfo,participants:res.data.result.participants}}))
-            cb({listInformation:res.data.result.listInformation})
+            dispatch(showProjectInformationSuccess({data:{projectInfo:res.data.result.projectInfo,participants:res.data.result.participants}}))
+            dispatch(addListFromProject(res.data.result.listInformation))
         }
     })
     .catch(function (error) {
@@ -55,11 +54,11 @@ export const showProjectInformation = (projectInfo,cb) => async dispacth => {
     });
 }
 
-export const editProject = (projectInfo,cb) => async dispacth => {
+export const editProject = (projectInfo,cb) => async dispatch => {
     axios.post('/projects/editProject',projectInfo)
     .then((res)=> {
         if(res.data.onSuccess){
-            dispacth(editProjectSuccess({data:res.data.result}))
+            dispatch(editProjectSuccess({data:res.data.result}))
         }
         cb(res.data.onSuccess);
     })
@@ -69,11 +68,11 @@ export const editProject = (projectInfo,cb) => async dispacth => {
     });
 }
 
-export const addParticipant = (projectInfo,cb) => async dispacth => {
+export const addParticipant = (projectInfo,cb) => async dispatch => {
     axios.post('/projects/addParticipantToProject',projectInfo)
     .then((res)=> {
         if(res.data.onSuccess){
-            dispacth(addParticipantSuccess({data:res.data.result}))
+            dispatch(addParticipantSuccess({data:res.data.result}))
         }
         cb(res.data.onSuccess);
     })

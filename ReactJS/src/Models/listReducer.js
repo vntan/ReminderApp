@@ -21,25 +21,26 @@ const listSlice = createSlice({
         removeListSuccess(state,action){
         },
         updateList(state,action){
+            console.log(action.payload)
             state.list = action.payload.data
         }
     }
 })
 
-const {addListSuccess,editListSuccess,removeListSuccess,showListSuccess,updateList} = listSlice.actions
+const {addListSuccess,editListSuccess,removeListSuccess,showListSuccess, updateList} = listSlice.actions
 
-export const showList = (listInfo) => async dispacth => {
+export const showList = (listInfo) => async dispatch => {
     axios.post('/lists/showList',listInfo)
     .then((res) => {
         if(res.data.onSuccess){
-            dispacth(showListSuccess({data:res.data.result}))
+            dispatch(showListSuccess({data:res.data.result}))
         }
     })
     .catch(function(error){
         console.log(error)
     })
 }
-export const addList = (listInfo,cb) => async dispacth => {
+export const addList = (listInfo,cb) => async dispatch => {
     axios.post('/lists/addListToProject',listInfo)
     .then((res)=>{
         if(res.data.onSuccess){
@@ -53,7 +54,7 @@ export const addList = (listInfo,cb) => async dispacth => {
     });
 }
 
-export const editList = (listInfo,cb) => async dispacth => {
+export const editList = (listInfo,cb) => async dispatch => {
     console.log(listInfo)
     axios.post('/lists/editList',listInfo)
     .then((res)=>{
@@ -68,7 +69,7 @@ export const editList = (listInfo,cb) => async dispacth => {
     });
 }
 
-export const removeList = (listInfo,cb) => async dispacth =>{
+export const removeList = (listInfo,cb) => async dispatch =>{
     axios.post('/lists/deleteList',listInfo)
     .then((res)=>{
         if(res.data.onSuccess){
@@ -82,6 +83,9 @@ export const removeList = (listInfo,cb) => async dispacth =>{
     });
 }
 
-export const updateListSuccess = listSlice.actions.updateList
+export const addListFromProject = (listInfo) => dispatch => {
+    console.log(listInfo)
+    dispatch(updateList({data:listInfo}))
+}
 
 export default listSlice.reducer

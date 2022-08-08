@@ -22,28 +22,14 @@ import { showProjectInformation } from '../../Models/projectReducer';
 const MyProjectsComponent = (props) => {
   const location = useLocation();
   const paramsURL = useParams();
-
   const [projectID, setProject] = useState(-1);
-
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const navigate = useNavigate();
+  
 
-  const showModal = () => {
-    if(projectID === -1){
-      message.error('Please choose your list to see information!!!')
-    }else{
-      props.showProjectInformation({userID:props.account.idAccount, projectID: projectID})
-      setIsModalVisible(true);
-    }
-  };
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
+  useEffect(()=>{
+    setProject(-1);
+  },[]);
 
   const menuProjectsView = [
     {
@@ -66,6 +52,21 @@ const MyProjectsComponent = (props) => {
     },
   ]
 
+
+
+  const showModal = () => {
+    props.showProjectInformation({userID:props.account.idAccount, projectID: projectID})
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   const selectedKey = () => {
     const url = location.pathname.toLowerCase();
 
@@ -76,16 +77,10 @@ const MyProjectsComponent = (props) => {
     return '';
   }
 
-
   const handleChangeProject = (projectID) => {
     setProject(projectID);
-    props.showProjectInformation({userID:props.account.idAccount, projectID: projectID}, result => {
-      console.log('project info',result)
-    })
-    console.log('hello',props.projectInfo)
   };
 
-  const navigate = useNavigate();
 
   const showAddProject = ()=>{
     console.log('Add project')
@@ -100,8 +95,12 @@ const MyProjectsComponent = (props) => {
           <ProjectSelector
             handleChangeProject={(projectID) => handleChangeProject(projectID) }
           />
-           <InfoCircleTwoTone className={styles.info} onClick={showModal} />
-          <PlusCircleFilled className={styles.info} onClick={showAddProject} />
+           {
+              projectID === -1 ?  <PlusCircleFilled className={styles.info} onClick={showAddProject} />
+              :  <InfoCircleTwoTone className={styles.info} onClick={showModal} />
+           }
+          
+           
           
         </div>
         <Menu

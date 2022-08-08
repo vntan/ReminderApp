@@ -18,9 +18,9 @@ const ProjectSelector = (props) => {
   const userID = props.account.idAccount
 
   useEffect(() => {
-    console.log('my project')
     props.getAllProject({userID})
   },[])
+  
   const handleOnChange = (value) => {
     if (props.handleChangeProject) props.handleChangeProject(value);
   };

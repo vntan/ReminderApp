@@ -10,13 +10,12 @@ import TableTasks from "../../TableTasks/TableTasks";
 
 
 const ProjectList = (props) => {
-  const [list, setList] = useState("- All Lists -");
+  const [list, setList] = useState(-1);
   const [loading, setLoading] = useState(false);
 
-
   useEffect(()=>{
-    setLoading(false);
-  });
+      console.log(props.projectID, list)
+  }, [props.projectID, list])
 
   const handleChangeList = (list) => {
     setList(list);
@@ -43,7 +42,7 @@ const ProjectList = (props) => {
     <>
       <div className={styles.listSubnav}>
         <div>
-          <ListSelector handleChangeList={(list) => handleChangeList(list)} projectID={props}/>
+          <ListSelector handleChangeList={(list) => handleChangeList(list)} projectID={props.projectID}/>
         </div>
 
         <div className={styles.groupControl}>
