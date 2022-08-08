@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Form, Input, Button, message, Select } from 'antd';
+import { Form, Input, Button, message, Select, Result,Modal } from 'antd';
 import { UsergroupAddOutlined, DeleteFilled,UnorderedListOutlined,EditFilled } from "@ant-design/icons";
 
 import { connect } from 'react-redux';
@@ -8,20 +8,19 @@ import { Space, Table } from 'antd';
 
 import styles from "./ProjectInformation.module.css"
 
-// import { changeProjectInformation,addParticipant,removeProject } from '../../Models/projectReducer';
-import { addList,editList,removeList } from '../../Models/listReducer';
+import { editProject,addParticipant } from '../../Models/projectReducer';
+
+import { addList,removeList,} from '../../Models/listReducer';
+import EditList from '../EditList/EditList';
+
+
 
 const ProjectInformation = (props) => {
     const { Option } = Select;
     const formRef = React.createRef();
 
-    const [nameValue,setNameValue]= useState()
-    const [description,setDescription]= useState()
+    const [recordList,setRecordList] = useState()
 
-    const onFinish = (values) => {
-        console.log(values);
-        formRef.current.resetFields();
-    };
     const columns_participant = [
         {
           title: 'Name',
@@ -35,12 +34,14 @@ const ProjectInformation = (props) => {
           dataIndex: 'email',
           key: 'Email',
           align : 'center',
+          width: '30%'
         },
         {
           title: 'Role',
           dataIndex: 'role',
           key: 'role',
-          align : 'center'
+          align : 'center',
+          width: '20%'
         },
         {
           title: 'Action',
@@ -84,56 +85,107 @@ const ProjectInformation = (props) => {
           width:'20%',
           render: (_, record) => (
             <Space size="middle">
-            <a className={styles.change_name_list}><EditFilled /></a>
-              <a className={styles.delete_button}><DeleteFilled /></a>
+            <a className={styles.change_name_list}><EditFilled onClick={() => {setRecordList(record);showModal()}} /></a>
+              <a className={styles.delete_button}><DeleteFilled onClick={() => {deleteList(record)} } /></a>
             </Space>
           ),
         },
       ];
 
-    const data = [];
+    const dataParticipant = [];
 
-    for (let i = 0; i < 20; i++) {
-    data.push({
-        key: i,
-        name: `Edrward ${i}`,
-        age: 32,
-        address: `London Park no. ${i}`,
-    });
+    for (let i = 0; i < props.projectInfo.participants.length; i++) {
+      dataParticipant.push({
+          key: i,
+          name: props.projectInfo.participants[i].name,
+          email:props.projectInfo.participants[i].email,
+          role: props.projectInfo.participants[i].role,
+      });
     }
 
-    const projectNameChange = (value) => {
-        // console.log('Received values of form: ',value );
-        // const userID = props.userID
-        // const projectID = props.projectID
-        // const nameProject = nameValue
-        // const description = props.description
-        // props.changeProjectInformation({userID,projectID,nameProject,description},(result)=>{
-        //     if(result.onSuccess){
-        //         message.success('Change name complete!',3)
-        //     }
-        //     else{
-        //         message.error('Can not change name!',3)
-        //     }
-        // })
-    }
-    const projectDescriptionChange = (value) => {
+    const dataList = []
+    for (let i = 0; i < props.projectInfo.listInformation.length; i++) {
+      dataList.push({
+          key: i,
+          name_list: props.projectInfo.listInformation[i].name,
+          count_task:props.projectInfo.listInformation[i].Tasks,
+          //task success not in database
+          task_success: props.projectInfo.listInformation[i].Tasks,
+          listID: props.projectInfo.listInformation[i].idList
+      });
+      }
 
+    const changeName = (value) => {
+
+        const userID = props.account.idAccount
+        const projectID = props.projectInfo.projectInfo[0].idProject
+        const nameProject = value
+        const description = props.projectInfo.projectInfo[0].description
+
+        props.editProject({userID,projectID,nameProject,description},(result) => {
+          console.log(result)
+        })
+        
     }
+    const changeDes = (value) => {
+
+      const userID = props.account.idAccount
+      const projectID = props.projectInfo.projectInfo[0].idProject
+      const nameProject = props.projectInfo.projectInfo[0].name
+      const description = value
+
+      props.editProject({userID,projectID,nameProject,description},(result) => {
+        console.log(result)
+      })
+    }
+
+    const onFinishAddParticipant = (values) => {
+      formRef.current.resetFields();
+    };
+    const onFinishAddList = (values) => {
+      formRef.current.resetFields();
+      const projectID = props.projectInfo.projectInfo[0].idProject
+      const nameList = values.nameList
+      props.addList({projectID,nameList},result => {
+        console.log(result)
+      })
+    };
+
+   
+    const deleteList = (record) => {
+       const listID = record.listID
+       props.removeList({listID}, (result) => {
+          console.log(result)
+       })
+    }
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const showModal = () => {
+
+        setIsModalVisible(true);
+    };
+  
+    const handleOk = () => {
+      setIsModalVisible(false);
+    };
+  
+    const handleCancel = () => {
+      setIsModalVisible(false);
+    };
     return(
         <div className={styles.project_information}>
             <div>
-                <Input className={styles.name_project} type='text' defaultValue={props.nameproject} style={{width:150}} bordered={false} value={nameValue} onChange={(c) => projectNameChange(c.target.value)}/>
-                {console.log(props)}
+                <Input className={styles.name_project} type='text' defaultValue={props.projectInfo && props.projectInfo.projectInfo[0].name} style={{width:500}} bordered={false} onChange={(evt) => changeName(evt.target.value)}/>
             </div>
             <div>
-                <Input className={styles.project_description} defaultValue='Description' style={{width:400}} bordered={false} value={description} onChange={(c) => setDescription(c.target.value)}/>
+                <Input className={styles.project_description} defaultValue={props.projectInfo && props.projectInfo.projectInfo[0].description} style={{width:400}} bordered={false} onChange={(evt) => changeDes(evt.target.value)}/>
             </div>
             
             <div className={styles.participant} style={{fontWeight:'bold'}}>
                 <UsergroupAddOutlined className={styles.participant_icon} /> Participant
             </div>
-            <Form ref={formRef} name="control-ref" onFinish={onFinish}  style={{width:'500px', marginLeft:'200px',display:'flex',flexDirection:'column'}} >
+            <Form ref={formRef} name="control-ref" onFinish={onFinishAddParticipant}  style={{width:'500px', marginLeft:'200px',display:'flex',flexDirection:'column'}} >
                 <Form.Item
                 className={styles.participant_email}
                 name="Email"
@@ -169,20 +221,22 @@ const ProjectInformation = (props) => {
             <Table 
             columns={columns_participant} 
             style={{marginTop:60,width:900,marginLeft:50}} 
+            
             hideSelect
             pagination={false} 
             scroll={{
                 x: 900,
                 y: 300,
               }} 
-            dataSource={data}/>
+            dataSource={dataParticipant}/>
               <div className={styles.list} style={{fontWeight:'bold'}}>
                 <UnorderedListOutlined  className={styles.list_icon} /> List
+                
             </div>
-            <Form ref={formRef} name="control-ref" onFinish={onFinish} style={{width:'500px', marginLeft:'200px',display:'flex',flexDirection:'column'}} >
+            <Form ref={formRef} name="control-ref" onFinish={onFinishAddList} style={{width:'500px', marginLeft:'200px',display:'flex',flexDirection:'column'}} >
                 <Form.Item
                 className={styles.name_list}
-                name="list"
+                name="nameList"
                 rules={[
                     {
                     required: true,
@@ -191,7 +245,7 @@ const ProjectInformation = (props) => {
                 >
                     <Input placeholder='Add new list'/>
                 </Form.Item>
-                <Button type='primary' htmlType="submit" className={styles.button_add_list}>
+                <Button type='primary' htmlType="submit" className={styles.button_add_list} >
                         Add
                 </Button>
             </Form>
@@ -203,24 +257,28 @@ const ProjectInformation = (props) => {
                 x: 900,
                 y: 300,
               }} 
-              dataSource={data}/>
+              dataSource={dataList}/>
             
-            <Button className={styles.delete_project}>Delete Project</Button>
+            <Button className={styles.delete_project} >Delete Project</Button>
+
+            <Modal title="Edit list" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} width={1000} centered >
+              <EditList record={recordList} handleCancel={handleCancel} />
+            </Modal>
         </div>
     )
 }
 const mapStateToProps = (state) => ({
-    project: state.project.project,
-    list:state.list.list
+    account: state.account.account,
+    projectInfo: state.project.projectInfo,
+    list: state.list.list
+
 });
 
 const mapActionToProps = {
-    // changeProjectInformation,
-    // addParticipant,
-    // addList,
-    // editList,
-    // removeList,
-    // removeProject
+    editProject,
+    addParticipant,
+    removeList,
+    addList
 }
 
 export default connect(mapStateToProps,mapActionToProps)(ProjectInformation)

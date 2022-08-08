@@ -16,7 +16,6 @@ const ProjectList = (props) => {
 
   useEffect(()=>{
     setLoading(false);
-    console.log(props);
   });
 
   const handleChangeList = (list) => {
@@ -44,7 +43,7 @@ const ProjectList = (props) => {
     <>
       <div className={styles.listSubnav}>
         <div>
-          <ListSelector handleChangeList={(list) => handleChangeList(list)} />
+          <ListSelector handleChangeList={(list) => handleChangeList(list)} projectID={props}/>
         </div>
 
         <div className={styles.groupControl}>

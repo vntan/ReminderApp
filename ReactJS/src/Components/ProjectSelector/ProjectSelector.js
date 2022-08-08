@@ -1,12 +1,27 @@
 import styles from "./ProjectSelector.module.css";
 
+import { useEffect } from "react";
+
 import { Select } from "antd";
+
+
+import { connect } from "react-redux";
+
+import { useState } from "react";
+
+import { getAllProject } from "../../Models/projectReducer";
 
 const { Option } = Select;
 
+
 const ProjectSelector = (props) => {
+  const userID = props.account.idAccount
+
+  useEffect(() => {
+    console.log('my project')
+    props.getAllProject({userID})
+  },[])
   const handleOnChange = (value) => {
-    console.log(value);
     if (props.handleChangeProject) props.handleChangeProject(value);
   };
 
@@ -16,25 +31,35 @@ const ProjectSelector = (props) => {
       onChange={(value) => {
         handleOnChange(value);
       }}
-      defaultValue="- All Projects -"
+      defaultValue={-1}
       showArrow={false}
       bordered={false}
       size="large"
     >
-      <Option value="- All Projects -" style={{ textAlign: "center" }}>
+      <Option value={-1} style={{ textAlign: "center" }}>
         - All Projects -
       </Option>
-      <Option value="Project 1" style={{ textAlign: "center" }}>
-        Project 1
-      </Option>
-      <Option value="Project 2" style={{ textAlign: "center" }}>
-        Project 2
-      </Option>
-      <Option value="Project 3" style={{ textAlign: "center" }}>
-        Project 3
-      </Option>
+      {
+          props.project && props.project.map((value,key) => {
+            return (<Option value={props.project[key].idProject} key={key} style={{ textAlign: "center" }}>
+                      {value.name}
+                    </Option>)
+          })
+      }
     </Select>
   );
 };
 
-export default ProjectSelector;
+const mapStateToProps = (state) => {
+  return {
+    project: state.project.listProject,
+    account: state.account.account
+  }
+}
+
+const mapActionToProps = {
+  getAllProject
+}
+
+
+export default connect(mapStateToProps,mapActionToProps)(ProjectSelector)

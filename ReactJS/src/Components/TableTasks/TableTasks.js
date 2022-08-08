@@ -108,7 +108,6 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
 
 
     useEffect(() => {
-        console.log("Hello", columns)
         if (columnsTable.length === 0) resetColumns(columns);
     }, []);
 

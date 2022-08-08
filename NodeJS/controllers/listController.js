@@ -53,7 +53,7 @@ const deleteList = (req, res) =>{
     if (listID){
         list.deleteList(listID, (err,rows)=>{
             if(err) res.json({onSuccess: false, error: err.sqlMessage});
-            else res.json({onSuccess: true});
+            else res.json({onSuccess: true, result: rows[0]});
         })
     }
     else res.json({onSuccess: false, error: "Can't receive the data"});

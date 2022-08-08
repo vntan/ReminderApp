@@ -28,11 +28,16 @@ const accountSlice = createSlice({
             state.isLogin = false;
             state.account = null;
         },
+        changePasswordSuccess(state,action){
+            state.isLogin = true;
+            state.account = {...state.account, ...action.payload.data};
+            localStorage.setItem(KEY_ACCOUNT_STATE, JSON.stringify(state));
+        },
     }
 });
 
 
-const { loginSuccess, registerSuccess, logoutSuccess } = accountSlice.actions
+const { loginSuccess, registerSuccess, logoutSuccess, changePasswordSuccess} = accountSlice.actions
 
 export const login = ({ email, password }, cb) => async dispatch => {
     axios.post('/accounts/login', { email, password })
@@ -85,6 +90,31 @@ export const register = (userInfo, cb) => async dispatch => {
         });
 
 }
+
+export const changePassword = (userInfo, cb) => async dispatch => {
+    axios.post('/accounts/updateUser', {
+        id:userInfo.id,
+        name:userInfo.name,
+        password:userInfo.password,
+        urlImage:userInfo.urlImage,
+    })
+    .then((res) => {
+        if(res.data.onSuccess){
+            dispatch(changePasswordSuccess({ data: {
+                id:userInfo.idAccount,
+                name:userInfo.name,
+                urlImage:userInfo.urlImage,
+            }}))
+        }
+        cb(res.data)
+    })
+    .catch(function (error) {
+        console.log(error);
+        cb({onSuccess:false});
+    });
+
+}
+
 
 export const logout =() => async dispatch => {
     localStorage.removeItem(KEY_ACCOUNT_STATE);

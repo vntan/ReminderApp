@@ -2,13 +2,25 @@ import styles from "./ListSelector.module.css";
 
 import { Select } from "antd";
 
+import { connect } from "react-redux";
+import { useEffect } from "react";
+
+import { showList } from "../../Models/listReducer";
+
 const { Option } = Select;
 
 const ListSelector = (props) => {
+
+    const userID = props.account.idAccount
+    const projectID = props.projectID
+    // useEffect(() => {
+    //   props.showList({userID})
+    // },[])
     const handleOnChange = (value) => { 
-        console.log(value);
         if (props.handleChangeList) props.handleChangeList(value);
     }
+
+    
 
   return (
     <Select
@@ -28,29 +40,29 @@ const ListSelector = (props) => {
       >
         - All Lists -
       </Option>
-      <Option
-      key={"List 1"}
-        value="List 1"
-        style={{ textAlign: "center" }}
-      >
-        List 1
-      </Option>
-      <Option
-      key={"List 2"}
-        value="List 2"
-        style={{ textAlign: "center" }}
-      >
-        List 2
-      </Option>
-      <Option
-      key={"List 3"}
-        value="List 3"
-        style={{ textAlign: "center" }}
-      >
-        List 3
-      </Option>
+      {
+          props.list &&  props.list.map((value,key) => {
+            if(props.list[key].idProject === projectID.projectID) {
+              return (<Option value={props.list[key].idList} key={key} style={{ textAlign: "center" }}>
+                    {value.name}
+                  </Option>)
+              }
+          })
+      }
+
     </Select>
   );
 };
 
-export default ListSelector;
+const mapStateToProps = (state) => {
+  return{
+    account: state.account.account,
+    list: state.list.list
+  }
+}
+
+const mapActionToProps = {
+  showList,
+}
+
+export default connect(mapStateToProps,mapActionToProps)(ListSelector);

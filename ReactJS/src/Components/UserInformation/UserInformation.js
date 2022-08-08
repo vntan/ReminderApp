@@ -31,7 +31,6 @@ const UserInformation = (props) => {
         const password = values.password;
         const urlImage = "";
 
-        console.log('Received values of form: ', values);
         props.changePassword({id, name, password,urlImage},(result) => {
             if(result.onSuccess){
                 message.success('Change password complete!',3)

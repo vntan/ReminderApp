@@ -1,0 +1,21 @@
+.container{
+    margin-top: 20px;
+    margin-left: 120px;
+}
+
+.inputNewNameList{
+    border-radius: 10px;
+    margin-right: 20px;
+    
+}
+
+.buttonSubmitNameList{
+    margin-left: 120px;
+    border-radius: 10px;
+}
+
+.buttonCancel{
+    border-radius: 10px;
+    margin-left: 20px;
+   
+}
