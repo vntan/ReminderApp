@@ -95,7 +95,6 @@ const ProjectInformation = (props) => {
 
 
   const changeName = (value) => {
-
     const userID = props.account.idAccount
     const projectID = props.projectInfo.projectInfo[0].idProject
     const nameProject = value
@@ -108,7 +107,6 @@ const ProjectInformation = (props) => {
   }
 
   const changeDes = (value) => {
-
     const userID = props.account.idAccount
     const projectID = props.projectInfo.projectInfo[0].idProject
     const nameProject = props.projectInfo.projectInfo[0].name

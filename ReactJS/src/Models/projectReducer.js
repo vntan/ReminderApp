@@ -19,7 +19,6 @@ const projectSlice = createSlice({
         editProjectSuccess(state,action){
         },
         addParticipantSuccess(state,action){
-            state.projectInfo = action.payload.data
         }
         
     }
@@ -72,7 +71,6 @@ export const addParticipant = (projectInfo,cb) => async dispatch => {
     axios.post('/projects/addParticipantToProject',projectInfo)
     .then((res)=> {
         if(res.data.onSuccess){
-            dispatch(addParticipantSuccess({data:res.data.result}))
         }
         cb(res.data.onSuccess);
     })
