@@ -19,6 +19,7 @@ const projectSlice = createSlice({
         editProjectSuccess(state,action){
         },
         addParticipantSuccess(state,action){
+
         }
         
     }

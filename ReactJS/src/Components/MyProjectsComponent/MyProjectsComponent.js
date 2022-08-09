@@ -55,7 +55,6 @@ const MyProjectsComponent = (props) => {
 
 
   const showModal = () => {
-    props.showProjectInformation({userID:props.account.idAccount, projectID: projectID})
     setIsModalVisible(true);
   };
 
@@ -78,6 +77,7 @@ const MyProjectsComponent = (props) => {
   }
 
   const handleChangeProject = (projectID) => {
+    props.showProjectInformation({userID:props.account.idAccount, projectID: projectID})
     setProject(projectID);
   };
 
@@ -89,7 +89,6 @@ const MyProjectsComponent = (props) => {
   
   return (
     <>
-      {console.log('MyProjectComponent')}
       <div className={styles.subnav}>
         <div className={styles.project}>
           <ProjectSelector

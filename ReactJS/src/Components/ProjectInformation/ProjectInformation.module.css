@@ -5,29 +5,78 @@
     height: 550px;
     max-height: 550px;
     overflow: auto;
-    direction: ltr;
 }
-.name_project{
+
+.name_project_container{
+    display:block;
+    position: relative;
+    border:1px solid black;
+    border-radius: 5px;
+}
+
+.name_project_text{
+    display: inline-block;
+    width: 100%;
     font-size: 30px;
     font-weight: bold;
-    margin-left: 20px;
-    margin-top: 10px;
+    padding-right: 100px;
+
 }
+
+
+
+
+.buttonChangeName{
+    display:block;
+    position: absolute;
+    z-index: 10;
+    cursor:pointer;
+    font-size: 30px;
+    top: 0;
+    right: 55px;
+    padding: 0 10px;
+}
+.buttonCancelChangeName{
+    display:block;
+    position: absolute;
+    z-index: 10;
+    cursor:pointer;
+    font-size: 30px;
+    top: 0;
+    right: 15px;
+    padding: 0 10px;
+}
+
+
+
+.project_description{
+    font-size: 20px;
+    margin-top: 10px;
+    
+}
+.project_description:hover{
+    border:1px solid black;
+    border-radius: 5px;
+}
+.buttonChangeDes{
+    display: none;
+    border-radius: 10px;
+    margin-left: 860px;
+    margin-top: -40px;
+}
+
 
 .participant{
     font-size: 20px;
     margin-bottom: 15px;
+    margin-top: 50px;
     margin-left: 20px;
 }
 .participant_icon{
     font-size: 30px;
 }
-.project_description{
-    font-size: 20px;
-    margin-bottom: 40px;
-    margin-top: 10px;
-    margin-left: 20px;
-}
+
+
 .participant_email{
     width: 400px;
 }
