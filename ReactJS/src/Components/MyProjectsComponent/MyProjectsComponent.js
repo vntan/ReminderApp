@@ -18,12 +18,15 @@ import ProjectInformation from "../ProjectInformation/ProjectInformation";
 
 import { showProjectInformation } from '../../Models/projectReducer';
 
+import AddNewProject from "../AddNewProject/AddNewProject";
+
 
 const MyProjectsComponent = (props) => {
   const location = useLocation();
   const paramsURL = useParams();
   const [projectID, setProject] = useState(-1);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisibleProjectInfo, setIsModalVisibleProjectInfo] = useState(false);
+  const [isModalVisibleAddProject, setIsModalVisibleAddproject] = useState(false);
   const navigate = useNavigate();
   
 
@@ -54,16 +57,28 @@ const MyProjectsComponent = (props) => {
 
 
 
-  const showModal = () => {
-    setIsModalVisible(true);
+  const showModalProjectInfo = () => {
+    setIsModalVisibleProjectInfo(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
+  const showAddProject = () => {
+    setIsModalVisibleAddproject(true);
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const handleOkProjectInfo = () => {
+    setIsModalVisibleProjectInfo(false);
+  };
+
+  const handleCancelProjectInfo = () => {
+    setIsModalVisibleProjectInfo(false);
+  };
+
+  const handleOkAddProject = () => {
+    setIsModalVisibleAddproject(false);
+  };
+
+  const handleCancelAddProject = () => {
+    setIsModalVisibleAddproject(false);
   };
 
   const selectedKey = () => {
@@ -81,10 +96,6 @@ const MyProjectsComponent = (props) => {
     setProject(projectID);
   };
 
-
-  const showAddProject = ()=>{
-    console.log('Add project')
-  }
  
   
   return (
@@ -96,7 +107,7 @@ const MyProjectsComponent = (props) => {
           />
            {
               projectID === -1 ?  <PlusCircleFilled className={styles.info} onClick={showAddProject} />
-              :  <InfoCircleTwoTone className={styles.info} onClick={showModal} />
+              :  <InfoCircleTwoTone className={styles.info} onClick={showModalProjectInfo} />
            }
           
            
@@ -113,15 +124,27 @@ const MyProjectsComponent = (props) => {
       </div>
       <Outlet/>
       <Modal title="Project Information"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        visible={isModalVisibleProjectInfo}
+        onOk={handleOkProjectInfo}
+        onCancel={handleCancelProjectInfo}
         footer={null}
         maskClosable={false}
         width={800}
         bodyStyle={{ maxHeight: 500 }}
         centered >
-         <ProjectInformation project={projectID} handleCancel={handleCancel}/>
+         <ProjectInformation project={projectID} handleCancel={handleCancelProjectInfo}/>
+      </Modal>
+
+      <Modal title="New Project"
+        visible={isModalVisibleAddProject}
+        onOk={handleOkAddProject}
+        onCancel={handleCancelAddProject}
+        footer={null}
+        maskClosable={false}
+        width={800}
+        bodyStyle={{ maxHeight: 500 }}
+        centered >
+         <AddNewProject handleCancel={handleCancelAddProject}/>
       </Modal>
 
       {

@@ -281,7 +281,7 @@ begin
 	
     insert projectparticipant values (projectID, userID, "Admin");
     
-    select projectID;
+    call showAllProject(userID);
 end//
 
 delimiter //

@@ -45,7 +45,7 @@ const addProject = (req, res) => {
     if ( userID  && project){
         project.addProject(userID, newProject, (err,rows)=>{
             if(err) res.json({onSuccess: false, error: err.sqlMessage});
-            else res.json({onSuccess: true, result: rows[0][0] });
+            else res.json({onSuccess: true, result: rows[0] });
         })
     }
     else res.json({onSuccess: false, error: "Can't receive the data"});

@@ -62,20 +62,23 @@ const projectSlice = createSlice({
             }
         },
         leaveProjectSuccess(state,action){
+            state.projectInfo.projectSelect = []
+            state.projectInfo.participants = []
             let index = -1
-            index = state.projectInfo.participants.findIndex(value => {
-                return value.idUser === action.payload.userIDAdd
+            index = state.listProject.findIndex(value => {
+                return value.idProject === action.payload.projectID
             })
             if(index > -1){
-                state.projectInfo.participants.splice(index,1)
-                state.projectInfo.projectSelect = []
-                state.projectInfo.participants = []
+                state.listProject.splice(index,1)
             }
+        },
+        addProjectSuccess(state,action){
+            state.listProject = action.payload.data
         }
     }
 })
 
-const {getAllProjectSuccess, showProjectInformationSuccess, editProjectSuccess, addParticipantSuccess,deleteParticipantToProjectSuccess,deleteProjectSuccess,leaveProjectSuccess} = projectSlice.actions
+const {getAllProjectSuccess, showProjectInformationSuccess, editProjectSuccess, addParticipantSuccess,deleteParticipantToProjectSuccess,deleteProjectSuccess,leaveProjectSuccess,addProjectSuccess} = projectSlice.actions
 
 
 export const getAllProject = (projectInfo) => async dispatch => {
@@ -161,7 +164,34 @@ export const deleteProject = (projectInfo,cb) => async dispatch => {
     });
 }
 
-// export const leaveProject = ()
+export const addProject = (projectInfo,cb) => async dispatch => {
+    axios.post('/projects/addProject',projectInfo)
+    .then((res) => {
+        if(res.data.onSuccess){
+            dispatch(addProjectSuccess({data:res.data.result}))
+        }
+        cb(res.data.onSuccess)
+    })
+    .catch(function (error) {
+        console.log(error);
+        cb(error)
+    });
+}
+
+export const leaveProject = (projectInfo,cb) => async dispatch => {
+    axios.post('/projects/deleteParticipantToProject',projectInfo)
+    .then((res) => {
+        console.log(projectInfo)
+        if(res.data.onSuccess){
+            dispatch(leaveProjectSuccess({projectID:projectInfo.projectID}))
+        }
+        cb(res.data.onSuccess)
+    })
+    .catch(function (error) {
+        console.log(error);
+        cb(error)
+    });
+}
 
 
 export default projectSlice.reducer

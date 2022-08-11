@@ -15,7 +15,7 @@ import { Space, Table } from "antd";
 
 import styles from "./ProjectInformation.module.css";
 
-import { editProject, addParticipant,deleteParticipantToProject,deleteProject } from "../../Models/projectReducer";
+import { editProject, addParticipant,deleteParticipantToProject,deleteProject,leaveProject } from "../../Models/projectReducer";
 
 import { getUserID } from "../../Models/accountReducer";
 
@@ -259,10 +259,9 @@ const ProjectInformation = (props) => {
       return value.role === 'Admin'
     })
     const projectID = props.projectInfo.projectSelect[0].idProject;
-    const userIDAdmin = props.projectInfo.participants[indexAdmin].idUser
     const userIDAdd = props.account.idAccount
     const role = 'User'
-    props.deleteParticipantToProject({projectID,userIDAdmin,userIDAdd,role}, result => {
+    props.leaveProject({projectID,userIDAdd,role}, result => {
       console.log(result)
       props.handleCancel()
     })
@@ -574,7 +573,8 @@ const mapActionToProps = {
   addList,
   getUserID,
   deleteParticipantToProject,
-  deleteProject
+  deleteProject,
+  leaveProject
 };
 
 export default connect(mapStateToProps, mapActionToProps)(ProjectInformation);
