@@ -14,7 +14,7 @@ const ProjectList = (props) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(()=>{
-      console.log(props.projectID, list)
+      console.log('projectList',props.projectID, list)
   }, [props.projectID, list])
 
   const handleChangeList = (list) => {

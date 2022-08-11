@@ -12,12 +12,14 @@ const initRoutesApp = (app) => {
     router.post('/accounts/register', accountController.register)
     router.post('/accounts/updateUser', accountController.updateUserInformation)
     router.post('/accounts/deleteUser', accountController.deleteUser)
+    router.post('/accounts/getUserID', accountController.getUserID)
     
 
     router.post('/projects/showAllProject', projectController.showAllProject)
     router.post('/projects/showProjectInfomation', projectController.showProjectInfomation)
     router.post('/projects/addProject', projectController.addProject)
     router.post('/projects/addParticipantToProject', projectController.addParticipantToProject)
+    router.post('/projects/deleteParticipantToProject', projectController.deleteParticipantToProject)
     router.post('/projects/deleteProject', projectController.deleteProject)
     router.post('/projects/editProject', projectController.editProject)
 

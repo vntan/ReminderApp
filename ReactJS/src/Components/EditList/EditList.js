@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux';
 
 import styles from "./EditList.module.css"
@@ -9,21 +9,30 @@ import { Form,Input,Button } from 'antd';
 import { editList } from '../../Models/listReducer';
 
 const EditList = (props) => {
+    const [formChangeName] = Form.useForm();
+
+    useEffect(() => {
+        formChangeName.setFieldsValue({list_name:props.record.name})
+    },[props.record.name])
+
     const onFinish = (value) => {
         const nameList = value.list_name
-        const listID = props.record.listID
+        const listID = props.record.idList
         props.editList({listID,nameList},result => {
             console.log(result)
+            formChangeName.resetFields()
+            props.handleCancel()
         })
-        props.handleCancel()
     }
     const buttonCancel = () => {
+        formChangeName.resetFields()
         props.handleCancel()
     }
 
   return (
     <div >
-       <Form name="control-ref" onFinish={onFinish}  style={{width:'500px', marginLeft:'200px',display:'flex',flexDirection:'column'}} >
+       <Form form={formChangeName}  name="control-ref" onFinish={onFinish}  >
+
                 <Form.Item
                 name='list_name'
                 className={styles.container}
@@ -34,7 +43,7 @@ const EditList = (props) => {
                     },
                 ]}
                 >
-                    <Input type='text' defaultValue={props.record.name_list} style={{width:300}} className={styles.inputNewNameList} />
+                    <Input type='text'  className={styles.inputNewNameList} />
                    
                 </Form.Item>
                 <Form.Item>
@@ -53,7 +62,7 @@ const EditList = (props) => {
 }
 
 const mapStateToProps = (state) => ({
-    list: state.list.list
+    list: state.list.listOfProject,
 
 });
 

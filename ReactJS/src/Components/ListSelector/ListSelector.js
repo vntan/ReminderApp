@@ -67,7 +67,7 @@ const ListSelector = (props) => {
 const mapStateToProps = (state) => {
   return {
     account: state.account.account,
-    list: state.list.list
+    list: state.list.listOfProject
   }
 }
 

@@ -191,6 +191,11 @@ begin
 	delete from account where idAccount = accountID;
 end//
 
+delimiter //
+create procedure findUser(in emailUser varchar(100))
+begin
+	select idAccount from account where email like emailUser;
+end//
 
 /*
 ----------------------------- Project -------------------------------------------
@@ -204,6 +209,15 @@ begin
 		select idProject from projectparticipant where idUser = userID
     );
 end//
+
+delimiter //
+create procedure getParticipants(in projectID int)
+begin
+	    select p.*, a.name, a.email, a.urlImage from projectparticipant as p
+		left join account as a on a.idAccount = p.idUser
+		where idProject = projectID;
+end//
+
 
 
 delimiter //
@@ -221,7 +235,7 @@ begin
         
 	select l.*, 
 			getCountTasksStatusInfomation(projectID, l.idList, null) as 'Tasks',
-            getCountTasksStatusInfomation(projectID, l.idList, "Complete") as 'Tasks'
+            getCountTasksStatusInfomation(projectID, l.idList, "Complete") as 'TasksSuccess'
     
     from listtask as l where idProject = projectID;
 end//
@@ -265,7 +279,7 @@ begin
 
 	-- set  projectIDR = projectID;
 	
-    insert projectparticipant values (projectID, userID, "admin");
+    insert projectparticipant values (projectID, userID, "Admin");
     
     select projectID;
 end//
@@ -287,7 +301,15 @@ begin
 	end if;
     
     insert projectparticipant values (projectID, userIDAdd, roleUser);
+
+	call getParticipants(projectID);
     
+end//
+
+delimiter //
+create procedure deleteParticipantToProject(in projectID int, in userIDDelete int, roleUser varchar(100))
+begin
+	delete from projectparticipant where idProject = projectID and idUser = userIDDelete and role like roleUser;
 end//
 
 delimiter //
@@ -336,11 +358,17 @@ begin
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the project';
         end if;
 		insert listtask(idProject, name) values (projectID, nameList);
+		select l.*, 
+			getCountTasksStatusInfomation(projectID, l.idList, null) as 'Tasks',
+            getCountTasksStatusInfomation(projectID, l.idList, "Complete") as 'TasksSuccess'
+    
+    	from listtask as l where idProject = projectID;
 	else
 		if (not exists(select * from account where idAccount = userID)) then
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
         end if;
 		insert listtask(idUser, name) values (userID, nameList);
+		call showList(userID);
     end if;
 end//
 

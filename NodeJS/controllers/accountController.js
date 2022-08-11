@@ -87,7 +87,20 @@ const deleteUser = (req, res) => {
     else res.json({onSuccess: false, result: "Cannot receive the data"});
 }
 
+const getUserID = (req, res) =>{
+    console.log(req.body)
 
+    const email = req.body["email"];
+
+    
+    if (email){
+        account.getUserID(email, (err, rows)=>{
+            if(err) res.json({onSuccess: false, error: err.sqlMessage});
+            else res.json({onSuccess: true, result: rows[0]});
+        });
+    }
+    else res.json({onSuccess: false, result: "Cannot receive the data"});
+}
 
 
 module.exports = {
@@ -95,5 +108,6 @@ module.exports = {
     loginWithGoogle,
     register,
     updateUserInformation,
-    deleteUser
+    deleteUser,
+    getUserID
 }

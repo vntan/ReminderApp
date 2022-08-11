@@ -6,7 +6,7 @@ import { KEY_ACCOUNT_STATE } from '../Utilities/Constants'
 /* initial state */
 const initialState = {
     isLogin: false,
-    account: null
+    account: null,
 };
 
 //Reducer
@@ -37,7 +37,7 @@ const accountSlice = createSlice({
 });
 
 
-const { loginSuccess, registerSuccess, logoutSuccess, changePasswordSuccess} = accountSlice.actions
+const { loginSuccess, registerSuccess, logoutSuccess, changePasswordSuccess,getUserIDSuccess} = accountSlice.actions
 
 export const login = ({ email, password }, cb) => async dispatch => {
     axios.post('/accounts/login', { email, password })
@@ -106,13 +106,24 @@ export const changePassword = (userInfo, cb) => async dispatch => {
                 urlImage:userInfo.urlImage,
             }}))
         }
-        cb(res.data)
+        cb(res.data.onSuccess)
     })
     .catch(function (error) {
         console.log(error);
         cb({onSuccess:false});
     });
 
+}
+
+export const getUserID = (userInfo,cb) => async dispatch => {
+    axios.post('/accounts/getUserID', userInfo)
+    .then((res) => {
+        cb(res.data.onSuccess, res.data.result[0].idAccount)
+    })
+    .catch(function (error) {
+        console.log(error);
+        cb(false, null);
+    });
 }
 
 

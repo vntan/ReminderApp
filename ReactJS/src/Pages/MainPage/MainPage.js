@@ -112,7 +112,7 @@ const MainPage = ({ state, logout }) => {
         </Header>
         <Content style={{ backgroundColor: '#fff' }}>
           <Outlet />
-          <Modal title="User Information" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} centered style={{transform:'translateY(-15%)'}}>
+          <Modal title="User Information" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} centered style={{transform:'translateY(-5px)'}}>
             <UserInformation setIsModalVisible={setIsModalVisible}/>
           </Modal>
         </Content>

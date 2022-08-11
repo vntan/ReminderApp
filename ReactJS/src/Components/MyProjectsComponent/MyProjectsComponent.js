@@ -112,8 +112,16 @@ const MyProjectsComponent = (props) => {
         
       </div>
       <Outlet/>
-      <Modal title="Project Information" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} width={1000} centered >
-         <ProjectInformation />
+      <Modal title="Project Information"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+        maskClosable={false}
+        width={800}
+        bodyStyle={{ maxHeight: 500 }}
+        centered >
+         <ProjectInformation project={projectID} handleCancel={handleCancel}/>
       </Modal>
 
       {
