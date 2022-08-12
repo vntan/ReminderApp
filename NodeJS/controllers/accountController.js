@@ -72,6 +72,22 @@ const updateUserInformation = (req, res) => {
     else res.json({onSuccess: false, result: "Cannot receive the data"});
 }
 
+const updateUserPassword = (req, res) => {
+    console.log(req.body)
+
+    const email = req.body["email"];
+    const password = req.body["password"];
+
+    
+    if (email && password){
+        account.updateUserPassword(email, password, (err)=>{
+            if(err) res.json({onSuccess: false, error: err.sqlMessage});
+            else res.json({onSuccess: true});
+        });
+    }
+    else res.json({onSuccess: false, result: "Cannot receive the data"});
+}
+
 const deleteUser = (req, res) => {
     console.log(req.body)
 
@@ -103,11 +119,14 @@ const getUserID = (req, res) =>{
 }
 
 
+
 module.exports = {
     login, 
     loginWithGoogle,
     register,
     updateUserInformation,
     deleteUser,
-    getUserID
+    getUserID,
+    updateUserPassword,
+    deleteUser
 }

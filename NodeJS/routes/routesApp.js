@@ -13,6 +13,7 @@ const initRoutesApp = (app) => {
     router.post('/accounts/updateUser', accountController.updateUserInformation)
     router.post('/accounts/deleteUser', accountController.deleteUser)
     router.post('/accounts/getUserID', accountController.getUserID)
+    router.post('/accounts/updateUserPassword', accountController.updateUserPassword)
     
 
     router.post('/projects/showAllProject', projectController.showAllProject)

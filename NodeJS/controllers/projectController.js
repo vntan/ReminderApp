@@ -1,7 +1,7 @@
 const project = require('../models/projectModel');
 
 const showAllProject = (req, res) =>{
-    // console.log(req.body)
+    console.log(req.body)
 
     const userID = req.body["userID"];
    
