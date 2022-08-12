@@ -1,0 +1,9 @@
+dispatch: làm nhiệm vụ call action 
+mission:    +change project name
+            +change project description
+            +add participant
+            +delete participant
+            +add list
+            +dlt list
+            +edit list
+            +dlt project

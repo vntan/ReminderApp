@@ -1,6 +1,9 @@
 import { Checkbox, Row, Col } from "antd";
 import styles from './MenuSelectColumns.module.css'
 
+import { connect } from "react-redux";
+import { updateVisibleColumns } from "../../Models/columnsTableReducer";
+
 
 const SelectColumnsMenu = ({ columnsTable, updateVisibleColumns }) => {
 
@@ -11,17 +14,7 @@ const SelectColumnsMenu = ({ columnsTable, updateVisibleColumns }) => {
     }
 
     const onChange = (checkedValues) => {
-        //updateVisibleColumns({ "columnsVisible": checkedValues });
-        for(const columns of columnsTable) columns.isVisible = false;
-
-        for(const nameColumn of checkedValues){
-            const index = columnsTable.findIndex(column => column.title === nameColumn)
-            if (index >= 0 ) columnsTable[index].isVisible = true;
-        }
-
-        console.log("hello");
-
-        updateVisibleColumns(columnsTable)
+        updateVisibleColumns(checkedValues)
     };
 
     return (
@@ -58,6 +51,15 @@ const SelectColumnsMenu = ({ columnsTable, updateVisibleColumns }) => {
 };
 
 
+const mapStateToProps = (state) => {
+    return {
+        columnsTable: state.columnsTable,
+    }
+}
 
+const mapActionToProps = {
+    updateVisibleColumns,
+}
 
-export default SelectColumnsMenu;
+export default connect(mapStateToProps, mapActionToProps)(SelectColumnsMenu);
+

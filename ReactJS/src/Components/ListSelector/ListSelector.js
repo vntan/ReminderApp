@@ -2,55 +2,85 @@ import styles from "./ListSelector.module.css";
 
 import { Select } from "antd";
 
+import { connect } from "react-redux";
+import { useEffect } from "react";
+
+import { showList } from "../../Models/listReducer";
+import { useState } from "react";
+
 const { Option } = Select;
 
 const ListSelector = (props) => {
-    const handleOnChange = (value) => { 
-        console.log(value);
-        if (props.handleChangeList) props.handleChangeList(value);
+
+  const userID = props.account.idAccount
+  const projectID = props.projectID
+  const [listSelection, setListSelection] = useState("- All Lists -")
+
+  useEffect(() => {
+    props.showList({ userID })
+    setListSelection("- All Lists -");
+  }, [props.projectID])
+
+
+  const handleOnChange = (value) => {
+    setListSelection(value);
+    if (props.handleChangeList) props.handleChangeList(value);
+  }
+
+  useEffect(() => {
+    if (props.list > 0)
+      setListSelection(props.list[0].name)
+    else {
+      setListSelection("- All Lists -")
+      if (props.handleChangeList) props.handleChangeList(-1);
     }
 
+  }, [props.list])
+
   return (
-    <Select
-      showSearch
-      className={styles.list}
-      onChange={(value) => {
-        handleOnChange(value);
-      }}
-      defaultValue="- All Lists -"
-      bordered={false}
-      size='large'
-    >
-      <Option
-        key={"All"}
-        value="- All Lists -"
-        style={{ textAlign: "center" }}
+    <>
+      <Select
+        showSearch
+        className={styles.list}
+        onChange={(value) => {
+          handleOnChange(value);
+        }}
+        defaultValue={"- All Lists -"}
+        value={listSelection}
+        bordered={false}
+        size='large'
       >
-        - All Lists -
-      </Option>
-      <Option
-      key={"List 1"}
-        value="List 1"
-        style={{ textAlign: "center" }}
-      >
-        List 1
-      </Option>
-      <Option
-      key={"List 2"}
-        value="List 2"
-        style={{ textAlign: "center" }}
-      >
-        List 2
-      </Option>
-      <Option
-      key={"List 3"}
-        value="List 3"
-        style={{ textAlign: "center" }}
-      >
-        List 3
-      </Option>
-    </Select>
+        <Option
+          key={-1}
+          value="- All Lists -"
+          style={{ textAlign: "center" }}
+        >
+          - All Lists -
+        </Option>
+        {
+          props.list && props.list.map((value, key) => {
+            if (props.list[key].idProject === projectID) {
+              return (<Option value={props.list[key].idList} key={key} style={{ textAlign: "center" }}>
+                {value.name}
+              </Option>)
+            }
+          })
+        }
+
+      </Select>
+    </>
   );
 };
 
-export default ListSelector;
+const mapStateToProps = (state) => {
+  return {
+    account: state.account.account,
+    list: state.list.listOfProject
+  }
+}
+
+const mapActionToProps = {
+  showList,
+}
+
+export default connect(mapStateToProps, mapActionToProps)(ListSelector);

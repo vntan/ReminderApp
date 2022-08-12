@@ -10,8 +10,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./Pages/LoginPage/LoginPage";
 import MainPage from "./Pages/MainPage/MainPage";
 import ProvideAuth from "./middleware/ProvideAuth";
-import PrivateProject from "./middleware/ProvideIDProject";
 import RegisterPage from "./Pages/RegisterPage/RegisterPage";
+import ForgottenPasswordPage from "./Pages/ForgottenPasswordPage/ForgottenPasswordPage";
 
 
 import MyProjectsComponent from "./Components/MyProjectsComponent/MyProjectsComponent";
@@ -30,24 +30,20 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgetpassword" element={<ForgottenPasswordPage />} />
 
             <Route path="/" element={<ProvideAuth>  <MainPage /> </ProvideAuth>}>
               <Route path="" element={<Navigate to="mytasks" />} />
               <Route path="mytasks" element={<MyTasksComponent />}>
                 <Route path="" element={<Navigate to="list" />} />
-                <Route path="list" element={<TaskList />} />
-                <Route path="calendar" element={<TaskCalendar />} />
+                <Route path="list" />
+                <Route path="calendar" />
               </Route>
 
-              <Route path="projects" element={<PrivateProject> <MyProjectsComponent /> </PrivateProject>} >
-                <Route path=":projectID">
-                  <Route path="" element={<Navigate to="list" />} />
-                  <Route path="list" element={<ProjectList />} />
-                  <Route path="calendar" element={<ProjectCalendar />} />
-                </Route>
-
-
-
+              <Route path="projects" element={<MyProjectsComponent />} >
+                <Route path="" element={<Navigate to="list" />} />
+                <Route path="list" />
+                <Route path="calendar" />
               </Route>
             </Route>
 

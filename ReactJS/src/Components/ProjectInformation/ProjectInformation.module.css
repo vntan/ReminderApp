@@ -1,0 +1,168 @@
+.ant-modal-body{
+    padding:0;
+}
+.project_information{
+    height: 476px;
+    max-height: 450px;
+    overflow: auto;
+    
+}
+
+.name_project_container{
+    display:block;
+    position: relative;
+    border:1px solid black;
+    border-radius: 5px;
+    margin-bottom: 30px;
+}
+
+.name_project_text{
+    display: inline-block;
+    width: 100%;
+    font-size: 30px;
+    font-weight: bold;
+    padding-right: 100px;
+
+}
+
+
+.buttonChangeName{
+    display:block;
+    position: absolute;
+    z-index: 10;
+    cursor:pointer;
+    font-size: 30px;
+    top: 0;
+    right: 55px;
+    padding: 0 10px;
+}
+.buttonCancelChangeName{
+    display:block;
+    position: absolute;
+    z-index: 10;
+    cursor:pointer;
+    font-size: 30px;
+    top: 0;
+    right: 15px;
+    padding: 0 10px;
+}
+
+
+.des_project_container{
+    display:block;
+    position: relative;
+    border:1px solid black;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.des_project_text{
+    display: inline-block;
+    width: 100%;
+    font-size: 20px;
+    padding-right: 100px;
+}
+
+
+.buttonChangeDes{
+    display:block;
+    position: absolute;
+    z-index: 10;
+    cursor:pointer;
+    font-size: 20px;
+    top: -3px;
+    right: 55px;
+    padding: 0 10px;
+}
+.buttonCancelChangeDes{
+    display:block;
+    position: absolute;
+    z-index: 10;
+    cursor:pointer;
+    font-size: 20px;
+    top: -3px;
+    right: 15px;
+    padding: 0 10px;
+}
+
+
+.participant{
+    font-size: 20px;
+    margin-bottom: 15px;
+    margin-top: 30px;
+}
+.participant_icon{
+    font-size: 30px;
+}
+
+
+.participant_email{
+}
+
+.participant_email:hover{
+    border-color:none;
+}
+
+.participant_role{
+}
+
+.button_add{
+    border-radius: 15px;
+}
+.delete_button{
+    color: black;
+    font-size:20px ;
+}
+.change_name_list{
+    color: black;
+    font-size:20px ;
+}
+.list{
+    margin-top: 30px;
+    font-size: 20px;
+}
+.list_icon{
+    padding-bottom: 5px;
+    font-size: 30px;
+}
+.name_list{
+    width: 400px;
+}
+.button_add_list{
+    width: 80px;
+    margin-left: 10px;
+    border-radius: 15px;
+}
+
+.delete_project{
+    margin-top: 40px;
+    margin-bottom:40px;
+    border-radius: 20px;
+    background-color: red;
+    color: white;
+    width: 200px;
+}
+
+.scrollbar{
+    
+}
+
+.scrollbar::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+.scrollbar::-webkit-scrollbar
+{
+	width: 5px;
+	background-color: #F5F5F5;
+}
+
+.scrollbar::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(49, 49, 49, 0.3);
+	background-color: #555;
+}

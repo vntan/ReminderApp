@@ -6,6 +6,8 @@
     padding : 5px 0; 
     width: 24vw;
     max-width: 160px;
-    border: none; 
+    min-width: 160px;
+    border: none;
+    margin-right: 16px; 
 }
 

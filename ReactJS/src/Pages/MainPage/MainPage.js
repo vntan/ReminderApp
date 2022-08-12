@@ -1,20 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 
 import styles from "./MainPage.module.css";
 import "./MainPageGlobal.css";
 
 import { Layout, Menu, Avatar, Dropdown } from "antd";
+import { Button, Modal } from 'antd';
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 
 import { connect } from "react-redux";
 import { logout } from "../../Models/accountReducer";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 
+import UserInformation from "../../Components/UserInformation/UserInformation";
+
 const { Header, Content } = Layout;
 
-const MainPage = ({ state, logout }) => {
+const MainPage = ({ displayName, urlImage, logout }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
 
   const mainMenuItem = [
@@ -41,12 +58,10 @@ const MainPage = ({ state, logout }) => {
     return '';
   }
 
-  const showInformation = () => {
-    console.log("Show information");
-  };
-
   const handleLogout = () => {
     console.log("Log out");
+    logout();
+    navigate('/login', { replace: true });
   };
 
   const userMenu = (
@@ -55,7 +70,7 @@ const MainPage = ({ state, logout }) => {
         {
           key: "Information",
           label: (
-            <div className={styles.inforDiv} onClick={showInformation}>
+            <div className={styles.inforDiv} onClick={showModal}>
               <UserOutlined style={{ fontSize: "22px" }} />
               <p style={{ margin: 0, paddingLeft: "10px" }}>User Information</p>
             </div>
@@ -85,20 +100,34 @@ const MainPage = ({ state, logout }) => {
             className={styles.menu}
             selectedKeys={[selectedKey()]}
             items={mainMenuItem}
+            style={{ minWidth: 0, flex: "auto" }}
           />
           <Dropdown overlay={userMenu} trigger="click">
             <div className={styles.profile}>
-              {true && "Carrot"}
+              <span title={displayName}>{displayName}</span>
               <Avatar
                 size={42}
-                src="https://www.partyanimalsgame.com/static/avatars-07_Carrot.png"
+                src={urlImage}
                 style={{ marginLeft: "8%" }}
-              />
+              >
+                {displayName ? "U" : displayName[0]}
+              </Avatar>
             </div>
           </Dropdown>
         </Header>
         <Content style={{ backgroundColor: '#fff' }}>
           <Outlet />
+          <Modal title="User Information"
+            destroyOnClose
+            visible={isModalVisible}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            footer={null}
+            maskClosable={false}
+            centered
+            style={{ transform: 'translateY(-5px)' }}>
+            <UserInformation setIsModalVisible={setIsModalVisible} />
+          </Modal>
         </Content>
       </Layout>
 
@@ -107,7 +136,11 @@ const MainPage = ({ state, logout }) => {
 };
 
 const mapStateToProps = (state) => {
-  return { state };
+  return {
+    displayName: state.account.account ? state.account.account.name : "",
+    urlImage: state.account.account ? state.account.account.urlImage : "",
+  }
+
 };
 
 const mapActionToProps = {

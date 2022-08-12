@@ -13,7 +13,14 @@
     font-size: 20px;
     align-items: center;
     border: none;
-    width: 20%
+}
+
+.container_project_page{
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+
 }
 
 .menu {
@@ -24,5 +31,4 @@
 
 .info {
     font-size: 28px ;
-    margin-left: 8%;
 }

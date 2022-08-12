@@ -45,7 +45,7 @@ const addProject = (req, res) => {
     if ( userID  && project){
         project.addProject(userID, newProject, (err,rows)=>{
             if(err) res.json({onSuccess: false, error: err.sqlMessage});
-            else res.json({onSuccess: true, result: rows[0][0] });
+            else res.json({onSuccess: true, result: rows[0] });
         })
     }
     else res.json({onSuccess: false, error: "Can't receive the data"});
@@ -62,6 +62,40 @@ const addParticipantToProject = (req, res) =>{
    
     if ( projectID && userIDAdmin && userIDAdd  && role){
         project.addParticipantToProject(projectID, userIDAdmin, userIDAdd, role, (err,rows)=>{
+            if(err) res.json({onSuccess: false, error: err.sqlMessage});
+            else res.json({onSuccess: true, participants: rows[0]});
+        })
+    }
+    else res.json({onSuccess: false, error: "Can't receive the data"});
+}
+
+const deleteParticipantToProject = (req, res) =>{
+    console.log(req.body)
+
+    const projectID = req.body["projectID"];
+    const userIDDelete = req.body["userIDDelete"];
+    const role = req.body["role"];
+
+   
+    if ( projectID && userIDDelete  && role){
+        project.deleteParticipantToProject(projectID, userIDDelete, role, (err)=>{
+            if(err) res.json({onSuccess: false, error: err.sqlMessage});
+            else res.json({onSuccess: true});
+        })
+    }
+    else res.json({onSuccess: false, error: "Can't receive the data"});
+}
+
+const updateParticipantToProject = (req, res) =>{
+    console.log(req.body)
+
+    const projectID = req.body["projectID"];
+    const userIDUpdate = req.body["userIDUpdate"];
+    const role = req.body["role"];
+
+   
+    if ( projectID && userIDUpdate  && role){
+        project.updateParticipantToProject(projectID, userIDUpdate, role, (err)=>{
             if(err) res.json({onSuccess: false, error: err.sqlMessage});
             else res.json({onSuccess: true});
         })
@@ -111,6 +145,8 @@ module.exports = {
     showProjectInfomation,
     addProject,
     addParticipantToProject,
+    deleteParticipantToProject,
+    updateParticipantToProject,
     deleteProject,
     editProject
 }

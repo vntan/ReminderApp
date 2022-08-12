@@ -6,21 +6,16 @@ import ListSelector from "../../ListSelector/ListSelector";
 import { AppstoreOutlined } from "@ant-design/icons";
 import { Popover } from "antd";
 import SelectColumnsMenu from "../../MenuSelectColumns/MenuSelectColumns";
-
-
-import { connect } from "react-redux";
 import TableTasks from "../../TableTasks/TableTasks";
-import { useOutletContext } from "react-router-dom";
 
-const ProjectList = () => {
-  const [list, setList] = useState("- All Lists -");
+
+const ProjectList = (props) => {
+  const [list, setList] = useState(-1);
   const [loading, setLoading] = useState(false);
-  const [columnsTable, setColumnsTable] = useOutletContext();
-
 
   useEffect(()=>{
-    setLoading(false);
-  }, []);
+      console.log('projectList',props.projectID, list)
+  }, [props.projectID, list])
 
   const handleChangeList = (list) => {
     setList(list);
@@ -47,16 +42,13 @@ const ProjectList = () => {
     <>
       <div className={styles.listSubnav}>
         <div>
-          <ListSelector handleChangeList={(list) => handleChangeList(list)} />
+          <ListSelector handleChangeList={(list) => handleChangeList(list)} projectID={props.projectID}/>
         </div>
 
         <div className={styles.groupControl}>
           <Popover
             content={
-              <SelectColumnsMenu
-                columnsTable={columnsTable}
-                updateVisibleColumns={(columnsTable) => { setColumnsTable([...columnsTable]) }}
-              />
+              <SelectColumnsMenu />
             }
             trigger="click"
             placement="bottomLeft"

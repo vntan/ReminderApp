@@ -22,11 +22,19 @@ var account ={
 
     deleteUser: function(userID, cb){
         return db.query("CALL deleteUser (?)", [userID], cb)
-    }
+    },
 
-    // getUserInformation: function(email, cb){
-    //     return db.query("select `idAccount`,`name`,`email`, `urlImage` from account where email like ?",  [email], cb)
-    // }
+    getUserID: function(email, cb){
+        return db.query("CALL findUser (?)",  [email], cb)
+    },
+
+    updateUserPassword: function(email, password, cb){
+        return db.query("CALL updateAccountPassword(?,?); ", [email, password], cb)
+    },
+
+    getUserInformation: function(userID, cb){
+        return db.query("CALL getAccount(?)",  [userID], cb)
+    }
 
 }
 

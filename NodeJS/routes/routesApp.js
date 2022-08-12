@@ -12,12 +12,17 @@ const initRoutesApp = (app) => {
     router.post('/accounts/register', accountController.register)
     router.post('/accounts/updateUser', accountController.updateUserInformation)
     router.post('/accounts/deleteUser', accountController.deleteUser)
-
+    router.post('/accounts/getUserID', accountController.getUserID)
+    router.post('/accounts/getUserInformation', accountController.getUserInformation)
+    router.post('/accounts/updateUserPassword', accountController.updateUserPassword)
+    
 
     router.post('/projects/showAllProject', projectController.showAllProject)
     router.post('/projects/showProjectInfomation', projectController.showProjectInfomation)
     router.post('/projects/addProject', projectController.addProject)
     router.post('/projects/addParticipantToProject', projectController.addParticipantToProject)
+    router.post('/projects/deleteParticipantToProject', projectController.deleteParticipantToProject)
+    router.post('/projects/updateParticipantToProject', projectController.updateParticipantToProject)
     router.post('/projects/deleteProject', projectController.deleteProject)
     router.post('/projects/editProject', projectController.editProject)
 
@@ -30,29 +35,14 @@ const initRoutesApp = (app) => {
 
 
 
-    router.post('/tasks/getTasks', tasksController.showUserTasks)
-    router.post('/tasks/addTasks', tasksController.addTasks)
-    router.post('/tasks/deleteTasks', tasksController.deleteTasks)
-    router.post('/tasks/updateTasks', tasksController.updateTasks)
-
-    router.post('/tasks/addSubtasks', tasksController.addSubtasks)
-    router.post('/tasks/deleteSubtasks', tasksController.deleteSubtasks)
-
-    router.post('/tasks/addNotification', tasksController.addNotification)
-    router.post('/tasks/deleteNotification', tasksController.deleteNotification)
-
-    router.post('/tasks/addTag', tasksController.addTag)
-    router.post('/tasks/deleteTag', tasksController.deleteTag)
-    router.post('/tasks/deleteAllTag', tasksController.deleteAllTag)
-
-    router.post('/tasks/addTaskParticipant', tasksController.addTaskParticipant)
-    router.post('/tasks/deleteTaskParticipant', tasksController.deleteTaskParticipant)
-
-    router.post('/tasks/getProjectTasks', tasksController.showProjectTasks)
-    router.post('/tasks/updateTaskProjectList', tasksController.updateTaskProjectList)
-    router.post('/tasks/updateTaskStatus', tasksController.updateTaskStatus)
-
-
+    // router.post('/tasks/getTasks', tasksController.getTasks)
+    // router.post('/tasks/addTasks', tasksController.addTasks)
+    // router.post('/tasks/deleteTasks', tasksController.deleteTasks)
+    // router.post('/tasks/updateTasks', tasksController.updateTasks)
+    // router.post('/tasks/updateTaskProjectList', tasksController.updateTaskProjectList)
+    // router.post('/tasks/updateTaskStatus', tasksController.updateTaskStatus)
+    
+ 
     return app.use("/", router);
 }
 
