@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import ProjectSelector from "../ProjectSelector/ProjectSelector";
 import { Menu, message } from "antd";
 import { Button, Modal } from 'antd';
-import { InfoCircleTwoTone,PlusCircleFilled} from "@ant-design/icons";
+import { InfoCircleTwoTone,PlusCircleTwoTone  } from "@ant-design/icons";
 
 import { useNavigate, useLocation, useParams, Outlet } from "react-router-dom";
 
@@ -92,7 +92,8 @@ const MyProjectsComponent = (props) => {
   }
 
   const handleChangeProject = (projectID) => {
-    props.showProjectInformation({userID:props.account.idAccount, projectID: projectID})
+    if (projectID > -1)
+      props.showProjectInformation({userID:props.account.idAccount, projectID: projectID})
     setProject(projectID);
   };
 
@@ -106,7 +107,7 @@ const MyProjectsComponent = (props) => {
             handleChangeProject={(projectID) => handleChangeProject(projectID) }
           />
            {
-              projectID === -1 ?  <PlusCircleFilled className={styles.info} onClick={showAddProject} />
+              projectID === -1 ?  <PlusCircleTwoTone   className={styles.info} onClick={showAddProject} />
               :  <InfoCircleTwoTone className={styles.info} onClick={showModalProjectInfo} />
            }
           

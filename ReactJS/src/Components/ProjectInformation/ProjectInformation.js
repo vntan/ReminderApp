@@ -15,7 +15,7 @@ import { Space, Table } from "antd";
 
 import styles from "./ProjectInformation.module.css";
 
-import { editProject, addParticipant,deleteParticipantToProject,deleteProject,leaveProject } from "../../Models/projectReducer";
+import { editProject, addParticipant, deleteParticipantToProject, deleteProject, leaveProject } from "../../Models/projectReducer";
 
 import { getUserID } from "../../Models/accountReducer";
 
@@ -41,24 +41,24 @@ const ProjectInformation = (props) => {
 
   const [isEditDes, setIsEditDes] = useState(false);
 
-  const [roleUser,setRoleUser] = useState(false)
+  const [roleUser, setRoleUser] = useState(false)
 
   useEffect(() => {
-     if(props.projectInfo.projectSelect && props.projectInfo.projectSelect.length > 0){
-        const role = props.projectInfo.participants.find(value => {
-                return value.idUser === props.account.idAccount
-              })
-        setRoleUser(role.role === "Admin")
-     }
-  },[props.projectInfo.projectSelect])
+    if (props.projectInfo.projectSelect && props.projectInfo.projectSelect.length > 0) {
+      const role = props.projectInfo.participants.find(value => {
+        return value.idUser === props.account.idAccount
+      })
+      setRoleUser(role.role.toLowerCase() === "admin")
+    }
+  }, [props.projectInfo.projectSelect])
 
-  useEffect(()=>{
+  useEffect(() => {
     formAddParticipant.resetFields();
     formAddList.resetFields();
   }, [props.projectID])
 
   const showModal = (record) => {
-    console.log('record: ',record)
+    console.log('record: ', record)
     setRecordList(record)
     setIsModalVisible(true);
   };
@@ -142,20 +142,20 @@ const ProjectInformation = (props) => {
       render: (_, record) => (
         <Space size="middle">
           <a className={styles.change_name_list}>
-          {roleUser === true && <EditFilled
+            {roleUser === true && <EditFilled
               onClick={() => {
                 showModal(record);
               }}
             />}
           </a>
           <a className={styles.delete_button}>
-          {roleUser === true &&
-            <DeleteFilled
-              onClick={() => {
-                deleteList(record);
-              }}
-            />
-          }
+            {roleUser === true &&
+              <DeleteFilled
+                onClick={() => {
+                  deleteList(record);
+                }}
+              />
+            }
           </a>
         </Space>
       ),
@@ -201,19 +201,19 @@ const ProjectInformation = (props) => {
       const userIDAdd = idUserAdd;
       const role = values.Role;
       props.addParticipant(
-      { projectID, userIDAdmin, userIDAdd, role },
-      (result) => {
-        console.log(result);
-        if (result.error === "Can't receive the data") {
-          message.error("Email is not exist!!! Please enter again");
-        }
-        else if(result.error === "This account already in the project"){
-          message.error("Participant is already in the project!!!")
-        }
-        else formAddParticipant.resetFields();
+        { projectID, userIDAdmin, userIDAdd, role },
+        (result) => {
+          console.log(result);
+          if (result.error === "Can't receive the data") {
+            message.error("Email is not exist!!! Please enter again");
+          }
+          else if (result.error === "This account already in the project") {
+            message.error("Participant is already in the project!!!")
+          }
+          else formAddParticipant.resetFields();
 
-      }
-    );
+        }
+      );
     }
     );
   };
@@ -223,7 +223,7 @@ const ProjectInformation = (props) => {
     const projectID = record.idProject
     const userIDAdd = record.idUser
     const role = record.role
-    props.deleteParticipantToProject({projectID,userIDAdd,role}, result => {
+    props.deleteParticipantToProject({ projectID, userIDAdd, role }, result => {
       console.log(result)
     })
   }
@@ -248,7 +248,7 @@ const ProjectInformation = (props) => {
   const removeProject = () => {
     const userID = props.account.idAccount
     const projectID = props.projectInfo.projectSelect[0].idProject;
-    props.deleteProject({userID,projectID},cb => {
+    props.deleteProject({ userID, projectID }, cb => {
       console.log(cb)
       props.handleCancel()
     })
@@ -261,7 +261,7 @@ const ProjectInformation = (props) => {
     const projectID = props.projectInfo.projectSelect[0].idProject;
     const userIDAdd = props.account.idAccount
     const role = 'User'
-    props.leaveProject({projectID,userIDAdd,role}, result => {
+    props.leaveProject({ projectID, userIDAdd, role }, result => {
       console.log(result)
       props.handleCancel()
     })
@@ -269,294 +269,256 @@ const ProjectInformation = (props) => {
 
   return (
     <div>
-      {roleUser ? (<div className={styles.project_information}>
-      {isEditName == false ? (
-        <div
-          className={styles.name_project_text}
-          onClick={() => setIsEditName(true)}
-        >
-          <p>{props.projectInfo.projectSelect.length >0 && props.projectInfo.projectSelect[0].name}</p>
-        </div>
-      ) : (
-        <div
-          style={{ width: "calc(100% -24px)" }}
-          className={styles.name_project_container}
-        >
-          <Input
+      <div className={`${styles.scrollbar} ${styles.project_information}`}>
+        {isEditName == false || !roleUser ? (
+          <div
             className={styles.name_project_text}
-            type="text"
-            defaultValue={
-              props.projectInfo.projectSelect.length > 0 && props.projectInfo.projectSelect[0].name
-            }
-            bordered={false}
-            onChange={(evt) => setNameChange(evt.target.value)}
-            autoFocus={true}
-          />
-
-          <div
-            className={styles.buttonChangeName}
-            onClick={(value) => handleChangeName(value)}
+            onClick={() => setIsEditName(true)}
           >
-            <CheckOutlined />
+            <p>{props.projectInfo.projectSelect.length > 0 && props.projectInfo.projectSelect[0].name}</p>
           </div>
-
+        ) : (
           <div
-            onClick={() => setIsEditName(false)}
-            className={styles.buttonCancelChangeName}
-          >
-            <CloseOutlined />
-          </div>
-        </div>
-      )}
-
-      {isEditDes == false ? (
-        <div
-          className={styles.des_project_text}
-          onClick={() => setIsEditDes(true)}
-        >
-          <p>
-            {props.projectInfo.projectSelect.length >0 &&
-              props.projectInfo.projectSelect[0].description}
-          </p>
-        </div>
-      ) : (
-        <div
-          style={{ width: "calc(100% -24px)" }}
-          className={styles.des_project_container}
-        >
-          <Input
-            className={styles.des_project_text}
-            type="text"
-            defaultValue={
-              props.projectInfo.projectSelect.length >0 &&
-              props.projectInfo.projectSelect[0].description
-            }
-            bordered={false}
-            onChange={(evt) => setDesChange(evt.target.value)}
-            autoFocus={true}
-          />
-
-          <div className={styles.buttonChangeDes} onClick={handleChangeDes}>
-            <CheckOutlined />
-          </div>
-
-          <div
-            onClick={() => setIsEditDes(false)}
-            className={styles.buttonCancelChangeDes}
-          >
-            <CloseOutlined />
-          </div>
-        </div>
-      )}
-
-      <div className={styles.participant} style={{ fontWeight: "bold" }}>
-        <UsergroupAddOutlined className={styles.participant_icon} /> Participant
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Form
-          form={formAddParticipant}
-          name="control-ref"
-          onFinish={onFinishAddParticipant}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <Form.Item
-            name="Email"
-            rules={[
-              {
-                required: true,
-                message: "please input email participant",
-              },
-            ]}
+            style={{ width: "calc(100% -24px)" }}
+            className={styles.name_project_container}
           >
             <Input
-              placeholder="Email"
-              className={styles.participant_email}
+              className={styles.name_project_text}
+              type="text"
+              defaultValue={
+                props.projectInfo.projectSelect.length > 0 && props.projectInfo.projectSelect[0].name
+              }
+              bordered={false}
+              onChange={(evt) => setNameChange(evt.target.value)}
+              autoFocus={true}
             />
-          </Form.Item>
-          <Form.Item
-            name="Role"
-            rules={[
-              {
-                required: true,
-                message: "please choose role for participant",
-              },
-            ]}
-          >
-            <Select
-              className={styles.participant_role}
-              placeholder="Role"
-              style={{ width: 400}}
+
+            <div
+              className={styles.buttonChangeName}
+              onClick={(value) => handleChangeName(value)}
             >
-              <Option value="Admin">Admin</Option>
-              <Option value="User">User</Option>
-            </Select>
-          </Form.Item>
-        </Form>
-        <Button
-          type="primary"
-          htmlType="submit"
-          className={styles.button_add}
-          style={{ marginLeft: "16px", transform: "translateY(-12px)" }}
-          onClick={()=>formAddParticipant.submit()}
-        >
-          Add
-        </Button>
-      </div>
+              <CheckOutlined />
+            </div>
 
-      <Table
-        columns={columns_participant}
-        style={{ width: 700,marginLeft:'30px' }}
-        hideSelect
-        pagination={false}
-        scroll={{
-          x: 600,
-          y: 300,
-        }}
-        dataSource={props.projectInfo.participants}
-      />
+            <div
+              onClick={() => setIsEditName(false)}
+              className={styles.buttonCancelChangeName}
+            >
+              <CloseOutlined />
+            </div>
+          </div>
+        )}
 
-      <div className={styles.list} style={{ fontWeight: "bold" }}>
-        <UnorderedListOutlined className={styles.list_icon} /> List
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Form
-          form={formAddList}
-          name="control-ref"
-          onFinish={onFinishAddList}
-          style={{
-            display: "flex",
-            justifyContent: "center",
+        {isEditDes == false || !roleUser ? (
+          <div
+            className={styles.des_project_text}
+            onClick={() => setIsEditDes(true)}
+          >
+            <p>
+              {props.projectInfo.projectSelect.length > 0 &&
+                props.projectInfo.projectSelect[0].description}
+            </p>
+          </div>
+        ) : (
+          <div
+            style={{ width: "calc(100% -24px)" }}
+            className={styles.des_project_container}
+          >
+            <Input
+              className={styles.des_project_text}
+              type="text"
+              defaultValue={
+                props.projectInfo.projectSelect.length > 0 &&
+                props.projectInfo.projectSelect[0].description
+              }
+              bordered={false}
+              onChange={(evt) => setDesChange(evt.target.value)}
+              autoFocus={true}
+            />
+
+            <div className={styles.buttonChangeDes} onClick={handleChangeDes}>
+              <CheckOutlined />
+            </div>
+
+            <div
+              onClick={() => setIsEditDes(false)}
+              className={styles.buttonCancelChangeDes}
+            >
+              <CloseOutlined />
+            </div>
+          </div>
+        )}
+
+        <div className={styles.participant} style={{ fontWeight: "bold" }}>
+          <UsergroupAddOutlined className={styles.participant_icon} /> Participant
+        </div>
+
+        {
+          !roleUser ? null :
+            (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Form
+                  form={formAddParticipant}
+                  name="control-ref"
+                  onFinish={onFinishAddParticipant}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Form.Item
+                    name="Email"
+                    rules={[
+                      {
+                        required: true,
+                        message: "please input email participant",
+                      },
+                    ]}
+                  >
+                    <Input
+                      placeholder="Email"
+                      className={styles.participant_email}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="Role"
+                    rules={[
+                      {
+                        required: true,
+                        message: "please choose role for participant",
+                      },
+                    ]}
+                  >
+                    <Select
+                      className={styles.participant_role}
+                      placeholder="Role"
+                      style={{ width: 400 }}
+                    >
+                      <Option value="Admin">Admin</Option>
+                      <Option value="User">User</Option>
+                    </Select>
+                  </Form.Item>
+                </Form>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className={styles.button_add}
+                  style={{ marginLeft: "16px", transform: "translateY(-12px)" }}
+                  onClick={() => formAddParticipant.submit()}
+                >
+                  Add
+                </Button>
+              </div>
+            )
+        }
+
+
+        <Table
+          columns={columns_participant}
+          style={{ width: 700, marginLeft: '30px' }}
+          hideSelect
+          pagination={false}
+          scroll={{
+            x: 600,
+            y: 300,
           }}
-        >
-          <Form.Item
-            className={styles.name_list}
-            name="nameList"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input placeholder="Add new list" />
-          </Form.Item>
+          dataSource={props.projectInfo.participants}
+        />
 
-          <Button
-            type="primary"
-            htmlType="submit"
-            className={styles.button_add_list}
-          >
-            Add
-          </Button>
-        </Form>
-      </div>
-      <Table
-        columns={columns_list}
-        style={{ marginTop: 10, width: 700,marginLeft:'30px' }}
-        pagination={false}
-        scroll={{
-          x: 600,
-          y: 300,
-        }}
-        dataSource={props.listOfProject}
-      />
-      <div style={{
+        <div className={styles.list} style={{ fontWeight: "bold" }}>
+          <UnorderedListOutlined className={styles.list_icon} /> List
+        </div>
+
+        {
+          !roleUser ? null :
+            (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Form
+                  form={formAddList}
+                  name="control-ref"
+                  onFinish={onFinishAddList}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Form.Item
+                    className={styles.name_list}
+                    name="nameList"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Add new list" />
+                  </Form.Item>
+
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className={styles.button_add_list}
+                  >
+                    Add
+                  </Button>
+                </Form>
+              </div>
+            )
+        }
+
+
+        <Table
+          columns={columns_list}
+          style={{ marginTop: 10, width: 700, marginLeft: '30px' }}
+          pagination={false}
+          scroll={{
+            x: 600,
+            y: 300,
+          }}
+          dataSource={props.listOfProject}
+        />
+        <div style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
         }}>
-        <Button className={styles.delete_project} onClick={removeProject}>Delete Project</Button>
-      </div>
+          {
+            roleUser ? <Button className={styles.delete_project} onClick={removeProject}>Delete Project</Button>
+              : <Button className={styles.delete_project} onClick={leaveProject}>Leave project</Button>
+          }
 
-      <Modal
-        title="Edit list"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={null}
-        maskClosable={false}
-        width={500}
-        centered
-      >
-        <EditList record={recordList} handleCancel={handleCancel} />
-      </Modal>
-    </div>) : (<div className={styles.project_information}>
-        <div
-          style={{ width: "calc(100% -24px)" }}
-        >
-          <div style={{border:'none',fontSize:'30px',fontWeight:'bold',marginBottom:'15px'}}>
-            {props.projectInfo.projectSelect.length > 0 && props.projectInfo.projectSelect[0].name}
-          </div>
-        </div>
-        <div
-          style={{ width: "calc(100% -24px)" }}
-        >
-          <div style={{border:'none',fontSize:'20px'}}>
-          {props.projectInfo.projectSelect.length > 0 &&
-              props.projectInfo.projectSelect[0].description}
-          </div>
+
         </div>
 
-
-      <div className={styles.participant} style={{ fontWeight: "bold" }}>
-        <UsergroupAddOutlined className={styles.participant_icon} /> Participant
-      </div>
-
-      <Table
-        columns={columns_participant}
-        style={{ width: 700,marginLeft:'30px' }}
-        hideSelect
-        pagination={false}
-        scroll={{
-          x: 600,
-          y: 300,
-        }}
-        dataSource={props.projectInfo.participants}
-      />
-
-      <div className={styles.list} style={{ fontWeight: "bold" }}>
-        <UnorderedListOutlined className={styles.list_icon} /> List
-      </div>
-      
-      <Table
-        columns={columns_list}
-        style={{ marginTop: 10, width: 700,marginLeft:'30px' }}
-        pagination={false}
-        scroll={{
-          x: 600,
-          y: 300,
-        }}
-        dataSource={props.listOfProject}
-      />
-      <div style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}>
-        <Button className={styles.delete_project} onClick={leaveProject}>Leave project</Button>
-      </div>
-
-    </div>)}
+        <Modal
+          title="Edit list"
+          visible={isModalVisible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+          footer={null}
+          maskClosable={false}
+          width={500}
+          centered
+        >
+          <EditList record={recordList} handleCancel={handleCancel} />
+        </Modal>
+      </div>)
     </div>
   );
 };

@@ -27,7 +27,15 @@ const ListSelector = (props) => {
     if (props.handleChangeList) props.handleChangeList(value);
   }
 
+  useEffect(() => {
+    if (props.list > 0)
+      setListSelection(props.list[0].name)
+    else {
+      setListSelection("- All Lists -")
+      if (props.handleChangeList) props.handleChangeList(-1);
+    }
 
+  }, [props.list])
 
   return (
     <>

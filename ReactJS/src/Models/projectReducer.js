@@ -81,15 +81,17 @@ const projectSlice = createSlice({
 const {getAllProjectSuccess, showProjectInformationSuccess, editProjectSuccess, addParticipantSuccess,deleteParticipantToProjectSuccess,deleteProjectSuccess,leaveProjectSuccess,addProjectSuccess} = projectSlice.actions
 
 
-export const getAllProject = (projectInfo) => async dispatch => {
+export const getAllProject = (projectInfo, cb) => async dispatch => {
     axios.post('/projects/showAllProject',projectInfo)
     .then((res)=>{
         if(res.data.onSuccess){
             dispatch(getAllProjectSuccess({data:res.data.result}))
+            cb(res.data.result)
         }
     })
     .catch(function (error) {
         console.log(error);
+        cb(false)
     });
 }
 
