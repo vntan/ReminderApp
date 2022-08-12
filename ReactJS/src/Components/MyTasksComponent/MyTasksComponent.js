@@ -60,6 +60,7 @@ const MyTasksComponent = (props) => {
           className={styles.menu}
           selectedKeys={[selectedKey()]}
           items={menuTasksView}
+          style={{ minWidth: 0, flex: "auto" }}
         />
         <div className={styles.groupControl}>
           <Popover

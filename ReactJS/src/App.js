@@ -10,7 +10,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./Pages/LoginPage/LoginPage";
 import MainPage from "./Pages/MainPage/MainPage";
 import ProvideAuth from "./middleware/ProvideAuth";
-import PrivateProject from "./middleware/ProvideIDProject";
 import RegisterPage from "./Pages/RegisterPage/RegisterPage";
 import ForgottenPasswordPage from "./Pages/ForgottenPasswordPage/ForgottenPasswordPage";
 
@@ -41,12 +40,10 @@ const App = () => {
                 <Route path="calendar" />
               </Route>
 
-              <Route path="projects" element={<PrivateProject> <MyProjectsComponent /> </PrivateProject>} >
-                <Route path=":projectID">
-                  <Route path="" element={<Navigate to="list" />} />
-                  <Route path="list" />
-                  <Route path="calendar"  />
-                </Route>
+              <Route path="projects" element={<MyProjectsComponent />} >
+                <Route path="" element={<Navigate to="list" />} />
+                <Route path="list" />
+                <Route path="calendar" />
               </Route>
             </Route>
 

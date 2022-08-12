@@ -11,10 +11,6 @@ import { editList } from '../../Models/listReducer';
 const EditList = (props) => {
     const [formChangeName] = Form.useForm();
 
-    useEffect(() => {
-        formChangeName.setFieldsValue({list_name:props.record.name})
-    },[props.record.name])
-
     const onFinish = (value) => {
         const nameList = value.list_name
         const listID = props.record.idList
@@ -43,7 +39,7 @@ const EditList = (props) => {
                     },
                 ]}
                 >
-                    <Input type='text'  className={styles.inputNewNameList} />
+                    <Input type='text' defaultValue={props.record.name} className={styles.inputNewNameList} />
                    
                 </Form.Item>
                 <Form.Item>

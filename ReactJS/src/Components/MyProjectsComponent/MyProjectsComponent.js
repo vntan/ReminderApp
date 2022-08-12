@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import styles from "./MyProjectsComponent.module.css";
 
@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import ProjectSelector from "../ProjectSelector/ProjectSelector";
 import { Menu, message } from "antd";
 import { Button, Modal } from 'antd';
-import { InfoCircleTwoTone,PlusCircleTwoTone  } from "@ant-design/icons";
+import { InfoCircleTwoTone, PlusCircleTwoTone } from "@ant-design/icons";
 
 import { useNavigate, useLocation, useParams, Outlet } from "react-router-dom";
 
@@ -23,34 +23,26 @@ import AddNewProject from "../AddNewProject/AddNewProject";
 
 const MyProjectsComponent = (props) => {
   const location = useLocation();
-  const paramsURL = useParams();
   const [projectID, setProject] = useState(-1);
   const [isModalVisibleProjectInfo, setIsModalVisibleProjectInfo] = useState(false);
   const [isModalVisibleAddProject, setIsModalVisibleAddproject] = useState(false);
   const navigate = useNavigate();
-  
-
-  useEffect(()=>{
-    setProject(-1);
-  },[]);
 
   const menuProjectsView = [
     {
       label: "List",
       key: "list",
-      component: <ProjectList projectID =  {projectID}/>,
-      onClick: ()=> {
-        const ID = paramsURL.projectID;
-        navigate(ID+'/list')
+      component: <ProjectList projectID={projectID} />,
+      onClick: () => {
+        navigate('list')
       },
     },
     {
       label: "Calendar",
       key: "calendar",
-      component: <ProjectCalendar projectID =  {projectID}/>,
-      onClick: ()=> {
-        const ID = paramsURL.projectID;
-        navigate(ID+'/calendar')
+      component: <ProjectCalendar projectID={projectID} />,
+      onClick: () => {
+        navigate('calendar')
       },
     },
   ]
@@ -93,37 +85,44 @@ const MyProjectsComponent = (props) => {
 
   const handleChangeProject = (projectID) => {
     if (projectID > -1)
-      props.showProjectInformation({userID:props.account.idAccount, projectID: projectID})
+      props.showProjectInformation({ userID: props.account.idAccount, projectID: projectID })
     setProject(projectID);
   };
 
- 
-  
+
+
   return (
     <>
       <div className={styles.subnav}>
-        <div className={styles.project}>
-          <ProjectSelector
-            handleChangeProject={(projectID) => handleChangeProject(projectID) }
+        <div className={styles.container_project_page}>
+          <div className={styles.project}>
+            <ProjectSelector
+              handleChangeProject={(projectID) => handleChangeProject(projectID)}
+            />
+            {
+              projectID === -1 ? <PlusCircleTwoTone className={styles.info} onClick={showAddProject} />
+                : <InfoCircleTwoTone className={styles.info} onClick={showModalProjectInfo} />
+            }
+          </div>
+
+          <Menu
+            theme="light"
+            mode="horizontal"
+            className={styles.menu}
+            selectedKeys={[selectedKey()]}
+            items={menuProjectsView}
+            style={{ minWidth: 0, flex: "1 0 41%", justifyContent: 'end' }}
           />
-           {
-              projectID === -1 ?  <PlusCircleTwoTone   className={styles.info} onClick={showAddProject} />
-              :  <InfoCircleTwoTone className={styles.info} onClick={showModalProjectInfo} />
-           }
-          
-           
-          
         </div>
-        <Menu
-          theme="light"
-          mode="horizontal"
-          className={styles.menu}
-          selectedKeys={[selectedKey()]}
-          items={menuProjectsView}
-        />
-        
+
+
+
+
+
+
+
       </div>
-      <Outlet/>
+      <Outlet />
       <Modal title="Project Information"
         visible={isModalVisibleProjectInfo}
         onOk={handleOkProjectInfo}
@@ -132,8 +131,9 @@ const MyProjectsComponent = (props) => {
         maskClosable={false}
         width={800}
         bodyStyle={{ maxHeight: 500 }}
-        centered >
-         <ProjectInformation project={projectID} handleCancel={handleCancelProjectInfo}/>
+        centered 
+        destroyOnClose>
+        <ProjectInformation project={projectID} handleCancel={handleCancelProjectInfo} />
       </Modal>
 
       <Modal title="New Project"
@@ -144,14 +144,15 @@ const MyProjectsComponent = (props) => {
         maskClosable={false}
         width={800}
         bodyStyle={{ maxHeight: 500 }}
-        centered >
-         <AddNewProject handleCancel={handleCancelAddProject}/>
+        centered
+        destroyOnClose >
+        <AddNewProject handleCancel={handleCancelAddProject} />
       </Modal>
 
       {
-          menuProjectsView.find(menu => menu.key === selectedKey()) ?
-          menuProjectsView.find(menu => menu.key === selectedKey()).component 
-            : null
+        menuProjectsView.find(menu => menu.key === selectedKey()) ?
+          menuProjectsView.find(menu => menu.key === selectedKey()).component
+          : null
       }
 
 
@@ -166,7 +167,7 @@ const mapStateToProps = (state) => ({
 
 const mapActionToProps = {
   showProjectInformation,
-  
+
 }
 
-export default connect(mapStateToProps,mapActionToProps)(MyProjectsComponent)
+export default connect(mapStateToProps, mapActionToProps)(MyProjectsComponent)

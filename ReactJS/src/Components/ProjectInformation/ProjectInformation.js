@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Form, Input, Button, message, Select, Result, Modal } from "antd";
+import { Form, Input, Button, message, Select, notification, Modal } from "antd";
 import {
   UsergroupAddOutlined,
   DeleteFilled,
@@ -15,7 +15,7 @@ import { Space, Table } from "antd";
 
 import styles from "./ProjectInformation.module.css";
 
-import { editProject, addParticipant, deleteParticipantToProject, deleteProject, leaveProject } from "../../Models/projectReducer";
+import { editProject, addParticipant, deleteParticipantToProject, deleteProject, leaveProject, updateParticipantToProject } from "../../Models/projectReducer";
 
 import { getUserID } from "../../Models/accountReducer";
 
@@ -41,21 +41,16 @@ const ProjectInformation = (props) => {
 
   const [isEditDes, setIsEditDes] = useState(false);
 
-  const [roleUser, setRoleUser] = useState(false)
+  const [isAdminUser, setAdminUser] = useState(false)
 
   useEffect(() => {
     if (props.projectInfo.projectSelect && props.projectInfo.projectSelect.length > 0) {
       const role = props.projectInfo.participants.find(value => {
         return value.idUser === props.account.idAccount
       })
-      setRoleUser(role.role.toLowerCase() === "admin")
+      setAdminUser(role.role.toLowerCase() === "admin")
     }
   }, [props.projectInfo.projectSelect])
-
-  useEffect(() => {
-    formAddParticipant.resetFields();
-    formAddList.resetFields();
-  }, [props.projectID])
 
   const showModal = (record) => {
     console.log('record: ', record)
@@ -73,13 +68,22 @@ const ProjectInformation = (props) => {
 
   const [recordList, setRecordList] = useState();
 
+  const handleChangeRoleUserRow = (value, record)=>{
+    const projectID = record.idProject
+    const userIDUpdate = record.idUser
+    const role = value
+    props.updateParticipantToProject({ projectID, userIDUpdate, role }, result => {
+      console.log(result)
+    })
+  }
+
   const columns_participant = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
       align: "center",
-      render: (text) => <a>{text}</a>,
+      render: (text) => <span>{text}</span>,
     },
     {
       title: "Email",
@@ -94,6 +98,27 @@ const ProjectInformation = (props) => {
       key: "role",
       align: "center",
       width: "20%",
+      render: (text, record) => {
+        console.log(record)
+        if (!isAdminUser || record.idUser === props.account.idAccount) return (<span>{text}</span>)
+        else
+          return (
+            <Select
+              bordered={false}
+              placeholder="Role"
+              showArrow={false}
+              style={{width: '100%'}}
+              defaultValue={record.role[0].toUpperCase() + record.role.slice(1).toLowerCase()}
+              value={record.role[0].toUpperCase() + record.role.slice(1).toLowerCase()}
+              onSelect={(value)=>handleChangeRoleUserRow(value, record)}
+            >
+              <Option value="Admin">Admin</Option>
+              <Option value="User">User</Option>
+            </Select>
+          );
+
+
+      }
     },
     {
       title: "Action",
@@ -102,8 +127,9 @@ const ProjectInformation = (props) => {
       render: (_, record) => (
         <Space size="middle">
           <a className={styles.delete_button}>
-            {roleUser === true &&
-              <DeleteFilled onClick={() => deleteParticipant(record)} />
+            {
+              isAdminUser === true && record.idUser !== props.account.idAccount
+                && <DeleteFilled onClick={() => deleteParticipant(record)} />
             }
           </a>
         </Space>
@@ -142,20 +168,18 @@ const ProjectInformation = (props) => {
       render: (_, record) => (
         <Space size="middle">
           <a className={styles.change_name_list}>
-            {roleUser === true && <EditFilled
+            <EditFilled
               onClick={() => {
                 showModal(record);
               }}
-            />}
+            />
           </a>
           <a className={styles.delete_button}>
-            {roleUser === true &&
-              <DeleteFilled
-                onClick={() => {
-                  deleteList(record);
-                }}
-              />
-            }
+            <DeleteFilled
+              onClick={() => {
+                deleteList(record);
+              }}
+            />
           </a>
         </Space>
       ),
@@ -163,6 +187,15 @@ const ProjectInformation = (props) => {
   ];
 
   const handleChangeName = () => {
+
+    if (nameChange === "") {
+      notification['error']({
+        message: 'Cannot change name!',
+      });
+
+      return;
+    }
+
     const userID = props.account.idAccount;
     const projectID = props.projectInfo.projectSelect[0].idProject;
     const nameProject = nameChange;
@@ -221,9 +254,9 @@ const ProjectInformation = (props) => {
   const deleteParticipant = (record) => {
     console.log(record)
     const projectID = record.idProject
-    const userIDAdd = record.idUser
+    const userIDDelete = record.idUser
     const role = record.role
-    props.deleteParticipantToProject({ projectID, userIDAdd, role }, result => {
+    props.deleteParticipantToProject({ projectID, userIDDelete, role }, result => {
       console.log(result)
     })
   }
@@ -270,7 +303,7 @@ const ProjectInformation = (props) => {
   return (
     <div>
       <div className={`${styles.scrollbar} ${styles.project_information}`}>
-        {isEditName == false || !roleUser ? (
+        {isEditName == false || !isAdminUser ? (
           <div
             className={styles.name_project_text}
             onClick={() => setIsEditName(true)}
@@ -288,9 +321,11 @@ const ProjectInformation = (props) => {
               defaultValue={
                 props.projectInfo.projectSelect.length > 0 && props.projectInfo.projectSelect[0].name
               }
+              placeholder="Name Project"
               bordered={false}
               onChange={(evt) => setNameChange(evt.target.value)}
               autoFocus={true}
+              required
             />
 
             <div
@@ -309,14 +344,16 @@ const ProjectInformation = (props) => {
           </div>
         )}
 
-        {isEditDes == false || !roleUser ? (
+        {isEditDes == false || !isAdminUser ? (
           <div
             className={styles.des_project_text}
             onClick={() => setIsEditDes(true)}
           >
+
             <p>
               {props.projectInfo.projectSelect.length > 0 &&
-                props.projectInfo.projectSelect[0].description}
+                (props.projectInfo.projectSelect[0].description == "" ? "Description"
+                  : props.projectInfo.projectSelect[0].description)}
             </p>
           </div>
         ) : (
@@ -331,6 +368,7 @@ const ProjectInformation = (props) => {
                 props.projectInfo.projectSelect.length > 0 &&
                 props.projectInfo.projectSelect[0].description
               }
+              placeholder="Description"
               bordered={false}
               onChange={(evt) => setDesChange(evt.target.value)}
               autoFocus={true}
@@ -349,13 +387,12 @@ const ProjectInformation = (props) => {
           </div>
         )}
 
-        <div className={styles.participant} style={{ fontWeight: "bold" }}>
-          <UsergroupAddOutlined className={styles.participant_icon} /> Participant
-        </div>
-
         {
-          !roleUser ? null :
-            (
+          isAdminUser && (
+            <>
+              <div className={styles.participant} style={{ fontWeight: "bold" }}>
+                <UsergroupAddOutlined className={styles.participant_icon} /> Participant
+              </div>
               <div
                 style={{
                   display: "flex",
@@ -400,6 +437,7 @@ const ProjectInformation = (props) => {
                     <Select
                       className={styles.participant_role}
                       placeholder="Role"
+                      defaultValue={"Admin"}
                       style={{ width: 400 }}
                     >
                       <Option value="Admin">Admin</Option>
@@ -417,69 +455,67 @@ const ProjectInformation = (props) => {
                   Add
                 </Button>
               </div>
-            )
+              <Table
+                columns={columns_participant}
+                style={{ width: 700, marginLeft: '30px' }}
+                hideSelect
+                pagination={false}
+                scroll={{
+                  x: 600,
+                  y: 300,
+                }}
+                dataSource={props.projectInfo.participants}
+              />
+            </>
+          )
         }
-
-
-        <Table
-          columns={columns_participant}
-          style={{ width: 700, marginLeft: '30px' }}
-          hideSelect
-          pagination={false}
-          scroll={{
-            x: 600,
-            y: 300,
-          }}
-          dataSource={props.projectInfo.participants}
-        />
 
         <div className={styles.list} style={{ fontWeight: "bold" }}>
           <UnorderedListOutlined className={styles.list_icon} /> List
         </div>
 
-        {
-          !roleUser ? null :
-            (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Form
-                  form={formAddList}
-                  name="control-ref"
-                  onFinish={onFinishAddList}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Form.Item
-                    className={styles.name_list}
-                    name="nameList"
-                    rules={[
-                      {
-                        required: true,
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Add new list" />
-                  </Form.Item>
 
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className={styles.button_add_list}
-                  >
-                    Add
-                  </Button>
-                </Form>
-              </div>
-            )
-        }
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Form
+            form={formAddList}
+            name="control-ref"
+            onFinish={onFinishAddList}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Form.Item
+              className={styles.name_list}
+              name="nameList"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <Input placeholder="Add new list" />
+            </Form.Item>
+
+            <Button
+              type="primary"
+              htmlType="submit"
+              className={styles.button_add_list}
+            >
+              Add
+            </Button>
+          </Form>
+        </div>
+
+
 
 
         <Table
@@ -492,6 +528,31 @@ const ProjectInformation = (props) => {
           }}
           dataSource={props.listOfProject}
         />
+
+
+        {
+          !isAdminUser && (
+            <>
+              <div className={styles.participant} style={{ fontWeight: "bold" }}>
+                <UsergroupAddOutlined className={styles.participant_icon} /> Participant
+              </div>
+
+              <Table
+                columns={columns_participant}
+                style={{ width: 700, marginLeft: '30px' }}
+                hideSelect
+                pagination={false}
+                scroll={{
+                  x: 600,
+                  y: 300,
+                }}
+                dataSource={props.projectInfo.participants}
+              />
+            </>
+          )
+        }
+
+
         <div style={{
           display: "flex",
           flexDirection: "row",
@@ -499,11 +560,9 @@ const ProjectInformation = (props) => {
           alignItems: "center",
         }}>
           {
-            roleUser ? <Button className={styles.delete_project} onClick={removeProject}>Delete Project</Button>
+            isAdminUser ? <Button className={styles.delete_project} onClick={removeProject}>Delete Project</Button>
               : <Button className={styles.delete_project} onClick={leaveProject}>Leave project</Button>
           }
-
-
         </div>
 
         <Modal
@@ -515,10 +574,11 @@ const ProjectInformation = (props) => {
           maskClosable={false}
           width={500}
           centered
+          destroyOnClose
         >
           <EditList record={recordList} handleCancel={handleCancel} />
         </Modal>
-      </div>)
+      </div>
     </div>
   );
 };
@@ -535,6 +595,7 @@ const mapActionToProps = {
   addList,
   getUserID,
   deleteParticipantToProject,
+  updateParticipantToProject,
   deleteProject,
   leaveProject
 };

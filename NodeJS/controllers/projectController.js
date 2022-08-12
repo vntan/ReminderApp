@@ -73,12 +73,29 @@ const deleteParticipantToProject = (req, res) =>{
     console.log(req.body)
 
     const projectID = req.body["projectID"];
-    const userIDAdd = req.body["userIDAdd"];
+    const userIDDelete = req.body["userIDDelete"];
     const role = req.body["role"];
 
    
-    if ( projectID && userIDAdd  && role){
-        project.deleteParticipantToProject(projectID, userIDAdd, role, (err,rows)=>{
+    if ( projectID && userIDDelete  && role){
+        project.deleteParticipantToProject(projectID, userIDDelete, role, (err)=>{
+            if(err) res.json({onSuccess: false, error: err.sqlMessage});
+            else res.json({onSuccess: true});
+        })
+    }
+    else res.json({onSuccess: false, error: "Can't receive the data"});
+}
+
+const updateParticipantToProject = (req, res) =>{
+    console.log(req.body)
+
+    const projectID = req.body["projectID"];
+    const userIDUpdate = req.body["userIDUpdate"];
+    const role = req.body["role"];
+
+   
+    if ( projectID && userIDUpdate  && role){
+        project.updateParticipantToProject(projectID, userIDUpdate, role, (err)=>{
             if(err) res.json({onSuccess: false, error: err.sqlMessage});
             else res.json({onSuccess: true});
         })
@@ -129,6 +146,7 @@ module.exports = {
     addProject,
     addParticipantToProject,
     deleteParticipantToProject,
+    updateParticipantToProject,
     deleteProject,
     editProject
 }

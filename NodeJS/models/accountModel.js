@@ -30,11 +30,11 @@ var account ={
 
     updateUserPassword: function(email, password, cb){
         return db.query("CALL updateAccountPassword(?,?); ", [email, password], cb)
-    }
+    },
 
-    // getUserInformation: function(email, cb){
-    //     return db.query("select `idAccount`,`name`,`email`, `urlImage` from account where email like ?",  [email], cb)
-    // }
+    getUserInformation: function(userID, cb){
+        return db.query("CALL getAccount(?)",  [userID], cb)
+    }
 
 }
 

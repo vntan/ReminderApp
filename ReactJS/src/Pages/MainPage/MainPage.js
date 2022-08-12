@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 
 import styles from "./MainPage.module.css";
 import "./MainPageGlobal.css";
@@ -15,7 +15,7 @@ import UserInformation from "../../Components/UserInformation/UserInformation";
 
 const { Header, Content } = Layout;
 
-const MainPage = ({ state, logout }) => {
+const MainPage = ({ displayName, urlImage, logout }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,7 +61,7 @@ const MainPage = ({ state, logout }) => {
   const handleLogout = () => {
     console.log("Log out");
     logout();
-    navigate('/login', {replace: true});
+    navigate('/login', { replace: true });
   };
 
   const userMenu = (
@@ -100,22 +100,33 @@ const MainPage = ({ state, logout }) => {
             className={styles.menu}
             selectedKeys={[selectedKey()]}
             items={mainMenuItem}
+            style={{ minWidth: 0, flex: "auto" }}
           />
           <Dropdown overlay={userMenu} trigger="click">
             <div className={styles.profile}>
-              {true && "Carrot"}
+              <span title={displayName}>{displayName}</span>
               <Avatar
                 size={42}
-                src="https://www.partyanimalsgame.com/static/avatars-07_Carrot.png"
+                src={urlImage}
                 style={{ marginLeft: "8%" }}
-              />
+              >
+                {displayName ? "U" : displayName[0]}
+              </Avatar>
             </div>
           </Dropdown>
         </Header>
         <Content style={{ backgroundColor: '#fff' }}>
           <Outlet />
-          <Modal title="User Information" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null} maskClosable={false} centered style={{transform:'translateY(-5px)'}}>
-            <UserInformation setIsModalVisible={setIsModalVisible}/>
+          <Modal title="User Information"
+            destroyOnClose
+            visible={isModalVisible}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            footer={null}
+            maskClosable={false}
+            centered
+            style={{ transform: 'translateY(-5px)' }}>
+            <UserInformation setIsModalVisible={setIsModalVisible} />
           </Modal>
         </Content>
       </Layout>
@@ -125,7 +136,11 @@ const MainPage = ({ state, logout }) => {
 };
 
 const mapStateToProps = (state) => {
-  return { state };
+  return {
+    displayName: state.account.account ? state.account.account.name : "",
+    urlImage: state.account.account ? state.account.account.urlImage : "",
+  }
+
 };
 
 const mapActionToProps = {

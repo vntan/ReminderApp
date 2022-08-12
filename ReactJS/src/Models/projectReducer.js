@@ -44,10 +44,19 @@ const projectSlice = createSlice({
         deleteParticipantToProjectSuccess(state,action){
             let index = -1
             index = state.projectInfo.participants.findIndex(value => {
-                return value.idUser === action.payload.userIDAdd
+                return value.idUser === action.payload.userIDDelete
             })
             if(index > -1){
                 state.projectInfo.participants.splice(index,1)
+            }
+        },
+        updateParticipantToProjectSuccess(state,action){
+            let index = -1
+            index = state.projectInfo.participants.findIndex(value => {
+                return value.idUser === action.payload.userIDUpdate
+            })
+            if(index > -1){
+                state.projectInfo.participants[index].role = action.payload.role
             }
         },
         deleteProjectSuccess(state,action){
@@ -78,7 +87,7 @@ const projectSlice = createSlice({
     }
 })
 
-const {getAllProjectSuccess, showProjectInformationSuccess, editProjectSuccess, addParticipantSuccess,deleteParticipantToProjectSuccess,deleteProjectSuccess,leaveProjectSuccess,addProjectSuccess} = projectSlice.actions
+const {getAllProjectSuccess, showProjectInformationSuccess, editProjectSuccess, addParticipantSuccess,deleteParticipantToProjectSuccess,deleteProjectSuccess,leaveProjectSuccess,addProjectSuccess, updateParticipantToProjectSuccess} = projectSlice.actions
 
 
 export const getAllProject = (projectInfo, cb) => async dispatch => {
@@ -143,7 +152,7 @@ export const deleteParticipantToProject = (projectInfo,cb) => async dispatch => 
     .then((res) => {
         console.log(projectInfo)
         if(res.data.onSuccess){
-            dispatch(deleteParticipantToProjectSuccess({userIDAdd:projectInfo.userIDAdd}))
+            dispatch(deleteParticipantToProjectSuccess({userIDDelete:projectInfo.userIDDelete}))
         }
         cb(res.data.onSuccess)
     })
@@ -152,6 +161,23 @@ export const deleteParticipantToProject = (projectInfo,cb) => async dispatch => 
         cb(error)
     });
 }
+
+export const updateParticipantToProject = (projectInfo,cb) => async dispatch => {
+    axios.post('/projects/updateParticipantToProject',projectInfo)
+    .then((res) => {
+        console.log(projectInfo)
+        if(res.data.onSuccess){
+            dispatch(updateParticipantToProjectSuccess({userIDUpdate:projectInfo.userIDUpdate, role: projectInfo.role}))
+        }
+        cb(res.data.onSuccess)
+    })
+    .catch(function (error) {
+        console.log(error);
+        cb(error)
+    });
+}
+
+
 export const deleteProject = (projectInfo,cb) => async dispatch => {
     axios.post('/projects/deleteProject',projectInfo)
     .then((res) => {

@@ -118,6 +118,20 @@ const getUserID = (req, res) =>{
     else res.json({onSuccess: false, result: "Cannot receive the data"});
 }
 
+const getUserInformation = (req, res) =>{
+    console.log(req.body)
+
+    const userID = req.body["userID"];
+
+    
+    if (userID){
+        account.getUserInformation(userID, (err, rows)=>{
+            if(err) res.json({onSuccess: false, error: err.sqlMessage});
+            else res.json({onSuccess: true, result: rows[0]});
+        });
+    }
+    else res.json({onSuccess: false, result: "Cannot receive the data"});
+}
 
 
 module.exports = {
@@ -127,6 +141,7 @@ module.exports = {
     updateUserInformation,
     deleteUser,
     getUserID,
+    getUserInformation,
     updateUserPassword,
     deleteUser
 }

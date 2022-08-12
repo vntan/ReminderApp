@@ -46,12 +46,6 @@ const AddNewProject = (props) => {
     <Form.Item
       label="Description"
       name="description"
-      rules={[
-        {
-          required: true,
-          message: 'Please input your description!!!',
-        },
-      ]}
     >
       <Input />
     </Form.Item>

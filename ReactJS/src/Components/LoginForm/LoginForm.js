@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Form, Input, Button, Divider, message } from "antd";
+import { Form, Input, Button, Divider, message, notification } from "antd";
 import "../../Helper/WHResponsive.css";
 import "./LoginForm.css";
 
@@ -38,7 +38,10 @@ const LoginForm = ({ login, loginGoogle }) => {
     loginGoogle({ name, email, password, urlImage }, (result) => {
       console.log(result);
       if (result) {
-        message.success("Login successfully!", 3);
+        notification.success({
+          message: 'Login successfully!',
+          top: 24,
+        });
         navigate("/", { replace: true });
       } else message.error("Login failed! Please login this account again!", 3);
     });
@@ -51,7 +54,10 @@ const LoginForm = ({ login, loginGoogle }) => {
     console.log("Received values of form: ", values);
     await login(values, (result) => {
       if (result) {
-        message.success("Login successfully!", 3);
+        notification.success({
+          message: 'Login successfully!',
+          top: 24,
+        });
         navigate("/", { replace: true });
       } else message.error("Login failed! Please check your account!", 3);
     });

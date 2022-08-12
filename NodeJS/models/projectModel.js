@@ -19,9 +19,14 @@ var project ={
             [projectID, userIDAdmin, userIDAdd, role], cb);
     },
 
-    deleteParticipantToProject: function (projectID, userIDAdd, role, cb) {
+    deleteParticipantToProject: function (projectID, userIDDelete, role, cb) {
         return db.query("call deleteParticipantToProject(?, ?, ?)", 
-            [projectID, userIDAdd, role], cb);
+            [projectID, userIDDelete, role], cb);
+    },
+
+    updateParticipantToProject: function (projectID, userIDUpdate, role, cb) {
+        return db.query("call updateParticipantToProject(?, ?, ?)", 
+            [projectID, userIDUpdate, role], cb);
     },
 
     deleteProject:  function (projectID, userID, cb) {

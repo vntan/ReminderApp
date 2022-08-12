@@ -17,25 +17,32 @@ const UserInformation = (props) => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
-    if (values.password !== values.repassword) {
+
+    if (values.fullName === "") {
+      message.error("Please enter your name", 3);
+      return;
+    }
+
+    if (values.password !== "" && values.password !== values.repassword) {
       message.error("Re-enter password incorrect! Please enter again", 3);
       return;
     }
 
-    values.password = MD5(values.password).toString();
+    // console.log(values.password)
+    // return;
 
     const id = props.user.idAccount;
     const name = values.fullName;
-    const password = values.password;
-    const urlImage = "";
+    const password = values.password === "" || !values.password ? null : MD5(values.password).toString();
+    const urlImage = props.user.urlImage;
 
     props.changePassword({ id, name, password, urlImage }, (result) => {
-      if (result.onSuccess) {
-        message.success("Change password complete!", 3);
+      if (result) {
+        message.success("Update user's information complete!", 3);
         props.setIsModalVisible(false);
         form.resetFields();
       } else {
-        message.error("Can not change password!", 3);
+        message.error("Cannot update user's information!", 3);
       }
     });
   };
@@ -50,7 +57,8 @@ const UserInformation = (props) => {
           marginBottom: "20px",
         }}
       >
-        <Avatar size={50}>{props.user.name[0]}</Avatar>
+
+        <Avatar size={50} src={props.user.urlImage}>{props.user.name[0]}</Avatar>
         <div style={{ fontSize: "20px" }}>{props.user.name}</div>
       </div>
       <Form
@@ -58,6 +66,13 @@ const UserInformation = (props) => {
         name="form_login"
         className={styles.login - form}
         onFinish={onFinish}
+        initialValues={
+          {
+            "fullName": props.user.name,
+            "password": "",
+            "repassword": "",
+          }
+        }
       >
         <Form.Item>
           <div className={styles.Email}>
@@ -68,13 +83,11 @@ const UserInformation = (props) => {
         <Form.Item
           name="fullName"
           validateTrigger={["onSubmit", "onBlur"]}
-          rules={[{ required: true, message: "Please input your full name!" }]}
         >
           <Input
             size="large"
             prefix={<UserOutlined />}
             placeholder="Fullname"
-            defaultValue={props.user.name}
             className="rounded"
           />
         </Form.Item>
@@ -82,17 +95,6 @@ const UserInformation = (props) => {
         <Form.Item
           name="password"
           validateTrigger={["onSubmit", "onBlur"]}
-          rules={[
-            {
-              validator: async (_, password) => {
-                if (!password) {
-                  return Promise.reject(
-                    new Error("Please input your new password")
-                  );
-                }
-              },
-            },
-          ]}
         >
           <Input.Password
             size="large"
@@ -108,12 +110,6 @@ const UserInformation = (props) => {
         <Form.Item
           name="repassword"
           validateTrigger={["onSubmit", "onBlur"]}
-          rules={[
-            {
-              required: true,
-              message: "Please confirm your password!",
-            },
-          ]}
         >
           <Input.Password
             size="large"

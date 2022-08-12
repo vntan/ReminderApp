@@ -138,6 +138,12 @@ ON DELETE CASCADE;
 /*
 ----------------------------- Account -------------------------------------------
 */
+delimiter //
+create procedure getAccount(in userID int)
+begin
+	select `idAccount`,`name`,`email`, `urlImage` from account where account.idAccount = userID;
+end//
+
 
 delimiter //
 create procedure login(in emailAccount varchar(100), in passwordAccount nvarchar(100))
@@ -177,8 +183,9 @@ delimiter //
 create procedure updateAccountInformation(in accountID int, in nameUser varchar(100), in passwordUser varchar(500), in urlImageUser varchar(500))
 begin
 	if exists (select * from account where idAccount = accountID) then
-		update account set name = nameUser, password = passwordUser, urlImage = urlImageUser
-        where idAccount = accountID;
+		if (nameUser != "") then update account set name = nameUser where idAccount = accountID; end if;
+        if (passwordUser != "") then update account set password = passwordUser where idAccount = accountID; end if;
+		if (urlImageUser != "") then update account set urlImage = urlImageUser where idAccount = accountID; end if; 
 	else
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the account to update';
 	end if;
@@ -322,6 +329,12 @@ delimiter //
 create procedure deleteParticipantToProject(in projectID int, in userIDDelete int, roleUser varchar(100))
 begin
 	delete from projectparticipant where idProject = projectID and idUser = userIDDelete and role like roleUser;
+end//
+
+delimiter //
+create procedure updateParticipantToProject(in projectID int, in userIDUpdate int, roleUser varchar(100))
+begin
+	update projectparticipant set role = roleUser where idProject = projectID and idUser = userIDUpdate;
 end//
 
 delimiter //

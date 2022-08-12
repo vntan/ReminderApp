@@ -3,8 +3,8 @@
     font-size: 20px;
     padding : 5px 0; 
     width: 24vw;
-    max-width: 160px;
     border: none; 
-    
+    max-width: 160px;
+    min-width: 160px;
 }
 

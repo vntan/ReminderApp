@@ -11,13 +11,20 @@
 
 .profile {
   width: 30%; 
-  font-size: 1.4rem; 
+  font-size: 1.2rem; 
   font-weight: 500;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   margin-right: 2%;
   max-width: 240px;
+}
+
+.profile > span{
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  display:inline-block;
 }
 
 .profile:hover {
