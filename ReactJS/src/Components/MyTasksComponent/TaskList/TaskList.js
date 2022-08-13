@@ -15,12 +15,13 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
 
   const [loading, setLoading] = useState(false);
 
+
   useEffect(() => {
     setLoading(true);
 
-    getTasks(idAccount, () => {
-      setLoading(false);
-    });
+    // getTasks(idAccount, () => {
+    //   setLoading(false);
+    // });
 
     console.log(tasks);
 
@@ -71,6 +72,7 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
         handleEditTask={handleEditTask}
         handleEditStatusTask={handleEditStatusTask}
         handleDeleteTask={handleDeleteTask}
+        defaultHideColumns={["Assignees", "Subtasks"]}
       ></TableTasks>
 
       {showTaskInfo &&

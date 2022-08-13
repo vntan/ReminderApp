@@ -3,9 +3,16 @@ import styles from './MenuSelectColumns.module.css'
 
 import { connect } from "react-redux";
 import { updateVisibleColumns } from "../../Models/columnsTableReducer";
+import { useEffect } from "react";
 
 
-const SelectColumnsMenu = ({ columnsTable, updateVisibleColumns }) => {
+const SelectColumnsMenu = ({ columnsTable, updateVisibleColumns, columnsTableDisable }) => {
+
+    useEffect(() => {
+        if (!columnsTableDisable) columnsTableDisable = [];
+        else columnsTableDisable =
+            console.log(columnsTableDisable)
+    }, []);
 
     const getColumnsVisible = () => {
         return columnsTable.map((columns) => {
@@ -23,16 +30,14 @@ const SelectColumnsMenu = ({ columnsTable, updateVisibleColumns }) => {
                 <Col>
                     {
                         columnsTable.map((columns, index) => {
-                            if (columns.title.toLowerCase() === 'action') {
-                                return <Row style={{ marginBottom: "12px" }} key={index}>
-                                    <Checkbox value={columns.title} disabled >
-                                        {columns.title}
-                                    </Checkbox>
-                                </Row>
-                            }
                             return (
                                 <Row style={{ marginBottom: "12px" }} key={index}>
-                                    <Checkbox value={columns.title} >
+                                    <Checkbox value={columns.title}
+                                        disabled={columnsTableDisable &&
+                                            columnsTableDisable.map(columns => columns.toLowerCase())
+                                                .includes(columns.title.toLowerCase())
+                                        }
+                                    >
                                         {columns.title}
                                     </Checkbox>
                                 </Row>

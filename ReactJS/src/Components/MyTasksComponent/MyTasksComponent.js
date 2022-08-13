@@ -22,7 +22,6 @@ const MyTasksComponent = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [columnsTable, setColumnsTable] = useState([]);
   const [showCreateTask, setShowCreateTask] = useState(false)
 
 
@@ -79,8 +78,7 @@ const MyTasksComponent = (props) => {
         <div className={styles.groupControl}>
           <Popover
             content={
-              <SelectColumnsMenu columnsTable={props.columnsTable}
-                updateVisibleColumns={props.updateVisibleColumns} />
+              <SelectColumnsMenu columnsTableDisable={["Action", "Task"]} />
             }
             trigger="click"
             placement="bottomLeft"

@@ -5,8 +5,8 @@ import { completeColor, onGoingColor, toDoColor } from '../Utilities/Color';
 /* initial state */
 const initialState = [
     { nameStatus: "To do", isVisible: true, style: {color: toDoColor} },
-    { nameStatus: "Complete", isVisible: true, style: {color: completeColor} },
     { nameStatus: "On going", isVisible: true, style: {color: onGoingColor} },
+    { nameStatus: "Complete", isVisible: true, style: {color: completeColor} },
 ]
 
 //Reducer

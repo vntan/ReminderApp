@@ -5,10 +5,6 @@ var tasks ={
         return db.query("call showUserTasks(?);", [userID], cb)
     },
     
-    showProjectTasks: function(userID, projectID, listID, cb){
-        return db.query("call showProjectTasks(?, ?, ?);", [userID, projectID, listID], cb)
-    },
-
     addTasks: function(userID, taskInfo, cb){
         return db.query("CALL addTask(?,?,?,?,?,?,?);", [
             userID, taskInfo.projectID, taskInfo.listID, taskInfo.nameTask, taskInfo.status, taskInfo.descriptionTask, taskInfo.dueDateTask 

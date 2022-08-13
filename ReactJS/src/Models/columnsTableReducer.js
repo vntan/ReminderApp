@@ -14,6 +14,7 @@ const columnsTableSlice = createSlice({
     initialState: initialState,
     reducers: {
         resetColumns(state, action){
+            state.splice(0, state.length)
             state.push(...action.payload);
         },
 

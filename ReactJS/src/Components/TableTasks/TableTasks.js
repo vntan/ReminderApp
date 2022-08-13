@@ -1,6 +1,6 @@
 import styles from "./TableTasks.module.css";
 import { Avatar } from "antd";
-import { Space, Table, } from 'antd';
+import { Space, Table, Tag } from 'antd';
 
 import { connect } from 'react-redux'
 import { getTasks } from '../../Models/tasksReducer'
@@ -17,7 +17,7 @@ import moment from 'moment';
 import { Button, Input, } from 'antd';
 import Highlighter from 'react-highlight-words';
 
-const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask, handleEditStatusTask, handleDeleteTask, resetColumns, columnsTable }) => {
+const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask, handleEditStatusTask, handleDeleteTask, resetColumns, columnsTable, defaultHideColumns }) => {
 
 
     const handleClickTask = (task) => {
@@ -42,11 +42,11 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
 
     const columns = [
         {
-            title: "Task", isVisible: true, ellipsis: true, fixed: true, dataIndex: "nameTask",
+            title: "Task", width: '15%', isVisible: true, ellipsis: true, fixed: true, dataIndex: "nameTask",
         },
 
         {
-            title: "Deadline", width: "12%", isVisible: true, ellipsis: true, dataIndex: "dueDate",
+            title: "Deadline", isVisible: true, ellipsis: true, dataIndex: "dueDate",
             defaultSortOrder: 'ascend',
             sorter: (task1, task2) => {
                 return new moment(task1.dueDate, 'DD/MM/YYYY') - new moment(task2.dueDate, 'DD/MM/YYYY')
@@ -54,22 +54,22 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
         },
 
         {
-            title: "Notification", width: "12%", isVisible: true, ellipsis: true, dataIndex: "notification",
+            title: "Notification", isVisible: true, ellipsis: true, dataIndex: "notification",
             sorter: (task1, task2) => {
                 return new moment(task1.notification, 'DD/MM/YYYY') - new moment(task2.notification, 'DD/MM/YYYY')
             }
         },
         {
-            title: "Status", isVisible: true, width: "10%", dataIndex: "status", ellipsis: true,
+            title: "Status", isVisible: true, dataIndex: "status", ellipsis: true,
             filters: statusInfo.map((status) => { return { "text": status.nameStatus, value: status.nameStatus } }),
             filterMode: 'tree',
             filterSearch: true,
             onFilter: (value, record) => record["status"] === value,
             render: (text, record) => (
-                <div onClick={(e)=>{e.stopPropagation();}}>
+                <div onClick={(e) => { e.stopPropagation(); }}>
                     <StatusSelector task={record} onChangeValue={onChangeValue} />
                 </div>
-                
+
             )
         },
         { title: "Project", width: "8%", isVisible: true, ellipsis: true, dataIndex: "nameProject" },
@@ -92,7 +92,28 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
                 )
             }
         },
-        { title: "Subtask", isVisible: true, width: "10%", dataIndex: "subtasks" },
+        { title: "Subtasks", isVisible: true, width: "10%", dataIndex: "subtasks" },
+        {
+            title: 'Tags',
+            key: 'tag',
+            isVisible: true,
+            dataIndex: 'tag',
+            render: (_, { tags }) => (
+                <>
+                    {tags.map(tag => {
+                        let color = tag.length > 5 ? 'geekblue' : 'green';
+                        if (tag === 'loser') {
+                            color = 'volcano';
+                        }
+                        return (
+                            <Tag color={color} key={tag}>
+                                {tag.toUpperCase()}
+                            </Tag>
+                        );
+                    })}
+                </>
+            ),
+        },
         {
             title: "Action", width: "8%", isVisible: true, fixed: true, fixed: 'right', render: (_, record) => (
                 <div style={{ display: 'flex', }}>
@@ -102,14 +123,21 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
             )
         },
 
+
+
     ];
 
 
 
 
     useEffect(() => {
-        if (columnsTable.length === 0) resetColumns(columns);
-    }, []);
+        resetColumns(columns.map(col => {
+            col.isVisible = !defaultHideColumns
+                || (defaultHideColumns && !defaultHideColumns.map(p => p.toLowerCase()).includes(col.title.toLowerCase()))
+            return col;
+        }));
+
+    }, [defaultHideColumns]);
 
 
     return (

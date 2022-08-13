@@ -44,11 +44,11 @@ const addTasks = (req, res) => {
 
     if (userID && taskInfo) {
         tasks.addTasks(userID, taskInfo, (err, rows) => {
-            console.log(rows)
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
             else res.json({
-                onSuccess: true, data: {
-                    taskID: rows
+                onSuccess: true, 
+                data: {
+                    taskID: rows[0][0].idTask
                 }
             });
         });

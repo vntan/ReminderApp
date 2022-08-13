@@ -17,6 +17,7 @@ const ProjectList = (props) => {
       console.log('projectList',props.projectID, list)
   }, [props.projectID, list])
 
+
   const handleChangeList = (list) => {
     setList(list);
   };
@@ -48,7 +49,7 @@ const ProjectList = (props) => {
         <div className={styles.groupControl}>
           <Popover
             content={
-              <SelectColumnsMenu />
+              <SelectColumnsMenu columnsTableDisable={["Action", "Task"]}/>
             }
             trigger="click"
             placement="bottomLeft"
@@ -64,6 +65,7 @@ const ProjectList = (props) => {
         handleEditTask={handleEditTask}
         handleEditStatusTask={handleEditStatusTask}
         handleDeleteTask={handleDeleteTask}
+        defaultHideColumns={["Project", "List"]}
       ></TableTasks>
 
     </>

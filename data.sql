@@ -138,6 +138,7 @@ ON DELETE CASCADE;
 /*
 ----------------------------- Account -------------------------------------------
 */
+
 delimiter //
 create procedure getAccount(in userID int)
 begin
@@ -467,38 +468,37 @@ begin
 	from task 
     left join project on project.idProject = task.idProject
     left join listtask on listtask.idList = task.idList
-    where idProject in (select idProject from projectparticipant where idUser = userID)
-	  or idList in (select idList from listtask where idUser = userID);
-end//
-
-delimiter //
-create procedure showProjectTasks(in userID int, in projectID int, in listID int)
-begin
-	if (not exists(select * from projectparticipant where projectID = IDproject and  idUser = userID)) then
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Your permission is denied';
-	end if;
-
-	if listID = -1 then
-			select task.*, project.*, listtask.*,
-				getNearestNotification(task.idTask, userID) as 'notification',
-				getCountSubTasksStatus(task.idTask, null) as 'countTasks',
-				getCountSubTasksStatus(task.idTask, 'Complete') as 'countCompleteTasks'  
-			from task 
-			left join project on project.idProject = task.idProject
-			left join listtask on listtask.idList = task.idList
-			where idProject = projectID;
-    else
-			select task.*, project.*, listtask.*,
-				getNearestNotification(task.idTask, userID) as 'notification',
-				getCountSubTasksStatus(task.idTask, null) as 'countTasks',
-				getCountSubTasksStatus(task.idTask, 'Complete') as 'countCompleteTasks'  
-			from task 
-			left join project on project.idProject = task.idProject
-			left join listtask on listtask.idList = task.idList
-			where idProject = projectID and idList = listID;
-    end if;
-
-
+    where task.idProject in (select idProject from projectparticipant where idUser = userID)
+	  or task.idList in (select idList from listtask where idUser = userID);
+      
+      
+	select * from taskparticipant where idTask in
+		(
+			select task.idTask from task  
+			where task.idProject in (select idProject from projectparticipant where idUser = userID)
+			or task.idList in (select idList from listtask where idUser = userID)
+		);
+        
+	select * from notification where idTask in
+		(
+			select task.idTask from task  
+			where task.idProject in (select idProject from projectparticipant where idUser = userID)
+			or task.idList in (select idList from listtask where idUser = userID)
+		);
+        
+	select * from subtask where idTask in
+		(
+			select task.idTask from task  
+			where task.idProject in (select idProject from projectparticipant where idUser = userID)
+			or task.idList in (select idList from listtask where idUser = userID)
+		);
+        
+	select * from tag where idTask in
+		(
+			select task.idTask from task  
+			where task.idProject in (select idProject from projectparticipant where idUser = userID)
+			or task.idList in (select idList from listtask where idUser = userID)
+		);        
 end//
 
 delimiter //
@@ -511,16 +511,22 @@ begin
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
 	end if;
     
-    if (not exists (select * from projectparticipant where idProject = projectID and idUser = userID)) then
-		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account have not permission';
-    end if;
+    if (projectID = -1) then
+		if (not exists (select * from listtask where idList = idList and idUser = userID)) then
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account have not permission';
+		end if;
+    else
+		if (not exists (select * from projectparticipant where idProject = projectID and idUser = userID)) then
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account have not permission';
+		end if;
+	end if;
     
 	insert task(idProject, idList, name, status, description, dueDate)
 	values (projectID, listID, nameTask, statusTask, descriptionTask, dueDateTask);
     
     select max(idTask) into taskID from task where name = nameTask and dueDate = dueDateTask;
     call addTaskParticipant(taskID, userID);
-	select max(idTask) from task where name = nameTask and dueDate = dueDateTask;
+	select max(idTask) as 'idTask' from task where name = nameTask and dueDate = dueDateTask;
 end//
 
 delimiter //

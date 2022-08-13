@@ -6,11 +6,12 @@ import 'antd/dist/antd.css';
 import {
     Button, Modal, Checkbox, Row,
     Col, Form, Input, Avatar,
-    DatePicker, List, Select, Tag, Tooltip
+    DatePicker, List, Select, Tag, Tooltip,
+    message
 } from 'antd';
 import {
-    EditFilled, DeleteFilled, TeamOutlined,
-    FolderOutlined, CheckOutlined,
+    DeleteFilled,
+    FolderOutlined,
     FileTextOutlined, UnorderedListOutlined, LineChartOutlined,
     HourglassOutlined, BellOutlined, CloseOutlined, TagsOutlined, PlusOutlined, UserOutlined
 } from '@ant-design/icons'
@@ -43,7 +44,7 @@ const CreateTask = (props) => {
         name: '',
         idProject: -1,
         idList: -1,
-        dueDate: '',
+        dueDate: moment(today, dateFormat),
         status: 'To do',
         tag: '',
         notification: [],
@@ -52,6 +53,21 @@ const CreateTask = (props) => {
     })
 
     const submitTask = () => {
+        if (taskInfo.name == "") {
+            message.error('Please input your task name!');
+            return;
+        }
+
+        if (taskInfo.idProject == -1 && taskInfo.idList == -1) {
+            message.error('Please select the project');
+            return;
+        }
+
+        if (taskInfo.idProject > -1 && taskInfo.idList == -1) {
+            message.error('Please select the list');
+            return;
+        }
+
         props.handleOk({
             userID: userID,
             projectID: taskInfo.idProject,
@@ -66,7 +82,6 @@ const CreateTask = (props) => {
     const [urlPhoto, setUrlPhoto] = useState([])
 
     const statusToColor = (status) => {
-        console.log(props.filterStatus)
         const findStatus = props.filterStatus.find(s => s.nameStatus === status);
         return findStatus ? { ...findStatus.style } : { color: "000" };
     };
@@ -88,7 +103,7 @@ const CreateTask = (props) => {
     }
 
     const changeProject = (value) => {
-        setTaskInfo({ ...taskInfo, idProject: value })
+        setTaskInfo({ ...taskInfo, idProject: value, idList: -1})
     }
 
     const changeList = (value) => {
@@ -243,15 +258,17 @@ const CreateTask = (props) => {
                     onCancel={props.handleCancel}
                     maskClosable={false}
                     width={800}
-                    bodyStyle={{ maxHeight: 500 }}
+                    bodyStyle={{ maxHeight: 500, overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}
                     centered
                     destroyOnClose
-                    bodyStyle={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}
-                >
 
-                    <Form.Item >
-                        <Input value={taskInfo.name} placeholder='Enter name of Task' onChange={(e) => changeName(e)} />
-                    </Form.Item>
+                >
+                    <Form>
+                        <Form.Item name="nameTask" rules={[{ required: true, message: 'Please input your task name!' }]}>
+                            <Input value={taskInfo.name} placeholder='Enter Name of Task' onChange={(e) => changeName(e)} />
+                        </Form.Item>
+                    </Form>
+
 
                     {/* <Form layout="vertical">
                         <Form.Item label={
@@ -307,14 +324,15 @@ const CreateTask = (props) => {
                                         value={taskInfo.idList === -1 || !list ? '- Choose the list -' : list.find((item) => item.idList === taskInfo.idList).name}
                                     >
                                         <Option value={-1}>Add List</Option>
-                                        {list && list.filter((item) => {
-                                            return taskInfo.idProject !== -1 ?
-                                                item.idProject === taskInfo.idProject
-                                                :
-                                                item.idProject === null
-                                        }).map((item, index) => (
-                                            <Option key={item.idList} value={item.idList}>{item.name}</Option>
-                                        ))}
+                                        {
+                                            list && list.filter((item) => {
+                                                return taskInfo.idProject !== -1 ?
+                                                    item.idProject === taskInfo.idProject
+                                                    :
+                                                    item.idProject === null
+                                            }).map((item) => (
+                                                <Option key={item.idList} value={item.idList}>{item.name}</Option>
+                                            ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
@@ -329,7 +347,8 @@ const CreateTask = (props) => {
                         }>
                             <DatePicker
                                 showTime
-                                defaultValue={moment(taskInfo.dueDate.length > 0 ? taskInfo.dueDate : today, dateFormat)}
+                                inputReadOnly={true}
+                                defaultValue={taskInfo.dueDate}
                                 disabledDate={disabledDate}
                                 onChange={changeDueDate} />
                         </Form.Item>
