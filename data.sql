@@ -472,7 +472,9 @@ begin
 	  or task.idList in (select idList from listtask where idUser = userID);
       
       
-	select * from taskparticipant where idTask in
+	select t.*, a.idAccount, a.name, a.email, a.urlImage from taskparticipant as t
+    left join account as a on a.idAccount = t.idUser
+    where idTask in
 		(
 			select task.idTask from task  
 			where task.idProject in (select idProject from projectparticipant where idUser = userID)
@@ -515,6 +517,7 @@ begin
 		if (not exists (select * from listtask where idList = idList and idUser = userID)) then
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account have not permission';
 		end if;
+        set projectID =  null;
     else
 		if (not exists (select * from projectparticipant where idProject = projectID and idUser = userID)) then
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This account have not permission';
