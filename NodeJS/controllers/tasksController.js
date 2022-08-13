@@ -3,7 +3,7 @@ const tasks = require('../models/tasksModels');
 const showUserTasks = (req, res) => {
     console.log(req.body)
     const userID = req.body["userID"]
-    
+
     if (userID) {
         tasks.showUserTasks(userID, (err, rows) => {
             if (err) res.json({ onSuccess: false, error: err });
@@ -18,7 +18,7 @@ const showProjectTasks = (req, res) => {
     const userID = req.body["userID"]
     const projectID = req.body["projectID"]
     const listID = req.body["listID"]
-    
+
     if (userID && projectID && listID) {
         tasks.showProjectTasks(userID, projectID, listID, (err, rows) => {
             if (err) res.json({ onSuccess: false, error: err });
@@ -40,12 +40,17 @@ const addTasks = (req, res) => {
     const descriptionTask = req.body["descriptionTask"]
     const dueDateTask = req.body["dueDateTask"]
 
-    const taskInfo = { projectID, listID, nameTask, status, descriptionTask, dueDateTask}
+    const taskInfo = { projectID, listID, nameTask, status, descriptionTask, dueDateTask }
 
     if (userID && taskInfo) {
-        tasks.addTasks(userID, taskInfo, (err) => {
+        tasks.addTasks(userID, taskInfo, (err, rows) => {
+            console.log(rows)
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
-            else res.json({ onSuccess: true });
+            else res.json({
+                onSuccess: true, data: {
+                    taskID: rows
+                }
+            });
         });
     }
     else res.json({ onSuccess: false, error: "Can't receive the data" });
@@ -56,7 +61,7 @@ const addNotification = (req, res) => {
     const taskID = req.body["taskID"]
     const userID = req.body["userID"]
     const reminder = req.body["reminder"]
-    
+
     if (taskID && userID && reminder) {
         tasks.addNotification(taskID, userID, reminder, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -70,7 +75,7 @@ const addTag = (req, res) => {
     console.log(req.body)
     const taskID = req.body["taskID"]
     const nameTag = req.body["nameTag"]
-    
+
     if (taskID && nameTag) {
         tasks.addTag(taskID, nameTag, reminder, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -84,7 +89,7 @@ const addTaskParticipant = (req, res) => {
     console.log(req.body)
     const taskID = req.body["taskID"]
     const userID = req.body["userID"]
-    
+
     if (taskID && userID) {
         tasks.addTaskParticipant(taskID, userID, reminder, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -99,7 +104,7 @@ const addSubtasks = (req, res) => {
     const taskID = req.body["taskID"]
     const nameSubTask = req.body["nameSubTask"]
     const statusSubtask = req.body["statusSubtask"]
-    
+
     if (taskID && nameSubTask && statusSubtask) {
         tasks.addSubtasks(taskID, nameSubTask, statusSubtask, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -112,7 +117,7 @@ const addSubtasks = (req, res) => {
 const deleteTasks = (req, res) => {
     console.log(req.body)
     const taskID = req.body["taskID"]
-    
+
     if (taskID) {
         tasks.deleteTasks(taskID, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -127,7 +132,7 @@ const deleteNotification = (req, res) => {
     const taskID = req.body["taskID"]
     const userID = req.body["userID"]
     const reminder = req.body["reminder"]
-    
+
     if (taskID && userID && reminder) {
         tasks.deleteNotification(taskID, userID, reminder, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -140,7 +145,7 @@ const deleteNotification = (req, res) => {
 const deleteTag = (req, res) => {
     console.log(req.body)
     const tagID = req.body["tagID"]
-    
+
     if (tagID) {
         tasks.deleteTag(tagID, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -153,7 +158,7 @@ const deleteTag = (req, res) => {
 const deleteAllTag = (req, res) => {
     console.log(req.body)
     const taskID = req.body["taskID"]
-    
+
     if (taskID) {
         tasks.deleteAllTag(taskID, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -168,7 +173,7 @@ const deleteTaskParticipant = (req, res) => {
     console.log(req.body)
     const taskID = req.body["taskID"]
     const userID = req.body["userID"]
-    
+
     if (taskID && userID) {
         tasks.deleteTaskParticipant(taskID, userID, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -181,7 +186,7 @@ const deleteTaskParticipant = (req, res) => {
 const deleteSubtasks = (req, res) => {
     console.log(req.body)
     const subTaskID = req.body["subTaskID"]
-    
+
     if (tagID) {
         tasks.deleteSubtasks(subTaskID, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -202,7 +207,7 @@ const updateTasks = (req, res) => {
     const descriptionTask = req.body["descriptionTask"]
     const dueDateTask = req.body["dueDateTask"]
 
-    const taskInfo = { taskID, projectID, listID, nameTask, status, descriptionTask, dueDateTask}
+    const taskInfo = { taskID, projectID, listID, nameTask, status, descriptionTask, dueDateTask }
 
     if (taskInfo) {
         tasks.updateTasks(taskInfo, (err) => {
@@ -218,7 +223,7 @@ const updateTaskProjectList = (req, res) => {
     const taskID = req.body["taskID"]
     const idProject = req.body["idProject"]
     const idList = req.body["idList"]
-    
+
     if (taskID && idProject && idList) {
         tasks.updateTaskProjectList(taskID, idProject, idList, (err, rows) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
@@ -231,9 +236,9 @@ const updateTaskProjectList = (req, res) => {
 const updateTaskStatus = (req, res) => {
     console.log(req.body)
     const taskID = req.body["taskID"]
-    const newStatus = req.body["status"] 
-    
-    
+    const newStatus = req.body["status"]
+
+
     if (taskID && newStatus) {
         tasks.updateTaskStatus(taskID, newStatus, (err, rows) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });

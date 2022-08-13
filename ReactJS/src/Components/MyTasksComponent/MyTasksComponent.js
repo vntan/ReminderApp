@@ -16,6 +16,8 @@ import TaskCalendar from "./TaskCalendar/TaskCalendar";
 import { updateVisibleColumns } from "../../Models/columnsTableReducer";
 import { connect } from "react-redux";
 
+import { addTask } from "../../Models/tasksReducer";
+
 const MyTasksComponent = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,22 +55,14 @@ const MyTasksComponent = (props) => {
     console.log("Add Task", props.projects, props.lists);
   };
 
-  const closeCreateTask = () => {
-    // setShowCreateTask(false)
-  }
-
-  const addNewTask = (taskInfo) => {
-    // Call api
-    // setShowCreateTask(false)
-    console.log('Add new task: ', taskInfo)
-  }
-
-  const handleOk = () => {
-
+  const handleOk = (task, notification, subtask, tag) => {
+    // console.log(task, notification, subtask, tag)
+    props.addTask(task, tag, notification, subtask)
+    setShowCreateTask(false)
   }
 
   const handleCancel = () => {
-
+    setShowCreateTask(false)
   }
 
   return (
@@ -116,6 +110,8 @@ const MyTasksComponent = (props) => {
         showCreateTask={showCreateTask}
         handleOk={handleOk}
         handleCancel={handleCancel}
+        project={props.projects.listProject}
+        list={props.lists.list}
       // closeCreateTask={closeCreateTask}
       // addNewTask={addNewTask}
       />}
@@ -135,6 +131,7 @@ const mapStateToProps = (state) => {
 
 const mapActionToProps = {
   updateVisibleColumns,
+  addTask
 }
 
 export default connect(mapStateToProps, mapActionToProps)(MyTasksComponent);

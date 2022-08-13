@@ -520,6 +520,7 @@ begin
     
     select max(idTask) into taskID from task where name = nameTask and dueDate = dueDateTask;
     call addTaskParticipant(taskID, userID);
+	select max(idTask) from task where name = nameTask and dueDate = dueDateTask;
 end//
 
 delimiter //

@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { connect } from 'react-redux'
+import styles from './CreateTaskStyle.module.css'
 
 import 'antd/dist/antd.css';
 import {
     Button, Modal, Checkbox, Row,
     Col, Form, Input, Avatar,
-    DatePicker, List, Select
+    DatePicker, List, Select, Tag, Tooltip
 } from 'antd';
 import {
     EditFilled, DeleteFilled, TeamOutlined,
@@ -43,28 +44,24 @@ const CreateTask = (props) => {
         idProject: -1,
         idList: -1,
         dueDate: '',
-        status: '',
+        status: 'To do',
         tag: '',
         notification: [],
         description: '',
         subTask: []
     })
 
-    // const project = [
-    //     'Project 1',
-    //     'Project 2',
-    //     'Project 3',
-    //     'Project 6',
-    //     'Project 9'
-    // ]
-
-    // const list = [
-    //     'List 3',
-    //     'List 4',
-    //     'List 5',
-    //     'List 7',
-    //     'List 8'
-    // ]
+    const submitTask = () => {
+        props.handleOk({
+            userID: userID,
+            projectID: taskInfo.idProject,
+            listID: taskInfo.idList,
+            nameTask: taskInfo.name,
+            status: taskInfo.status,
+            descriptionTask: taskInfo.description,
+            dueDateTask: taskInfo.dueDate
+        }, taskInfo.notification, taskInfo.subTask, tags)
+    }
 
     const [urlPhoto, setUrlPhoto] = useState([])
 
@@ -185,13 +182,64 @@ const CreateTask = (props) => {
         setTaskInfo({ ...taskInfo, subTask: listSubtask })
     }
 
+    const [tags, setTags] = useState([]);
+    const [inputVisible, setInputVisible] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+    const [editInputIndex, setEditInputIndex] = useState(-1);
+    const [editInputValue, setEditInputValue] = useState('');
+    const inputRef = useRef(null);
+    const editInputRef = useRef(null);
+    useEffect(() => {
+        if (inputVisible) {
+            inputRef.current?.focus();
+        }
+    }, [inputVisible]);
+    useEffect(() => {
+        editInputRef.current?.focus();
+    }, [inputValue]);
+
+    const handleClose = (removedTag) => {
+        const newTags = tags.filter((tag) => tag !== removedTag);
+        console.log(newTags);
+        setTags(newTags);
+    };
+
+    const showInput = () => {
+        setInputVisible(true);
+    };
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+    };
+
+    const handleInputConfirm = () => {
+        if (inputValue && tags.indexOf(inputValue) === -1) {
+            setTags([...tags, inputValue]);
+        }
+
+        setInputVisible(false);
+        setInputValue('');
+    };
+
+    const handleEditInputChange = (e) => {
+        setEditInputValue(e.target.value);
+    };
+
+    const handleEditInputConfirm = () => {
+        const newTags = [...tags];
+        newTags[editInputIndex] = editInputValue;
+        setTags(newTags);
+        setEditInputIndex(-1);
+        setInputValue('');
+    };
+
     return (
         <>
             <div>
                 <Modal
                     title="Add Task"
                     visible={showCreateTask}
-                    onOk={props.handleOk}
+                    onOk={submitTask}
                     onCancel={props.handleCancel}
                     maskClosable={false}
                     width={800}
@@ -205,7 +253,7 @@ const CreateTask = (props) => {
                         <Input value={taskInfo.name} placeholder='Enter name of Task' onChange={(e) => changeName(e)} />
                     </Form.Item>
 
-                    <Form layout="vertical">
+                    {/* <Form layout="vertical">
                         <Form.Item label={
                             <><TeamOutlined
                                 style={{
@@ -220,7 +268,7 @@ const CreateTask = (props) => {
                                 <Button type="primary" shape="circle" icon={<PlusOutlined />} onClick={() => handleAddParticipant()}></Button>
                             </Avatar.Group>
                         </Form.Item>
-                    </Form>
+                    </Form> */}
 
                     <Form layout={'vertical'}
                     >
@@ -294,6 +342,7 @@ const CreateTask = (props) => {
                             /> &nbsp;Progress</>
                         }>
                             <Select
+                                defaultValue={'To do'}
                                 onChange={changeStatus}
                                 value={taskInfo.status}
                                 style={{ ...statusToColor(taskInfo.status), width: '205px' }}
@@ -333,14 +382,77 @@ const CreateTask = (props) => {
                             <><TagsOutlined style={{ fontSize: '25px', }}
                             /> &nbsp;Tag</>
                         }>
-                            <Input
+                            {/* <Input
                                 style={{
                                     width: '230px'
                                 }}
                                 value={taskInfo.tag}
                                 placeholder="Add more tag to your tag"
-                                onChange={(e) => changeTag(e)} />
+                                onChange={(e) => changeTag(e)} /> */}
+                            <>
+                                {tags.map((tag, index) => {
+                                    if (editInputIndex === index) {
+                                        return (
+                                            <Input
+                                                ref={editInputRef}
+                                                key={tag}
+                                                size="small"
+                                                className="tag-input"
+                                                value={editInputValue}
+                                                onChange={handleEditInputChange}
+                                                onBlur={handleEditInputConfirm}
+                                                onPressEnter={handleEditInputConfirm}
+                                            />
+                                        );
+                                    }
 
+                                    const isLongTag = tag.length > 20;
+                                    const tagElem = (
+                                        <Tag
+                                            className={styles.editTag}
+                                            key={tag}
+                                            closable={index !== 0}
+                                            onClose={() => handleClose(tag)}
+                                        >
+                                            <span
+                                                onDoubleClick={(e) => {
+                                                    if (index !== 0) {
+                                                        setEditInputIndex(index);
+                                                        setEditInputValue(tag);
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                            >
+                                                {isLongTag ? `${tag.slice(0, 20)}...` : tag}
+                                            </span>
+                                        </Tag>
+                                    );
+                                    return isLongTag ? (
+                                        <Tooltip title={tag} key={tag}>
+                                            {tagElem}
+                                        </Tooltip>
+                                    ) : (
+                                        tagElem
+                                    );
+                                })}
+                                {inputVisible && (
+                                    <Input
+                                        ref={inputRef}
+                                        type="text"
+                                        size="small"
+                                        className={styles.tagInput}
+                                        value={inputValue}
+                                        onChange={handleInputChange}
+                                        onBlur={handleInputConfirm}
+                                        onPressEnter={handleInputConfirm}
+                                    />
+                                )}
+                                {!inputVisible && (
+                                    <Tag className={styles.siteTagPlus} onClick={showInput}>
+                                        <PlusOutlined /> New Tag
+                                    </Tag>
+                                )}
+                            </>
                         </Form.Item>
                     </Form>
                     <Form layout="vertical">
