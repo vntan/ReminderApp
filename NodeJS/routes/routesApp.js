@@ -15,7 +15,7 @@ const initRoutesApp = (app) => {
     router.post('/accounts/getUserID', accountController.getUserID)
     router.post('/accounts/getUserInformation', accountController.getUserInformation)
     router.post('/accounts/updateUserPassword', accountController.updateUserPassword)
-    
+
 
     router.post('/projects/showAllProject', projectController.showAllProject)
     router.post('/projects/showProjectInfomation', projectController.showProjectInfomation)
@@ -29,6 +29,8 @@ const initRoutesApp = (app) => {
     router.post('/lists/showList', listController.showList)
     router.post('/lists/addListToProject', listController.addListToProject)
     router.post('/lists/addListToUser', listController.addListToUser)
+    router.post('/lists/addListByTaskToProject', listController.addListByTaskToProject)
+    router.post('/lists/addListByTaskToUser', listController.addListByTaskToUser)
     router.post('/lists/deleteList', listController.deleteList)
     router.post('/lists/editList', listController.editList)
 
@@ -41,8 +43,8 @@ const initRoutesApp = (app) => {
     // router.post('/tasks/updateTasks', tasksController.updateTasks)
     // router.post('/tasks/updateTaskProjectList', tasksController.updateTaskProjectList)
     // router.post('/tasks/updateTaskStatus', tasksController.updateTaskStatus)
-    
- 
+
+
     return app.use("/", router);
 }
 

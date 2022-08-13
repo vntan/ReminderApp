@@ -11,101 +11,137 @@ const initState = {
 const listSlice = createSlice({
     name: 'list',
     initialState: initState,
-    reducers:{
-        showListSuccess(state,action){
+    reducers: {
+        showListSuccess(state, action) {
             state.list = action.payload.data
         },
-        addListSuccess(state,action){
+        addListSuccess(state, action) {
             state.listOfProject = action.payload.data
         },
-        editListSuccess(state,action){
+        addListByTaskToProjectSuccess(state, action) {
+            state.list = action.payload.data
+        },
+        addListByTaskToUserSuccess(state, action) {
+            state.list = action.payload.data
+        },
+        editListSuccess(state, action) {
             let index = -1
             index = state.listOfProject.findIndex(value => {
                 return value.idList === action.payload.data.listID
             })
-            if(index > -1){
+            if (index > -1) {
                 state.listOfProject[index].name = action.payload.data.nameList
             }
         },
-        removeListSuccess(state,action){
+        removeListSuccess(state, action) {
             let index = -1
             index = state.listOfProject.findIndex(value => {
                 return value.idList === action.payload.listID
             })
-            if(index > -1){
-                state.listOfProject.splice(index,1)
+            if (index > -1) {
+                state.listOfProject.splice(index, 1)
             }
         },
-        updateList(state,action){
+        updateList(state, action) {
             console.log(action.payload)
             state.listOfProject = action.payload.data
         },
-        resetListOfProject(state,action){
+        resetListOfProject(state, action) {
             state.listOfProject = []
         }
     }
 })
 
-const {addListSuccess,editListSuccess,removeListSuccess,showListSuccess, updateList,showLIstToProjectSucess,resetListOfProject} = listSlice.actions
+const { addListSuccess, editListSuccess, removeListSuccess, showListSuccess, updateList, showLIstToProjectSucess, resetListOfProject, addListByTaskToProjectSuccess, addListByTaskToUserSuccess } = listSlice.actions
 
 export const showList = (listInfo) => async dispatch => {
-    axios.post('/lists/showList',listInfo)
-    .then((res) => {
-        if(res.data.onSuccess){
-            dispatch(showListSuccess({data:res.data.result}))
-        }
-    })
-    .catch(function(error){
-        console.log(error)
-    })
+    axios.post('/lists/showList', listInfo)
+        .then((res) => {
+            if (res.data.onSuccess) {
+                dispatch(showListSuccess({ data: res.data.result }))
+            }
+        })
+        .catch(function (error) {
+            console.log(error)
+        })
 }
-export const addList = (listInfo,cb) => async dispatch => {
-    axios.post('/lists/addListToProject',listInfo)
-    .then((res)=>{
-        if(res.data.onSuccess){
-            console.log(listInfo)
-            dispatch(addListSuccess({data:res.data.result}))
-        }
-        cb(res.data.onSuccess)
-    })
-    .catch(function (error) {
-        console.log(error);
-        cb(false);
-    });
+export const addList = (listInfo, cb) => async dispatch => {
+    axios.post('/lists/addListToProject', listInfo)
+        .then((res) => {
+            if (res.data.onSuccess) {
+                console.log(listInfo)
+                dispatch(addListSuccess({ data: res.data.result }))
+            }
+            cb(res.data.onSuccess)
+        })
+        .catch(function (error) {
+            console.log(error);
+            cb(false);
+        });
 }
 
-export const editList = (listInfo,cb) => async dispatch => {
+export const addListByTaskToProject = (listInfo, cb) => async dispatch => {
+    axios.post('/lists/addListByTaskToProject', listInfo)
+        .then((res) => {
+            if (res.data.onSuccess) {
+                console.log(res.data.result)
+                dispatch(addListByTaskToProjectSuccess({ data: res.data.result }))
+            }
+            cb(res.data.onSuccess)
+        })
+        .catch(function (error) {
+            console.log(error);
+            cb(false);
+        });
+}
+
+export const addListByTaskToUser = (listInfo, cb) => async dispatch => {
+    axios.post('/lists/addListByTaskToUser', listInfo)
+        .then((res) => {
+            if (res.data.onSuccess) {
+                console.log(res.data.result)
+                dispatch(addListByTaskToUserSuccess({ data: res.data.result }))
+            }
+            cb(res.data.onSuccess)
+        })
+        .catch(function (error) {
+            console.log(error);
+            cb(false);
+        });
+}
+
+export const editList = (listInfo, cb) => async dispatch => {
     console.log(listInfo)
-    axios.post('/lists/editList',listInfo)
-    .then((res)=>{
-        if(res.data.onSuccess){
-            dispatch(editListSuccess({data:listInfo}))
-        }
-        cb(res.data.onSuccess)
-    })
-    .catch(function (error) {
-        console.log(error);
-        cb(false);
-    });
+    axios.post('/lists/editList', listInfo)
+        .then((res) => {
+            if (res.data.onSuccess) {
+                dispatch(editListSuccess({ data: listInfo }))
+            }
+            cb(res.data.onSuccess)
+        })
+        .catch(function (error) {
+            console.log(error);
+            cb(false);
+        });
 }
 
-export const removeList = (listInfo,cb) => async dispatch =>{
-    axios.post('/lists/deleteList',listInfo)
-    .then((res)=>{
-        if(res.data.onSuccess){
-            dispatch(removeListSuccess({listID:listInfo.listID}))
-        }
-        cb(res.data.onSuccess)
-    })
-    .catch(function (error) {
-        console.log(error);
-        cb(false);
-    });
+export const removeList = (listInfo, cb) => async dispatch => {
+    axios.post('/lists/deleteList', listInfo)
+        .then((res) => {
+            if (res.data.onSuccess) {
+                dispatch(removeListSuccess({ listID: listInfo.listID }))
+            }
+            cb(res.data.onSuccess)
+        })
+        .catch(function (error) {
+            console.log(error);
+            cb(false);
+        });
 }
 
 export const addListFromProject = (listInfo) => dispatch => {
     console.log(listInfo)
-    dispatch(updateList({data:listInfo}))
+    dispatch(updateList({ data: listInfo }))
 }
 
 export const resetList = () => dispatch => {

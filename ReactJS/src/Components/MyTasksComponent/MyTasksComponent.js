@@ -1,7 +1,7 @@
 import styles from "./MyTasksComponent.module.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { Menu, Popover, Button } from "antd";
+import { Menu, Popover, Button, Modal } from "antd";
 import { AppstoreOutlined } from "@ant-design/icons";
 
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
@@ -21,6 +21,7 @@ const MyTasksComponent = (props) => {
   const location = useLocation();
 
   const [columnsTable, setColumnsTable] = useState([]);
+  const [showCreateTask, setShowCreateTask] = useState(false)
 
 
   const menuTasksView = [
@@ -49,17 +50,25 @@ const MyTasksComponent = (props) => {
 
   const handleAddTask = () => {
     setShowCreateTask(true)
-    console.log("Add Task");
+    console.log("Add Task", props.projects, props.lists);
   };
 
   const closeCreateTask = () => {
-    setShowCreateTask(false)
+    // setShowCreateTask(false)
   }
 
   const addNewTask = (taskInfo) => {
     // Call api
-    setShowCreateTask(false)
+    // setShowCreateTask(false)
     console.log('Add new task: ', taskInfo)
+  }
+
+  const handleOk = () => {
+
+  }
+
+  const handleCancel = () => {
+
   }
 
   return (
@@ -77,7 +86,7 @@ const MyTasksComponent = (props) => {
           <Popover
             content={
               <SelectColumnsMenu columnsTable={props.columnsTable}
-                         updateVisibleColumns={props.updateVisibleColumns}/>
+                updateVisibleColumns={props.updateVisibleColumns} />
             }
             trigger="click"
             placement="bottomLeft"
@@ -89,13 +98,13 @@ const MyTasksComponent = (props) => {
           </Popover>
         </div>
       </div>
-          
+
       <Outlet></Outlet>
 
       {
-          menuTasksView.find(menu => menu.key === selectedKey()) ?
-            menuTasksView.find(menu => menu.key === selectedKey()).component 
-            : null
+        menuTasksView.find(menu => menu.key === selectedKey()) ?
+          menuTasksView.find(menu => menu.key === selectedKey()).component
+          : null
       }
 
 
@@ -105,16 +114,22 @@ const MyTasksComponent = (props) => {
 
       {showCreateTask && <CreateTask
         showCreateTask={showCreateTask}
-        closeCreateTask={closeCreateTask}
-        addNewTask={addNewTask}
+        handleOk={handleOk}
+        handleCancel={handleCancel}
+      // closeCreateTask={closeCreateTask}
+      // addNewTask={addNewTask}
       />}
+
+
     </>
   );
 };
 
 const mapStateToProps = (state) => {
   return {
-      columnsTable: state.columnsTable,
+    columnsTable: state.columnsTable,
+    projects: state.project,
+    lists: state.list
   }
 }
 

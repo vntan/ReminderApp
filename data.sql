@@ -398,6 +398,28 @@ begin
 end//
 
 delimiter //
+create procedure addListByTask(in projectID int, in userID int, in nameList varchar(100))
+begin
+	if ISNULL(projectID) and ISNULL(userID) THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'List must belong to project or created by user';
+    END IF;
+    
+    if ISNULL(projectID) then
+		if (not exists(select * from account where idAccount = userID)) then
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the user';
+        end if;
+		insert listtask(idUser, name) values (userID, nameList);
+	else
+		if (not exists(select * from project where idProject = projectID)) then
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot find the project';
+        end if;
+		insert listtask(idProject, name) values (projectID, nameList);
+    end if;
+
+	call showList(userID);
+end//
+
+delimiter //
 create procedure deleteList(in listID int)
 begin
 	delete from listtask where idList = listID;

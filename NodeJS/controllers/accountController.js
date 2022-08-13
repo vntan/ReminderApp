@@ -141,5 +141,7 @@ module.exports = {
     updateUserInformation,
     deleteUser,
     getUserID,
+    getUserInformation,
+    updateUserPassword,
     deleteUser
 }

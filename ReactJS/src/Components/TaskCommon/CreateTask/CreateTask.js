@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { connect } from 'react-redux'
 
 import 'antd/dist/antd.css';
 import {
@@ -7,25 +8,40 @@ import {
     DatePicker, List, Select
 } from 'antd';
 import {
-    EditFilled, DeleteFilled,
-    FolderFilled, CheckOutlined,
-    FileTextFilled, UnorderedListOutlined,
-    HourglassFilled, BellFilled, CloseOutlined, TagsFilled, PlusOutlined, UserOutlined
+    EditFilled, DeleteFilled, TeamOutlined,
+    FolderOutlined, CheckOutlined,
+    FileTextOutlined, UnorderedListOutlined, LineChartOutlined,
+    HourglassOutlined, BellOutlined, CloseOutlined, TagsOutlined, PlusOutlined, UserOutlined
 } from '@ant-design/icons'
 
 import { today, disabledDate, dateFormat, moment } from "../../../Helper/DateMoment";
 
+import { getAllProject } from "../../../Models/projectReducer";
+import { resetList } from "../../../Models/listReducer";
+import { showList } from "../../../Models/listReducer";
+import AddList from "../../AddList/AddList";
+
 const { Option } = Select;
 
 const CreateTask = (props) => {
-    const { showCreateTask, closeCreateTask, addNewTask } = props
+    const { showCreateTask, closeCreateTask, addNewTask, project, list, userID } = props
     const [notification, setNotification] = useState('')
     const [subTask, setSubTask] = useState('')
+    const [showAddList, setShowAddList] = useState(false)
+
+
+    useEffect(() => {
+        props.getAllProject({ userID }, (result) => {
+            if (result) {
+                props.showList({ userID })
+            }
+        })
+    }, [])
 
     const [taskInfo, setTaskInfo] = useState({
         name: '',
-        nameProject: '',
-        nameList: '',
+        idProject: -1,
+        idList: -1,
         dueDate: '',
         status: '',
         tag: '',
@@ -34,23 +50,33 @@ const CreateTask = (props) => {
         subTask: []
     })
 
-    const project = [
-        'Project 1',
-        'Project 2',
-        'Project 3',
-        'Project 6',
-        'Project 9'
-    ]
+    // const project = [
+    //     'Project 1',
+    //     'Project 2',
+    //     'Project 3',
+    //     'Project 6',
+    //     'Project 9'
+    // ]
 
-    const list = [
-        'List 3',
-        'List 4',
-        'List 5',
-        'List 7',
-        'List 8'
-    ]
+    // const list = [
+    //     'List 3',
+    //     'List 4',
+    //     'List 5',
+    //     'List 7',
+    //     'List 8'
+    // ]
 
     const [urlPhoto, setUrlPhoto] = useState([])
+
+    const statusToColor = (status) => {
+        console.log(props.filterStatus)
+        const findStatus = props.filterStatus.find(s => s.nameStatus === status);
+        return findStatus ? { ...findStatus.style } : { color: "000" };
+    };
+
+    const handleCancel = () => {
+        setShowAddList(false)
+    }
 
     const handleAddParticipant = () => {
         console.log('Add participant')
@@ -65,19 +91,16 @@ const CreateTask = (props) => {
     }
 
     const changeProject = (value) => {
-        if (value === 'None') {
-            setTaskInfo({ ...taskInfo, nameProject: '' })
-            return;
-        }
-        setTaskInfo({ ...taskInfo, nameProject: value })
+        setTaskInfo({ ...taskInfo, idProject: value })
     }
 
     const changeList = (value) => {
-        if (value === 'None') {
-            setTaskInfo({ ...taskInfo, nameList: '' })
-            return;
+        console.log(value)
+        setTaskInfo({ ...taskInfo, idList: value })
+        if (value === -1) {
+            setShowAddList(true)
         }
-        setTaskInfo({ ...taskInfo, nameList: value })
+
     }
 
     const changeDueDate = (value, dateString) => {
@@ -96,12 +119,27 @@ const CreateTask = (props) => {
         setNotification(dateString)
     }
 
+    const deleteNotification = (notification) => {
+        let listNotification = taskInfo.notification;
+        listNotification = listNotification.filter(item => item.id !== notification.id)
+        setTaskInfo({ ...taskInfo, notification: listNotification })
+        console.log(taskInfo.notification)
+    }
+
     const submitNotification = () => {
+        console.log("Add Notification")
         if (!notification) {
             return;
         }
-        let listNotification = taskInfo.notification;
-        listNotification.push(notification)
+        let listNotification = taskInfo.notification
+        let objIndex = listNotification.findIndex((item => item.reminder === notification))
+        if (objIndex >= 0) {
+            return;
+        }
+        listNotification.push({
+            id: Math.floor(Math.random() * 9999) + 1000,
+            reminder: notification
+        })
         setTaskInfo({ ...taskInfo, notification: listNotification })
     }
 
@@ -113,12 +151,24 @@ const CreateTask = (props) => {
         setSubTask(e.target.value)
     }
 
+    const deleteSubtask = (subtask) => {
+        let listSubtask = taskInfo.subTask;
+        listSubtask = listSubtask.filter(item => item.id !== subtask.id)
+        setTaskInfo({ ...taskInfo, subTask: listSubtask })
+        console.log(taskInfo.subTask)
+    }
+
     const submitSubtask = () => {
         if (!subTask) {
             return;
         }
         let listSubtask = taskInfo.subTask;
+        let objIndex = listSubtask.findIndex((item => item.name === subTask))
+        if (objIndex >= 0) {
+            return;
+        }
         listSubtask.push({
+            id: Math.floor(Math.random() * 9999) + 1000,
             checked: false,
             name: subTask
         });
@@ -127,14 +177,273 @@ const CreateTask = (props) => {
 
     }
 
-    const tickSubTask = (e) => {
+    const tickSubTask = (subtask) => {
         // Need id of each subtask to do that
-        console.log('Tick subtask: ', e.target.checked)
+        let listSubtask = taskInfo.subTask;
+        let objIndex = listSubtask.findIndex((item => item.name === subtask.name))
+        listSubtask[objIndex].checked = !listSubtask[objIndex].checked
+        setTaskInfo({ ...taskInfo, subTask: listSubtask })
     }
 
     return (
         <>
+            <div>
+                <Modal
+                    title="Add Task"
+                    visible={showCreateTask}
+                    onOk={props.handleOk}
+                    onCancel={props.handleCancel}
+                    maskClosable={false}
+                    width={800}
+                    bodyStyle={{ maxHeight: 500 }}
+                    centered
+                    destroyOnClose
+                    bodyStyle={{ overflowY: 'auto', maxHeight: 'calc(100vh - 200px)' }}
+                >
+
+                    <Form.Item >
+                        <Input value={taskInfo.name} placeholder='Enter name of Task' onChange={(e) => changeName(e)} />
+                    </Form.Item>
+
+                    <Form layout="vertical">
+                        <Form.Item label={
+                            <><TeamOutlined
+                                style={{
+                                    fontSize: '25px',
+                                }} />
+                                &nbsp;Participant</>
+                        }>
+                            <Avatar.Group>
+                                {urlPhoto.map(item => (
+                                    <Avatar>{item}</Avatar>
+                                ))}
+                                <Button type="primary" shape="circle" icon={<PlusOutlined />} onClick={() => handleAddParticipant()}></Button>
+                            </Avatar.Group>
+                        </Form.Item>
+                    </Form>
+
+                    <Form layout={'vertical'}
+                    >
+                        <Row>
+                            <Col span={12}>
+
+                                <Form.Item label={
+                                    <><FolderOutlined
+                                        style={{ fontSize: '25px', }}
+                                    /> &nbsp;Project</>
+                                }
+                                    style={{ marginRight: '60px', }}>
+                                    <Select
+                                        listHeight={130}
+                                        defaultValue={-1}
+                                        onChange={changeProject}
+                                    >
+                                        <Option value={-1}>None</Option>
+                                        {project && project.map((item, index) => (
+                                            <Option key={item.idProject} value={item.idProject}>{item.name}</Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item label={
+                                    <><UnorderedListOutlined
+                                        style={{ fontSize: '25px', }}
+                                    /> &nbsp;List</>
+                                }
+                                    style={{ marginRight: '60px', }}>
+
+                                    <Select
+                                        listHeight={130}
+                                        onChange={changeList}
+                                        value={taskInfo.idList === -1 || !list ? '- Choose the list -' : list.find((item) => item.idList === taskInfo.idList).name}
+                                    >
+                                        <Option value={-1}>Add List</Option>
+                                        {list && list.filter((item) => {
+                                            return taskInfo.idProject !== -1 ?
+                                                item.idProject === taskInfo.idProject
+                                                :
+                                                item.idProject === null
+                                        }).map((item, index) => (
+                                            <Option key={item.idList} value={item.idList}>{item.name}</Option>
+                                        ))}
+                                    </Select>
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    </Form>
+
+                    <Form layout="horizontal">
+                        <Form.Item label={
+                            <><HourglassOutlined
+                                style={{ fontSize: '25px', }}
+                            /> &nbsp;Deadline</>
+                        }>
+                            <DatePicker
+                                showTime
+                                defaultValue={moment(taskInfo.dueDate.length > 0 ? taskInfo.dueDate : today, dateFormat)}
+                                disabledDate={disabledDate}
+                                onChange={changeDueDate} />
+                        </Form.Item>
+                    </Form>
+
+                    <Form layout="horizontal">
+                        <Form.Item label={
+                            <><LineChartOutlined
+                                style={{ fontSize: '25px', }}
+                            /> &nbsp;Progress</>
+                        }>
+                            <Select
+                                onChange={changeStatus}
+                                value={taskInfo.status}
+                                style={{ ...statusToColor(taskInfo.status), width: '205px' }}
+                                showArrow={false}
+                            >
+                                {
+                                    props.filterStatus.map((status, index) => {
+                                        return (
+                                            <Option
+                                                key={index}
+                                                value={status.nameStatus}
+                                                style={{ textAlign: "center", ...status.style }}
+                                            >
+                                                {status.nameStatus}
+                                            </Option>
+                                        );
+                                    })
+                                }
+                            </Select>
+                            {/* <Select
+                                value={taskInfo.status}
+                                onChange={changeStatus}
+                                allowClear
+                                style={{
+                                    width: '205px'
+                                }}
+                            >
+                                <Option value="To Do">To do</Option>
+                                <Option value="On Going">On Going</Option>
+                                <Option value="Complete">Complete</Option>
+                            </Select> */}
+                        </Form.Item>
+                    </Form>
+
+                    <Form layout="horizontal">
+                        <Form.Item label={
+                            <><TagsOutlined style={{ fontSize: '25px', }}
+                            /> &nbsp;Tag</>
+                        }>
+                            <Input
+                                style={{
+                                    width: '230px'
+                                }}
+                                value={taskInfo.tag}
+                                placeholder="Add more tag to your tag"
+                                onChange={(e) => changeTag(e)} />
+
+                        </Form.Item>
+                    </Form>
+                    <Form layout="vertical">
+                        <Form.Item label={
+                            <><BellOutlined style={{ fontSize: '25px', }}
+                            /> &nbsp;Notification</>
+                        }>
+                            <Row justify="center">
+                                <Col>
+                                    <DatePicker
+                                        showTime
+                                        defaultValue={moment(today, dateFormat)}
+                                        disabledDate={disabledDate}
+                                        onChange={changeNotification} />
+                                    <Button type="primary" style={{ marginLeft: '20px', borderRadius: '10px' }} onClick={() => submitNotification()}>Add</Button>
+                                </Col>
+                                <Col span={24}>
+                                    <List
+                                        dataSource={taskInfo.notification}
+                                        renderItem={(item) => (
+                                            <Row justify="center">
+                                                <List.Item
+                                                    actions={[
+                                                        <Button type="danger" onClick={() => deleteNotification(item)}>Delete</Button>
+                                                    ]}
+                                                >
+                                                    {item.reminder}
+                                                </List.Item>
+                                            </Row>
+                                        )}
+                                    />
+                                </Col>
+                            </Row>
+                        </Form.Item>
+                    </Form>
+
+                    <Form layout="vertical">
+                        <Form.Item label={
+                            <><UnorderedListOutlined
+                                style={{ fontSize: '25px', }}
+                            /> &nbsp;Subtask</>
+                        }>
+                            <Row justify="center">
+                                <Col>
+                                    <Row>
+                                        <Col><Input value={subTask} placeholder="Add new subtask" onChange={(e) => changeSubtask(e)} /></Col>
+                                        <Col><Button type="primary" style={{ marginLeft: '20px', borderRadius: '10px' }} onClick={() => submitSubtask()}>Add</Button></Col>
+                                    </Row>
+                                </Col>
+                                <Col span={24}>
+                                    <List
+                                        dataSource={taskInfo.subTask}
+                                        renderItem={(item) => (
+                                            <Row justify="center" align="middle">
+                                                <Col span={12}>
+                                                    <List.Item
+                                                        actions={[
+                                                            <Col span={12} >
+                                                                <Button type="text" onClick={() => deleteSubtask(item)} icon={<DeleteFilled />}></Button>
+                                                            </Col>
+                                                        ]}
+                                                    >
+
+                                                        <Checkbox onClick={() => tickSubTask(item)}>{item.name}</Checkbox>
+                                                    </List.Item>
+                                                </Col>
+
+
+                                            </Row>
+                                        )}
+                                    />
+                                </Col>
+                            </Row>
+                        </Form.Item>
+                    </Form>
+
+                    <Form layout="vertical">
+                        <Form.Item label={
+                            <><FileTextOutlined
+                                style={{ fontSize: '25px', }}
+                            /> &nbsp;Description</>}>
+                            <Input value={taskInfo.description} placeholder="Add more description" onChange={(e) => changeDescription(e)} />
+                        </Form.Item>
+                    </Form>
+
+
+
+                </Modal>
+            </div>
+
             <Modal
+                title="Add new list"
+                visible={showAddList}
+                footer={null}
+                onCancel={handleCancel}
+                maskClosable={false}
+                width={500}
+                centered
+                destroyOnClose
+            >
+                <AddList handleCancel={handleCancel} projectID={taskInfo.idProject} userID={userID} />
+            </Modal>
+            {/* <Modal
                 title={[
                     <Row>
                         <Col span={22}>
@@ -319,9 +628,22 @@ const CreateTask = (props) => {
                         </Row>
                     </Form.Item>
                 </Form>
-            </Modal >
+            </Modal > */}
         </>
     )
 }
 
-export default CreateTask;
+const mapStateToProps = (state) => ({
+    filterStatus: state.statusTask,
+    userID: state.account.account ? state.account.account.idAccount : -1,
+    project: state.project.listProject,
+    list: state.list.list
+});
+
+const mapActionToProps = {
+    getAllProject,
+    resetList,
+    showList
+}
+
+export default connect(mapStateToProps, mapActionToProps)(CreateTask);
