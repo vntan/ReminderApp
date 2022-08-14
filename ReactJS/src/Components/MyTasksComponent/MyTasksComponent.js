@@ -1,7 +1,7 @@
 import styles from "./MyTasksComponent.module.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { Menu, Popover, Button, Modal } from "antd";
+import { Menu, Popover, Button, Modal, Result } from "antd";
 import { AppstoreOutlined } from "@ant-design/icons";
 
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
@@ -16,7 +16,7 @@ import TaskCalendar from "./TaskCalendar/TaskCalendar";
 import { updateVisibleColumns } from "../../Models/columnsTableReducer";
 import { connect } from "react-redux";
 
-import { addTask } from "../../Models/tasksReducer";
+import { addTask, addNotification, addTag, addSubTask, getTasks } from "../../Models/tasksReducer";
 
 const MyTasksComponent = (props) => {
   const navigate = useNavigate();
@@ -51,12 +51,36 @@ const MyTasksComponent = (props) => {
 
   const handleAddTask = () => {
     setShowCreateTask(true)
-    console.log("Add Task", props.projects, props.lists);
   };
 
   const handleOk = (task, notification, subtask, tag) => {
     // console.log(task, notification, subtask, tag)
-    props.addTask(task, tag, notification, subtask)
+    props.addTask(task, tag, notification, subtask, taskID => {
+      if (taskID > 0) {
+        tag && tag.map(item => {
+          props.addTag({ taskID: taskID, nameTag: item }, result => {
+            if (!result) {
+              return;
+            }
+          })
+        })
+        notification && notification.map(item => (
+          props.addNotification({ taskID: taskID, userID: task.userID, reminder: item.reminder }, result => {
+            if (!result) {
+              return;
+            }
+          })
+        ))
+        subtask && subtask.map(item => (
+          props.addSubTask({ taskID: taskID, nameSubTask: item.name, statusSubtask: item.checked }, result => {
+            if (!result) {
+              return;
+            }
+          })
+        ))
+        props.getTasks({ userID: task.userID })
+      }
+    })
     setShowCreateTask(false)
   }
 
@@ -129,7 +153,11 @@ const mapStateToProps = (state) => {
 
 const mapActionToProps = {
   updateVisibleColumns,
-  addTask
+  addTask,
+  addTag,
+  addNotification,
+  addSubTask,
+  getTasks
 }
 
 export default connect(mapStateToProps, mapActionToProps)(MyTasksComponent);

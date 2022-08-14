@@ -18,7 +18,7 @@ import { Button, Input, } from 'antd';
 import Highlighter from 'react-highlight-words';
 
 const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask, handleEditStatusTask, handleDeleteTask, resetColumns, columnsTable, defaultHideColumns }) => {
-
+    console.log(tasks)
 
     const handleClickTask = (task) => {
         handleViewTask && handleViewTask(task);

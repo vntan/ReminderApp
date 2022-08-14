@@ -19,11 +19,9 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
   useEffect(() => {
     setLoading(true);
 
-    // getTasks(idAccount, () => {
-    //   setLoading(false);
-    // });
-
-    console.log(tasks);
+    getTasks(idAccount, () => {
+      setLoading(false);
+    });
 
   }, []);
 
@@ -66,7 +64,7 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
   return (
     <>
       <TableTasks
-        tasks={tasks}
+        // tasks={tasks}
         loading={loading}
         handleViewTask={handleViewTask}
         handleEditTask={handleEditTask}
@@ -75,7 +73,7 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
         defaultHideColumns={["Assignees", "Subtasks"]}
       ></TableTasks>
 
-      {showTaskInfo &&
+      {/* {showTaskInfo &&
         <TaskInfo
           showTaskInfo={showTaskInfo}
           closeTaskInfo={closeTaskInfo}
@@ -91,7 +89,7 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
           saveTask={handleSaveTask}
           task={taskCurrent}
         />
-      }
+      } */}
     </>
 
   );
@@ -100,7 +98,7 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
 const mapStateToProps = (state) => {
   return {
     idAccount: state.account.account.idAccount,
-    tasks: state.taskReducer.taskInfo
+    tasks: state.taskReducer.tasks
   }
 }
 

@@ -7,13 +7,15 @@ const showUserTasks = (req, res) => {
     if (userID) {
         tasks.showUserTasks(userID, (err, rows) => {
             if (err) res.json({ onSuccess: false, error: err });
-            else res.json({ onSuccess: true, result: {
-                "TaskInformation": rows[0],
-                "TaskParticipant": rows[1],
-                "TaskNotification": rows[2],
-                "SubTasks": rows[3],
-                "Tags": rows[4],
-            } });
+            else res.json({
+                onSuccess: true, result: {
+                    "TaskInformation": rows[0],
+                    "TaskParticipant": rows[1],
+                    "TaskNotification": rows[2],
+                    "SubTasks": rows[3],
+                    "Tags": rows[4],
+                }
+            });
         });
     }
     else res.json({ onSuccess: false, error: "Can't receive the data" });
@@ -52,7 +54,7 @@ const addTasks = (req, res) => {
         tasks.addTasks(userID, taskInfo, (err, rows) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
             else res.json({
-                onSuccess: true, 
+                onSuccess: true,
                 data: {
                     taskID: rows[0][0].idTask
                 }

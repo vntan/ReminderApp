@@ -21,16 +21,16 @@ import { today, disabledDate, dateFormat, moment } from "../../../Helper/DateMom
 import { getAllProject } from "../../../Models/projectReducer";
 import { resetList } from "../../../Models/listReducer";
 import { showList } from "../../../Models/listReducer";
+import { deleteTag, deleteNotification, deleteSubtask } from "../../../Models/tasksModels";
 import AddList from "../../AddList/AddList";
 
 const { Option } = Select;
 
-const CreateTask = (props) => {
-    const { showCreateTask, closeCreateTask, addNewTask, project, list, userID } = props
+const EditTask = (props) => {
+    const { showEditTask, closeEditTask, addNewTask, project, list, userID } = props
     const [notification, setNotification] = useState('')
     const [subTask, setSubTask] = useState('')
     const [showAddList, setShowAddList] = useState(false)
-
 
     useEffect(() => {
         props.getAllProject({ userID }, (result) => {
@@ -252,8 +252,8 @@ const CreateTask = (props) => {
         <>
             <div>
                 <Modal
-                    title="Add Task"
-                    visible={showCreateTask}
+                    title="Edit Task"
+                    visible={showEditTask}
                     onOk={submitTask}
                     onCancel={props.handleCancel}
                     maskClosable={false}
@@ -300,7 +300,7 @@ const CreateTask = (props) => {
                                     style={{ marginRight: '60px', }}>
                                     <Select
                                         listHeight={130}
-                                        defaultValue={-1}
+                                        // defaultValue={taskInfo.idProject}
                                         onChange={changeProject}
                                     >
                                         <Option value={-1}>None</Option>
@@ -321,6 +321,7 @@ const CreateTask = (props) => {
                                     <Select
                                         listHeight={130}
                                         onChange={changeList}
+                                        // defaultValue={taskInfo.idList}
                                         value={taskInfo.idList === -1 || !list ? '- Choose the list -' : list.find((item) => item.idList === taskInfo.idList).name}
                                     >
                                         <Option value={-1}>Add List</Option>
@@ -361,7 +362,7 @@ const CreateTask = (props) => {
                             /> &nbsp;Progress</>
                         }>
                             <Select
-                                defaultValue={'To do'}
+                                defaultValue={taskInfo.status}
                                 onChange={changeStatus}
                                 value={taskInfo.status}
                                 style={{ ...statusToColor(taskInfo.status), width: '205px' }}
@@ -381,18 +382,6 @@ const CreateTask = (props) => {
                                     })
                                 }
                             </Select>
-                            {/* <Select
-                                value={taskInfo.status}
-                                onChange={changeStatus}
-                                allowClear
-                                style={{
-                                    width: '205px'
-                                }}
-                            >
-                                <Option value="To Do">To do</Option>
-                                <Option value="On Going">On Going</Option>
-                                <Option value="Complete">Complete</Option>
-                            </Select> */}
                         </Form.Item>
                     </Form>
 
@@ -401,13 +390,6 @@ const CreateTask = (props) => {
                             <><TagsOutlined style={{ fontSize: '25px', }}
                             /> &nbsp;Tag</>
                         }>
-                            {/* <Input
-                                style={{
-                                    width: '230px'
-                                }}
-                                value={taskInfo.tag}
-                                placeholder="Add more tag to your tag"
-                                onChange={(e) => changeTag(e)} /> */}
                             <>
                                 {tags.map((tag, index) => {
                                     if (editInputIndex === index) {
@@ -589,7 +571,10 @@ const mapStateToProps = (state) => ({
 const mapActionToProps = {
     getAllProject,
     resetList,
-    showList
+    showList,
+    deleteNotification,
+    deleteSubtask,
+    deleteTag
 }
 
-export default connect(mapStateToProps, mapActionToProps)(CreateTask);
+export default connect(mapStateToProps, mapActionToProps)(EditTask);

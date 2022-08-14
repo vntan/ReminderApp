@@ -16,7 +16,48 @@ const taskSlice = createSlice({
     initialState: initialState,
     reducers: {
         getTasksSuccess(state, action) {
-            state.taskInfo = action.payload.data;
+            let task = action.payload.data;
+            let info = []
+            console.log(task)
+            task.TaskInformation && task.TaskInformation.map(taskInfo => {
+                const participant = []
+                const notification = []
+                const tag = []
+                const subtask = []
+                task.TaskParticipant && task.TaskParticipant.map(item => {
+                    if (item.idTask = taskInfo.idTask) {
+                        participant.push(item)
+                    }
+                })
+                task.Tags && task.Tags.map(item => {
+                    if (item.idTask = taskInfo.idTask) {
+                        tag.push(item)
+                    }
+                })
+                task.TaskNotification && task.TaskNotification.map(item => {
+                    if (item.idTask = taskInfo.idTask) {
+                        notification.push(item)
+                    }
+                })
+                task.SubTasks && task.SubTasks.map(item => {
+                    if (item.idTask = taskInfo.idTask) {
+                        subtask.push(item)
+                    }
+                })
+                info = [
+                    ...info,
+                    {
+                        taskInfo: taskInfo,
+                        participant: participant,
+                        notification: notification,
+                        subtask: subtask,
+                        tag: tag
+                    }
+
+                ]
+            })
+            state.tasks = info
+            console.log(state.tasks)
         },
         deleteTasksSuccess(state, action) {
             let task = state.taskInfo
@@ -39,6 +80,12 @@ const taskSlice = createSlice({
         },
         addSubTaskSuccess(state, action) {
 
+        },
+        deleteTagSuccess(state, action) {
+
+        },
+        deleteSubtaskSuccess(state, action) {
+
         }
     }
 })
@@ -50,29 +97,10 @@ export const getTasks = (userID, cb) => async dispatch => {
     axios.post('/tasks/showUserTasks', { userID })
         .then((response) => {
             const data = response.data;
+            console.log(data["result"])
             if (data["onSuccess"]) {
                 dispatch(getTasksSuccess({ data: data["result"] }));
                 cb && cb();
-            }
-            else console.log(data["error"]);
-
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-}
-
-const { addTasksSuccess } = taskSlice.actions;
-
-export const addTask = (task, tag, notification, subtask, cb) => async dispatch => {
-    console.log("Redux: ", task, notification, subtask, tag)
-    axios.post('/tasks/addTasks', { userID: task.userID, projectID: task.projectID, listID: task.listID, nameTask: task.nameTask, status: task.status, descriptionTask: task.descriptionTask, dueDateTask: task.dueDateTask })
-        .then((response) => {
-            const data = response.data;
-            if (data["onSuccess"]) {
-                console.log("Result: ", data)
-                dispatch(addTasksSuccess({ data: task }));
-                cb && cb(data["result"]);
             }
             else console.log(data["error"]);
 
@@ -108,14 +136,14 @@ export const addNotification = (notification, cb) => async dispatch => {
         .then((response) => {
             const data = response.data;
             if (data["onSuccess"]) {
-                dispatch(addNotificationSuccess({ data: notification }));
-                cb && cb();
+                cb && cb(data["onSuccess"]);
             }
             else console.log(data["error"]);
 
         })
         .catch((error) => {
             console.log(error);
+            cb(false)
         });
 }
 
@@ -144,8 +172,72 @@ export const addSubTask = (subtask, cb) => async dispatch => {
         .then((response) => {
             const data = response.data;
             if (data["onSuccess"]) {
-                dispatch(addSubTaskSuccess({ data: subtask }));
-                cb && cb();
+                cb && cb(data["onSuccess"]);
+            }
+            else console.log(data["error"]);
+
+        })
+        .catch((error) => {
+            console.log(error);
+            cb(false)
+        });
+}
+
+const { addTagSuccess } = taskSlice.actions;
+
+export const addTag = (tag, cb) => async dispatch => {
+    console.log("Redux tag: ", tag)
+    axios.post('/tasks/addTag', { taskID: tag.taskID, nameTag: tag.nameTag })
+        .then((response) => {
+            const data = response.data;
+            console.log("Result add Tag: ", data)
+            if (data["onSuccess"]) {
+                // dispatch(addTagSuccess({ data: tag }));
+                cb && cb(data["onSuccess"]);
+            }
+            else console.log(data["error"]);
+
+        })
+        .catch((error) => {
+            console.log(error);
+            cb(false)
+        });
+}
+
+const { addTasksSuccess } = taskSlice.actions;
+
+export const addTask = (task, tag, notification, subtask, cb) => async dispatch => {
+    // console.log("Redux: ", task, notification, subtask, tag)
+    axios.post('/tasks/addTasks', { userID: task.userID, projectID: task.projectID, listID: task.listID, nameTask: task.nameTask, status: task.status, descriptionTask: task.descriptionTask, dueDateTask: task.dueDateTask })
+        .then((response) => {
+            const data = response.data;
+            if (data["onSuccess"]) {
+                console.log("Result: ", data["data"].taskID)
+                dispatch(addTasksSuccess({ data: task }));
+                // tag && tag.map(item => {
+                //     addTag({ taskID: data["data"].taskID, nameTag: item }, result => {
+                //         if (!result) {
+                //             return;
+                //         }
+                //     })
+                // })
+                // notification && notification.map(item => (
+                //     addNotification({ taskID: data["data"].taskID, userID: task.userID, reminder: item.reminder }, result => {
+                //         if (!result) {
+                //             return;
+                //         }
+                //     })
+                // ))
+                // subtask && subtask.map(item => (
+                //     addSubTask({ taskID: data["data"].taskID, nameSubTask: item.name, statusSubtask: item.checked }, result => {
+                //         if (!result) {
+                //             return;
+                //         }
+                //     })
+                // ))
+                getTasks({ userID: task.userID })
+
+                cb && cb(data["data"].taskID);
             }
             else console.log(data["error"]);
 
@@ -155,21 +247,43 @@ export const addSubTask = (subtask, cb) => async dispatch => {
         });
 }
 
-const { addTagSuccess } = taskSlice.actions;
+const { deleteTagSuccess } = taskSlice.actions;
 
-export const addTag = (tag, cb) => async dispatch => {
-    axios.post('/tasks/addSubtasks', { taskID: tag.taskID, nameTag: tag.nameTag })
+export const deleteTag = (tagID, cb) => async dispatch => {
+    axios.post('/tasks/deleteTag', { tagID: tagID })
         .then((response) => {
             const data = response.data;
+            console.log("Result add Tag: ", data)
             if (data["onSuccess"]) {
-                dispatch(addTagSuccess({ data: tag }));
-                cb && cb();
+                // dispatch(deleteTagSuccess({ data: tag }));
+                cb && cb(data["onSuccess"]);
             }
             else console.log(data["error"]);
 
         })
         .catch((error) => {
             console.log(error);
+            cb(false)
+        });
+}
+
+const { deleteSubtaskSuccess } = taskSlice.actions;
+
+export const deleteSubtask = (subTaskID, cb) => async dispatch => {
+    axios.post('/tasks/deleteSubtasks', { subTaskID: subTaskID })
+        .then((response) => {
+            const data = response.data;
+            console.log("Result add Tag: ", data)
+            if (data["onSuccess"]) {
+                // dispatch(deleteSubtaskSuccess({ data: tag }));
+                cb && cb(data["onSuccess"]);
+            }
+            else console.log(data["error"]);
+
+        })
+        .catch((error) => {
+            console.log(error);
+            cb(false)
         });
 }
 
