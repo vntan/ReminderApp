@@ -1,11 +1,11 @@
 import { connect } from 'react-redux'
 
-import { getTasks } from '../../../Models/tasksReducer'
+import tasksReducer, { getTasks } from '../../../Models/tasksReducer'
 import { useEffect, useState } from "react";
 
 import TableTasks from "../../TableTasks/TableTasks";
 
-import TaskInfo from '../../TaskCommon/TaskInformaion/TaskInfo';
+import TaskInfo from '../../TaskCommon/TaskInformation/TaskInfo';
 import EditTask from '../../TaskCommon/EditTask/EditTask'
 
 const TaskList = ({ idAccount, tasks, getTasks }) => {
@@ -15,15 +15,19 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
 
   const [loading, setLoading] = useState(false);
 
-
   useEffect(() => {
     setLoading(true);
 
     getTasks(idAccount, () => {
       setLoading(false);
+      console.log("Task:", tasks)
     });
 
   }, []);
+
+  // useEffect(() => {
+
+  // }, [tasks])
 
 
   const handleViewTask = (task) => {
@@ -38,7 +42,7 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
   };
 
   const handleEditTask = (task) => {
-    setShowTaskInfo(false);
+    // setShowTaskInfo(false);
     setTaskCurrent(task)
     setShowEditTask(true)
     console.log("Edit task", task);
@@ -63,8 +67,13 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
 
   return (
     <>
+      {/* {console.log("Task return: ", tasks.map(item => {
+        return item.taskInfo
+      }))} */}
       <TableTasks
-        // tasks={tasks}
+        tasks={tasks && tasks.map(item => {
+          return item.taskInfo
+        })}
         loading={loading}
         handleViewTask={handleViewTask}
         handleEditTask={handleEditTask}
@@ -80,16 +89,17 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
           handleDeleteTask={handleDeleteTask}
           handleEditTask={handleEditTask}
           task={taskCurrent}
-        />}
+        />} */}
 
       {showEditTask &&
         <EditTask
           showEditTask={showEditTask}
           closeEditTask={closeEditTask}
-          saveTask={handleSaveTask}
+          // saveTask={handleSaveTask}
           task={taskCurrent}
+          tasks={tasks && tasks[tasks.findIndex(item => item.taskInfo.idTask === taskCurrent.idTask)]}
         />
-      } */}
+      }
     </>
 
   );

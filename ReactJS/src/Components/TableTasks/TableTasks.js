@@ -42,7 +42,7 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
 
     const columns = [
         {
-            title: "Task", width: '15%', isVisible: true, ellipsis: true, fixed: true, dataIndex: "nameTask",
+            title: "Task", width: '15%', isVisible: true, ellipsis: true, fixed: true, dataIndex: "name",
         },
 
         {
@@ -100,7 +100,7 @@ const TableTasks = ({ tasks, loading, statusInfo, handleViewTask, handleEditTask
             dataIndex: 'tag',
             render: (_, { tags }) => (
                 <>
-                    {tags.map(tag => {
+                    {tags && tags.map(tag => {
                         let color = tag.length > 5 ? 'geekblue' : 'green';
                         if (tag === 'loser') {
                             color = 'volcano';

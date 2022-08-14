@@ -461,6 +461,8 @@ delimiter //
 create procedure showUserTasks(in userID int)
 begin
 	select task.*, project.*, listtask.*,
+			project.name as 'nameProject', listtask.name as 'nameList',
+			task.name as name,
 			getNearestNotification(task.idTask, userID) as 'notification',
 			getCountSubTasksStatus(task.idTask, null) as 'countTasks',
             getCountSubTasksStatus(task.idTask, 'Complete') as 'countCompleteTasks'  
