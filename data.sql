@@ -53,11 +53,10 @@ create table taskParticipant(
 );
 
 create table notification(
+	idNotification int not null AUTO_INCREMENT PRIMARY KEY,
     idTask int,
    	idUser int,
-   	reminderTime datetime,
-    
-    CONSTRAINT PK_TaskParticipant PRIMARY KEY (idTask, idUser)
+   	reminderTime datetime
 );
 
 create table subTask(
@@ -538,13 +537,15 @@ begin
 	if (exists(select * from notification where idTask = taskID and idUser = userID and reminderTime = reminder)) then
 		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Notification existed';
 	end if;
-	insert notification values (taskID, userID, reminderTime);
+	insert notification(`idTask`, `idUser`, `reminderTime`) values (taskID, userID, reminder);
+	select * from notification where idTask = taskID and idUser = userID;
 end//
 
 delimiter //
 create procedure addTag(in taskID int, in nameTag varchar(100))
 begin
-	insert tag values (taskID, nameTag);
+	insert tag(idTask, nameTag) values (taskID, nameTag);
+	select * from tag where idTask = taskID;
 end//
 
 delimiter //
@@ -554,9 +555,10 @@ begin
 end//
 
 delimiter //
-create procedure addSubtasks(in taskID int, nameSubTask varchar(100), statusSubtask bool)
+create procedure addSubtask(in taskID int, nameSubTask varchar(100), statusSubtask bool)
 begin
-	insert subtasks values (taskID, nameSubTask, statusSubtask);
+	insert subtask(`idTask`, `name`, `status`) values (taskID, nameSubTask, statusSubtask);
+	select * from subtask where idTask = taskID;
 end//
 
 

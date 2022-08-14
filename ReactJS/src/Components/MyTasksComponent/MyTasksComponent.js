@@ -54,31 +54,9 @@ const MyTasksComponent = (props) => {
   };
 
   const handleOk = (task, notification, subtask, tag) => {
-    // console.log(task, notification, subtask, tag)
-    props.addTask(task, tag, notification, subtask, taskID => {
-      if (taskID > 0) {
-        tag && tag.map(item => {
-          props.addTag({ taskID: taskID, nameTag: item }, result => {
-            if (!result) {
-              return;
-            }
-          })
-        })
-        notification && notification.map(item => (
-          props.addNotification({ taskID: taskID, userID: task.userID, reminder: item.reminder }, result => {
-            if (!result) {
-              return;
-            }
-          })
-        ))
-        subtask && subtask.map(item => (
-          props.addSubTask({ taskID: taskID, nameSubTask: item.name, statusSubtask: item.checked }, result => {
-            if (!result) {
-              return;
-            }
-          })
-        ))
-        props.getTasks({ userID: task.userID })
+    props.addTask(task, tag, notification, subtask, result => {
+      if (result >= 0) {
+        props.getTasks(task.userID)
       }
     })
     setShowCreateTask(false)

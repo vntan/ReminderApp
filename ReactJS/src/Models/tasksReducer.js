@@ -25,22 +25,22 @@ const taskSlice = createSlice({
                 const tag = []
                 const subtask = []
                 task.TaskParticipant && task.TaskParticipant.map(item => {
-                    if (item.idTask = taskInfo.idTask) {
+                    if (item.idTask === taskInfo.idTask) {
                         participant.push(item)
                     }
                 })
                 task.Tags && task.Tags.map(item => {
-                    if (item.idTask = taskInfo.idTask) {
+                    if (item.idTask === taskInfo.idTask) {
                         tag.push(item)
                     }
                 })
                 task.TaskNotification && task.TaskNotification.map(item => {
-                    if (item.idTask = taskInfo.idTask) {
+                    if (item.idTask === taskInfo.idTask) {
                         notification.push(item)
                     }
                 })
                 task.SubTasks && task.SubTasks.map(item => {
-                    if (item.idTask = taskInfo.idTask) {
+                    if (item.idTask === taskInfo.idTask) {
                         subtask.push(item)
                     }
                 })
@@ -131,7 +131,7 @@ export const deleteTasks = (taskID, cb) => async dispatch => {
 const { addNotificationSuccess } = taskSlice.actions;
 
 export const addNotification = (notification, cb) => async dispatch => {
-    console.log(notification)
+    console.log("Redux add notification: ", notification)
     axios.post('/tasks/addNotification', { taskID: notification.taskID, userID: notification.userID, reminder: notification.reminder })
         .then((response) => {
             const data = response.data;
@@ -153,6 +153,7 @@ export const deleteNotification = (notification, cb) => async dispatch => {
     axios.post('/tasks/deleteNotification', { taskID: notification.taskID, userID: notification.userID, reminder: notification.reminder })
         .then((response) => {
             const data = response.data;
+            console.log("Result add ntoification: ", data)
             if (data["onSuccess"]) {
                 dispatch(deleteNotificationSuccess({ data: notification }));
                 cb && cb();
@@ -168,9 +169,12 @@ export const deleteNotification = (notification, cb) => async dispatch => {
 const { addSubTaskSuccess } = taskSlice.actions;
 
 export const addSubTask = (subtask, cb) => async dispatch => {
+    console.log("Redux add subtask: ", subtask)
     axios.post('/tasks/addSubtasks', { taskID: subtask.taskID, nameSubTask: subtask.nameSubTask, statusSubtask: subtask.statusSubtask })
         .then((response) => {
             const data = response.data;
+            console.log("Result add subtask: ", data)
+            console.log(data)
             if (data["onSuccess"]) {
                 cb && cb(data["onSuccess"]);
             }
@@ -186,7 +190,7 @@ export const addSubTask = (subtask, cb) => async dispatch => {
 const { addTagSuccess } = taskSlice.actions;
 
 export const addTag = (tag, cb) => async dispatch => {
-    console.log("Redux tag: ", tag)
+    console.log("Redux add tag: ", tag)
     axios.post('/tasks/addTag', { taskID: tag.taskID, nameTag: tag.nameTag })
         .then((response) => {
             const data = response.data;
@@ -212,30 +216,30 @@ export const addTask = (task, tag, notification, subtask, cb) => async dispatch 
         .then((response) => {
             const data = response.data;
             if (data["onSuccess"]) {
-                console.log("Result: ", data["data"].taskID)
-                dispatch(addTasksSuccess({ data: task }));
-                // tag && tag.map(item => {
-                //     addTag({ taskID: data["data"].taskID, nameTag: item }, result => {
-                //         if (!result) {
-                //             return;
-                //         }
-                //     })
-                // })
-                // notification && notification.map(item => (
-                //     addNotification({ taskID: data["data"].taskID, userID: task.userID, reminder: item.reminder }, result => {
-                //         if (!result) {
-                //             return;
-                //         }
-                //     })
-                // ))
-                // subtask && subtask.map(item => (
-                //     addSubTask({ taskID: data["data"].taskID, nameSubTask: item.name, statusSubtask: item.checked }, result => {
-                //         if (!result) {
-                //             return;
-                //         }
-                //     })
-                // ))
-                getTasks({ userID: task.userID })
+                // console.log("Result: ", data["data"].taskID)
+                // dispatch(addTasksSuccess({ data: task }));
+                for (let tg of tag) {
+                    addTag({ taskID: data["data"].taskID, nameTag: tg }, result => {
+                        if (!result) {
+                            return;
+                        }
+                    })
+                }
+                for (let notice of notification) {
+                    addNotification({ taskID: data["data"].taskID, userID: task.userID, reminder: notice.reminder }, result => {
+                        if (!result) {
+                            return;
+                        }
+                    })
+                }
+                for (let sub of subtask) {
+                    addSubTask({ taskID: data["data"].taskID, nameSubTask: sub.name, statusSubtask: sub.checked }, result => {
+                        if (!result) {
+                            return;
+                        }
+                    })
+                }
+                // getTasks(task.userID)
 
                 cb && cb(data["data"].taskID);
             }
@@ -244,6 +248,7 @@ export const addTask = (task, tag, notification, subtask, cb) => async dispatch 
         })
         .catch((error) => {
             console.log(error);
+            cb(-1)
         });
 }
 

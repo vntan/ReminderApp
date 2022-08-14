@@ -3,6 +3,7 @@ const tasks = require('../models/tasksModels');
 const showUserTasks = (req, res) => {
     console.log(req.body)
     const userID = req.body["userID"]
+    console.log(userID)
 
     if (userID) {
         tasks.showUserTasks(userID, (err, rows) => {
@@ -71,9 +72,9 @@ const addNotification = (req, res) => {
     const reminder = req.body["reminder"]
 
     if (taskID && userID && reminder) {
-        tasks.addNotification(taskID, userID, reminder, (err) => {
+        tasks.addNotification(taskID, userID, reminder, (err, rows) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
-            else res.json({ onSuccess: true });
+            else res.json({ onSuccess: true, data: rows[0] });
         });
     }
     else res.json({ onSuccess: false, error: "Can't receive the data" });
@@ -85,9 +86,10 @@ const addTag = (req, res) => {
     const nameTag = req.body["nameTag"]
 
     if (taskID && nameTag) {
-        tasks.addTag(taskID, nameTag, reminder, (err) => {
+        tasks.addTag(taskID, nameTag, (err, rows) => {
+            console.log(err, rows)
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
-            else res.json({ onSuccess: true });
+            else res.json({ onSuccess: true, data: rows[0] });
         });
     }
     else res.json({ onSuccess: false, error: "Can't receive the data" });
@@ -113,10 +115,13 @@ const addSubtasks = (req, res) => {
     const nameSubTask = req.body["nameSubTask"]
     const statusSubtask = req.body["statusSubtask"]
 
-    if (taskID && nameSubTask && statusSubtask) {
-        tasks.addSubtasks(taskID, nameSubTask, statusSubtask, (err) => {
+    // console.log(taskID, nameSubTask, statusSubtask, taskID && nameSubTask && statusSubtask)
+
+    if (taskID && nameSubTask) {
+        tasks.addSubtasks(taskID, nameSubTask, statusSubtask, (err, rows) => {
+            // console.log(rows, err)
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
-            else res.json({ onSuccess: true });
+            else res.json({ onSuccess: true, data: rows[0] });
         });
     }
     else res.json({ onSuccess: false, error: "Can't receive the data" });
