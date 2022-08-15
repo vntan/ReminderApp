@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 
 import TableTasks from "../../TableTasks/TableTasks";
 
-import TaskInfo from '../../TaskCommon/TaskInformation/TaskInfo';
-import EditTask from '../../TaskCommon/EditTask/EditTask'
+
 
 const TaskList = ({ idAccount, tasks, getTasks }) => {
   const [showTaskInfo, setShowTaskInfo] = useState(false)
@@ -25,9 +24,6 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
 
   }, []);
 
-  // useEffect(() => {
-
-  // }, [tasks])
 
 
   const handleViewTask = (task) => {
@@ -39,13 +35,6 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
   const handleEditStatusTask = (task, newStatus) => {
     console.log("Edit Status", task, newStatus);
     return true;
-  };
-
-  const handleEditTask = (task) => {
-    // setShowTaskInfo(false);
-    setTaskCurrent(task)
-    setShowEditTask(true)
-    console.log("Edit task", task);
   };
 
   const handleDeleteTask = (task) => {
@@ -72,14 +61,19 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
       }))} */}
       <TableTasks
         tasks={tasks && tasks.map(item => {
-          return item.taskInfo
+          const obj = {
+            ...item.taskInfo,
+            participant: item.participant,
+            notificationList: item.notification,
+            subtask: item.subtask,
+            tag: item.tag
+          }
+          return obj
         })}
         loading={loading}
         handleViewTask={handleViewTask}
-        handleEditTask={handleEditTask}
         handleEditStatusTask={handleEditStatusTask}
         handleDeleteTask={handleDeleteTask}
-        defaultHideColumns={["Assignees", "Subtasks"]}
       ></TableTasks>
 
       {/* {showTaskInfo &&
@@ -91,7 +85,7 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
           task={taskCurrent}
         />} */}
 
-      {showEditTask &&
+      {/* {showEditTask &&
         <EditTask
           showEditTask={showEditTask}
           closeEditTask={closeEditTask}
@@ -99,7 +93,7 @@ const TaskList = ({ idAccount, tasks, getTasks }) => {
           task={taskCurrent}
           tasks={tasks && tasks[tasks.findIndex(item => item.taskInfo.idTask === taskCurrent.idTask)]}
         />
-      }
+      } */}
     </>
 
   );

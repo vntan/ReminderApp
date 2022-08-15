@@ -16,7 +16,7 @@ import TaskCalendar from "./TaskCalendar/TaskCalendar";
 import { updateVisibleColumns } from "../../Models/columnsTableReducer";
 import { connect } from "react-redux";
 
-import { addTask, addNotification, addTag, addSubTask, getTasks } from "../../Models/tasksReducer";
+import { getTasks } from "../../Models/tasksReducer";
 
 const MyTasksComponent = (props) => {
   const navigate = useNavigate();
@@ -24,7 +24,8 @@ const MyTasksComponent = (props) => {
 
   const [showCreateTask, setShowCreateTask] = useState(false)
 
-
+  const closeCreateTask = ()=> setShowCreateTask(false);
+  
   const menuTasksView = [
     {
       label: "List",
@@ -53,12 +54,7 @@ const MyTasksComponent = (props) => {
     setShowCreateTask(true)
   };
 
-  const handleOk = (task, notification, subtask, tag) => {
-    props.addTask(task, tag, notification, subtask, result => {
-      if (result >= 0) {
-        props.getTasks(task.userID)
-      }
-    })
+  const handleOk = () => {
     setShowCreateTask(false)
   }
 
@@ -112,7 +108,7 @@ const MyTasksComponent = (props) => {
         handleCancel={handleCancel}
         project={props.projects.listProject}
         list={props.lists.list}
-      // closeCreateTask={closeCreateTask}
+        closeCreateTask={closeCreateTask}
       // addNewTask={addNewTask}
       />}
 
@@ -131,10 +127,6 @@ const mapStateToProps = (state) => {
 
 const mapActionToProps = {
   updateVisibleColumns,
-  addTask,
-  addTag,
-  addNotification,
-  addSubTask,
   getTasks
 }
 

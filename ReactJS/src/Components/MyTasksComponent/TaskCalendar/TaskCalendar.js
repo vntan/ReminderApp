@@ -27,9 +27,10 @@ const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
 
     getTasks(idAccount, () => {
       setLoading(false);
+      console.log(tasks);
     });
 
-    console.log(tasks);
+   
   }, []);
 
   const statusToColor = {
@@ -60,7 +61,8 @@ const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
   const getListData = (listTasks, value) => {
     const filteredTasks = listTasks.filter(
       (task) => {
-        return (new moment(task.dueDate, "DD/MM/YYYY").format("DD/MM/YYYY")) === value.format("DD/MM/YYYY")
+        console.log("Hello",(new moment(task.taskInfo.dueDate).utc().format("DD/MM/YYYY")), value.format("DD/MM/YYYY"))
+        return (new moment(task.taskInfo.dueDate).utc().format("DD/MM/YYYY")) === value.format("DD/MM/YYYY")
       }
     );
     return filteredTasks;
@@ -81,10 +83,40 @@ const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
                 <Alert
                   key={task.idTask}
                   className={styles.alert}
-                  style={{ backgroundColor: statusToColor[task.status] }}
+                  style={{ backgroundColor: statusToColor[task.taskInfo.status] }}
                   onClick={(e) => { e.stopPropagation(); handleClickTask(task) }}
                 >
-                  {task.nameTask}
+                  {task.taskInfo.name}
+                </Alert>
+              );
+            })}
+        </div>
+      );
+    };
+  }
+
+  
+
+  const monthCellRender= (value) =>{
+    const listTask = tasks && tasks.filter(item=>{
+      const date = moment(item.taskInfo.dueDate).utc();
+      return date.month() === value.month() && date.year() === value.year()
+    });
+
+    if (listTask && listTask.length > 0) {
+      return (
+        <div style={{ width: "100%", height: "100%" }}>
+          {
+
+            listTask.map((task) => {
+              return (
+                <Alert
+                  key={task.idTask}
+                  className={styles.alert}
+                  style={{ backgroundColor: statusToColor[task.taskInfo.status] }}
+                  onClick={(e) => { e.stopPropagation(); handleClickTask(task) }}
+                >
+                  {task.taskInfo.name}
                 </Alert>
               );
             })}
@@ -117,7 +149,7 @@ const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
                 onSelect={onSelect}
                 onPanelChange={onPanelChange}
                 dateCellRender={dateCellRender}
-
+                monthCellRender={monthCellRender}
               />
 
             </div>
@@ -142,7 +174,7 @@ const TaskCalendar = ({ tasks, idAccount, getTasks }) => {
 const mapStateToProps = (state) => {
   return {
     idAccount: state.account.account.idAccount,
-    tasks: state.taskReducer.taskInfo,
+    tasks: state.taskReducer.tasks,
   }
 }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import styles from "./ProjectCalendar.module.css";
 import {
@@ -7,55 +7,28 @@ import {
   toDoColor,
 } from "../../../Utilities/Color";
 
-import { Calendar } from "antd";
+import { Calendar, Spin } from "antd";
 import Alert from "react-bootstrap/Alert";
 
 import moment from "moment";
+import { connect } from "react-redux";
 
-const ProjectCalendar = () => {
- 
-  const tasks = [
-    {
-      taskname: "Tìm hiểu kiến thức",
-      deadline: "18/07/2022",
-      status: "On going",
-      assignees: [
-        "https://www.partyanimalsgame.com/static/avatars-04_Machitto.png",
-        "https://www.partyanimalsgame.com/static/avatars-01_Underbite.png",
-        "https://www.partyanimalsgame.com/static/avatars-08_Otter.png",
-        "https://www.partyanimalsgame.com/static/avatars-11_Unicorn.png",
-        "https://www.partyanimalsgame.com/static/avatars-10_Crocodile.png",
-      ],
-    },
-    {
-      taskname: "Kiểm thử sản phẩm",
-      deadline: "01/05/2022",
-      notification: "30/04/2022",
-      status: "Complete",
-      assignees: [
-        "https://www.partyanimalsgame.com/static/avatars-07_Carrot.png",
-        "https://www.partyanimalsgame.com/static/avatars-01_Underbite.png",
-        "https://www.partyanimalsgame.com/static/avatars-08_Otter.png",
-        "https://www.partyanimalsgame.com/static/avatars-11_Unicorn.png",
-        "https://www.partyanimalsgame.com/static/avatars-10_Crocodile.png",
-      ],
-      subtask: "3/5",
-    },
-    {
-      taskname: "Phát triển sản phẩm",
-      deadline: "01/05/2022",
-      notification: "29/04/2022",
-      status: "To do",
-      assignees: [
-        "https://www.partyanimalsgame.com/static/avatars-07_Carrot.png",
-        "https://www.partyanimalsgame.com/static/avatars-01_Underbite.png",
-        "https://www.partyanimalsgame.com/static/avatars-08_Otter.png",
-        "https://www.partyanimalsgame.com/static/avatars-11_Unicorn.png",
-        "https://www.partyanimalsgame.com/static/avatars-10_Crocodile.png",
-      ],
-      subtask: "0/3",
-    },
-  ];
+import { getTasks } from "../../../Models/tasksReducer";
+import CreateTask from "../../TaskCommon/CreateTask/CreateTask";
+
+const ProjectCalendar = ({ tasks, idAccount, getTasks, projectID }) => {
+  const [showCreateTask, setShowCreateTask] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+
+    getTasks(idAccount, () => {
+      setLoading(false);
+      console.log(tasks);
+    });
+  }, []);
 
   const statusToColor = {
     Complete: completeColor,
@@ -64,33 +37,43 @@ const ProjectCalendar = () => {
   };
 
   const [value, setValue] = useState(moment());
-  //const [selectedValue, setSelectedValue] = useState(moment());
 
   const onSelect = (newValue) => {
     setValue(newValue);
-    //setSelectedValue(newValue);
   };
 
-  const handleOnClickTask = (e, task) => {
-    e.stopPropagation();
-    console.log('on Click', task);
+  const handleClickTask = (task) => {
+    //On Click The Task
   };
 
+  const handleAddTask = () => {
+    setShowCreateTask(true);
+    console.log("Add Task");
+  };
 
   const onPanelChange = (newValue) => {
     setValue(newValue);
   };
 
-  const getListData = (value) => {
-    const filteredTasks = tasks.filter(
-      (task) => task.dueDate === value.format("DD/MM/YYYY")
-    );
+  const getListData = (listTasks, value) => {
+    const taskInProject = listTasks.filter((item) => {
+      if (projectID === -1) return true;
+      else return item.taskInfo.idProject === projectID;
+    });
+
+    const filteredTasks = taskInProject.filter((task) => {
+      return (
+        new moment(task.taskInfo.dueDate).utc().format("DD/MM/YYYY") ===
+        value.format("DD/MM/YYYY")
+      );
+    });
     return filteredTasks;
   };
 
   const dateCellRender = (value) => {
-    const listTask = getListData(value);
-    if (listTask.length > 0) {
+    const listTask = tasks && getListData(tasks, value);
+
+    if (listTask && listTask.length > 0) {
       return (
         <div style={{ width: "100%", height: "100%" }}>
           {listTask.map((task) => {
@@ -98,10 +81,13 @@ const ProjectCalendar = () => {
               <Alert
                 key={task.idTask}
                 className={styles.alert}
-                style={{ backgroundColor: statusToColor[task.status] }}
-                onClick={(e) => handleOnClickTask(e, task)}
+                style={{ backgroundColor: statusToColor[task.taskInfo.status] }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickTask(task);
+                }}
               >
-                {task.name}
+                {task.taskInfo.name}
               </Alert>
             );
           })}
@@ -110,21 +96,104 @@ const ProjectCalendar = () => {
     }
   };
 
+  const monthCellRender = (value) => {
+    const listTask =
+      tasks &&
+      tasks
+        .filter((item) => {
+          if (projectID === -1) return true;
+          else return item.taskInfo.idProject === projectID;
+        })
+        .filter((item) => {
+          const date = moment(item.taskInfo.dueDate).utc();
+          return date.month() === value.month() && date.year() === value.year();
+        });
+
+    if (listTask && listTask.length > 0) {
+      return (
+        <div style={{ width: "100%", height: "100%" }}>
+          {listTask.map((task) => {
+            return (
+              <Alert
+                key={task.idTask}
+                className={styles.alert}
+                style={{ backgroundColor: statusToColor[task.taskInfo.status] }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClickTask(task);
+                }}
+              >
+                {task.taskInfo.name}
+              </Alert>
+            );
+          })}
+        </div>
+      );
+    }
+  };
+
+  const closeCreateTask = () => {
+    setShowCreateTask(false);
+  };
+
+  const addNewTask = (taskInfo) => {
+    // Call api
+    setShowCreateTask(false);
+    console.log("Add new task: ", taskInfo);
+  };
+
   return (
-    <div >
-      <div className={styles.calendar}>
-        <Calendar
-          value={value}
-          onSelect={onSelect}
-          onPanelChange={onPanelChange}
-          dateCellRender={dateCellRender}
-
+    <div>
+      {" "}
+      {console.log("render", tasks)}
+      {loading ? (
+        <Spin
+          size="large"
+          style={{
+            width: "35px",
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
         />
+      ) : (
+        <>
+          <div className={styles.calendar}>
+            <Calendar
+              value={value}
+              onSelect={onSelect}
+              onPanelChange={onPanelChange}
+              dateCellRender={dateCellRender}
+              monthCellRender={monthCellRender}
+            />
+          </div>
 
-      </div>
-      
+          <div className={styles.button} onClick={handleAddTask}>
+            <span>+</span>
+          </div>
+        </>
+      )}
+      {showCreateTask && (
+        <CreateTask
+          showCreateTask={showCreateTask}
+          closeCreateTask={closeCreateTask}
+          addNewTask={addNewTask}
+        />
+      )}
     </div>
   );
 };
 
-export default ProjectCalendar;
+const mapStateToProps = (state) => {
+  return {
+    idAccount: state.account.account.idAccount,
+    tasks: state.taskReducer.tasks,
+  };
+};
+
+const mapActionToProps = {
+  getTasks,
+};
+
+export default connect(mapStateToProps, mapActionToProps)(ProjectCalendar);

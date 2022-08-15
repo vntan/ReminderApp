@@ -461,17 +461,18 @@ delimiter //
 create procedure showUserTasks(in userID int)
 begin
 	select task.*, project.*, listtask.*,
+			task.description as 'description',
+            project.description as 'proejectDescription',
 			project.name as 'nameProject', listtask.name as 'nameList',
 			task.name as name,
 			getNearestNotification(task.idTask, userID) as 'notification',
 			getCountSubTasksStatus(task.idTask, null) as 'countTasks',
-            getCountSubTasksStatus(task.idTask, 'Complete') as 'countCompleteTasks'  
+            getCountSubTasksStatus(task.idTask, 1) as 'countCompleteTasks'  
 	from task 
     left join project on project.idProject = task.idProject
     left join listtask on listtask.idList = task.idList
     where task.idProject in (select idProject from projectparticipant where idUser = userID)
 	  or task.idList in (select idList from listtask where idUser = userID);
-      
       
 	select t.*, a.idAccount, a.name, a.email, a.urlImage from taskparticipant as t
     left join account as a on a.idAccount = t.idUser
@@ -572,9 +573,9 @@ begin
 end//
 
 delimiter //
-create procedure deleteNotification(in taskID int, in userID int, in reminder datetime)
+create procedure deleteNotification(in notificationID int)
 begin
-	delete from notification where idTask = taskID and idUser = userID and reminderTime = reminder;
+	delete from notification where idNotification = notificationID;
 end//
 
 delimiter //
@@ -604,27 +605,7 @@ begin
     where idTask = taskID;
 end//
 
--- delimiter ;
--- call loginWithGoogle('admin1', 'admin1@gmail.com', '202cb962ac59075b964b07152d234b70', 'https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg');
--- call loginWithGoogle('admin2', 'admin2@gmail.com', '202cb962ac59075b964b07152d234b70', 'https://media.sproutsocial.com/uploads/2017/02/10x-featured-social-media-image-size.png');
 
--- call addProject(1, 'Project 1', 'This is project 1', @projectID);
--- call addProject(1, 'Project 2', 'This is project 2', @projectID);
-
--- call addProject(2, 'Project 1', 'This is project 1', @projectID);
--- call addProject(2, 'Project 2', 'This is project 2', @projectID);
-
--- call addList(2, null, 'Project 2 - List 1');
--- call addList(2, null, 'Project 2 - List 2');
-
--- call addList(1, null, 'Project 1 - List 1');
--- call addList(1, null, 'Project 1 - List 2');
-
-
-
--- select * from project;
--- select * from listtask;
--- select * from task;
 
 
 

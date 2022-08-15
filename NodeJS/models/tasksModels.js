@@ -29,7 +29,6 @@ var tasks = {
             [taskID, nameSubTask, statusSubtask], cb)
     },
 
-
     deleteTasks: function (taskID, cb) {
         return db.query("call deleteTask(?); ", [taskID], cb)
     },

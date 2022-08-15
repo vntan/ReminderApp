@@ -19,9 +19,7 @@
     padding: 10px;
 }
 
-
 .button {
-
     position: fixed;
     bottom: 52px;
     right: 64px;
@@ -33,9 +31,12 @@
     z-index: 3;
     display: flex;
     justify-content: center;
-    align-items: center;
-
+    text-align: center;
+    background-color: #007bff;
+    cursor: pointer;
+    color: #fff;
 }
+
 
 .calendar::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);

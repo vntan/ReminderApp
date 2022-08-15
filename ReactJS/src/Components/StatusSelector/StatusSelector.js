@@ -26,14 +26,21 @@ const StatusSelector = (props) => {
       className={styles.status}
       onChange={(value) => {
         onChange = true;
+        console.log(props.task)
         if (value !== props.task.status && props.onChangeValue) 
         {
-            if (props.onChangeValue(props.task, value)) setStatus(value); 
-            else message.error("Cannot update the status of this task!");
+            props.onChangeValue(props.task, value, (result)=>{
+              if (result) setStatus(value);
+              else {
+                message.error(`Cannot update the status of ${props.task.name}!`);
+                setStatus(props.task.status);
+              }
+            }); 
+            
             
         }
-        
-        else setStatus(value);
+        else setStatus(value)
+
       }}
       value={status}
       style={statusToColor(status)}

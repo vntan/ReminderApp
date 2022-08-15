@@ -131,7 +131,8 @@ const deleteTasks = (req, res) => {
     console.log(req.body)
     const taskID = req.body["taskID"]
 
-    if (taskID) {
+    console.log("BE nè ..........", req.body)
+    if (taskID != -1) {
         tasks.deleteTasks(taskID, (err) => {
             if (err) res.json({ onSuccess: false, error: err["sqlMessage"] });
             else res.json({ onSuccess: true });

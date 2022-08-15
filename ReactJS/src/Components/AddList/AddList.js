@@ -18,7 +18,7 @@ const AddList = (props) => {
             props.addListByTaskToProject({ projectID, userID, nameList }, result => {
                 if (result) {
                     formChangeName.resetFields()
-                    props.handleCancel()
+                    props.handleCancelAddList()
                 }
 
             })
@@ -27,7 +27,7 @@ const AddList = (props) => {
             props.addListByTaskToUser({ userID, nameList }, result => {
                 if (result) {
                     formChangeName.resetFields()
-                    props.handleCancel()
+                    props.handleCancelAddList()
                 }
 
             })
@@ -35,7 +35,7 @@ const AddList = (props) => {
     }
     const buttonCancel = () => {
         formChangeName.resetFields()
-        props.handleCancel()
+        props.handleCancelAddList()
     }
 
     return (

@@ -6,27 +6,46 @@ import { connect } from "react-redux";
 
 import ProjectSelector from "../ProjectSelector/ProjectSelector";
 import { Menu, message } from "antd";
-import { Button, Modal } from 'antd';
+import { Button, Modal } from "antd";
 import { InfoCircleTwoTone, PlusCircleTwoTone } from "@ant-design/icons";
 
 import { useNavigate, useLocation, useParams, Outlet } from "react-router-dom";
 
-import ProjectList from './ProjectList/ProjectList'
-import ProjectCalendar from './ProjectCalendar/ProjectCalendar'
+import ProjectList from "./ProjectList/ProjectList";
+import ProjectCalendar from "./ProjectCalendar/ProjectCalendar";
 
 import ProjectInformation from "../ProjectInformation/ProjectInformation";
 
-import { showProjectInformation } from '../../Models/projectReducer';
+import { showProjectInformation } from "../../Models/projectReducer";
 
+import CreateTask from "../TaskCommon/CreateTask/CreateTask";
 import AddNewProject from "../AddNewProject/AddNewProject";
-
 
 const MyProjectsComponent = (props) => {
   const location = useLocation();
   const [projectID, setProject] = useState(-1);
-  const [isModalVisibleProjectInfo, setIsModalVisibleProjectInfo] = useState(false);
-  const [isModalVisibleAddProject, setIsModalVisibleAddproject] = useState(false);
+  const [isModalVisibleProjectInfo, setIsModalVisibleProjectInfo] =
+    useState(false);
+  const [isModalVisibleAddProject, setIsModalVisibleAddproject] =
+    useState(false);
   const navigate = useNavigate();
+
+  const [showCreateTask, setShowCreateTask] = useState(false)
+
+  const closeCreateTask = ()=> setShowCreateTask(false);
+
+  const handleAddTask = () => {
+    setShowCreateTask(true)
+  };
+
+  const handleOk = () => {
+    setShowCreateTask(false)
+  }
+
+  const handleCancel = () => {
+    setShowCreateTask(false)
+  }
+
 
   const menuProjectsView = [
     {
@@ -34,7 +53,7 @@ const MyProjectsComponent = (props) => {
       key: "list",
       component: <ProjectList projectID={projectID} />,
       onClick: () => {
-        navigate('list')
+        navigate("list");
       },
     },
     {
@@ -42,12 +61,10 @@ const MyProjectsComponent = (props) => {
       key: "calendar",
       component: <ProjectCalendar projectID={projectID} />,
       onClick: () => {
-        navigate('calendar')
+        navigate("calendar");
       },
     },
-  ]
-
-
+  ];
 
   const showModalProjectInfo = () => {
     setIsModalVisibleProjectInfo(true);
@@ -77,19 +94,19 @@ const MyProjectsComponent = (props) => {
     const url = location.pathname.toLowerCase();
 
     for (const item of menuProjectsView)
-      if (url.includes(item.key.toLowerCase()))
-        return item.key;
+      if (url.includes(item.key.toLowerCase())) return item.key;
 
-    return '';
-  }
+    return "";
+  };
 
   const handleChangeProject = (projectID) => {
     if (projectID > -1)
-      props.showProjectInformation({ userID: props.account.idAccount, projectID: projectID })
+      props.showProjectInformation({
+        userID: props.account.idAccount,
+        projectID: projectID,
+      });
     setProject(projectID);
   };
-
-
 
   return (
     <>
@@ -97,12 +114,21 @@ const MyProjectsComponent = (props) => {
         <div className={styles.container_project_page}>
           <div className={styles.project}>
             <ProjectSelector
-              handleChangeProject={(projectID) => handleChangeProject(projectID)}
+              handleChangeProject={(projectID) =>
+                handleChangeProject(projectID)
+              }
             />
-            {
-              projectID === -1 ? <PlusCircleTwoTone className={styles.info} onClick={showAddProject} />
-                : <InfoCircleTwoTone className={styles.info} onClick={showModalProjectInfo} />
-            }
+            {projectID === -1 ? (
+              <PlusCircleTwoTone
+                className={styles.info}
+                onClick={showAddProject}
+              />
+            ) : (
+              <InfoCircleTwoTone
+                className={styles.info}
+                onClick={showModalProjectInfo}
+              />
+            )}
           </div>
 
           <Menu
@@ -111,19 +137,13 @@ const MyProjectsComponent = (props) => {
             className={styles.menu}
             selectedKeys={[selectedKey()]}
             items={menuProjectsView}
-            style={{ minWidth: 0, flex: "1 0 41%", justifyContent: 'end' }}
+            style={{ minWidth: 0, flex: "1 0 41%", justifyContent: "end" }}
           />
         </div>
-
-
-
-
-
-
-
       </div>
       <Outlet />
-      <Modal title="Project Information"
+      <Modal
+        title="Project Information"
         visible={isModalVisibleProjectInfo}
         onOk={handleOkProjectInfo}
         onCancel={handleCancelProjectInfo}
@@ -131,12 +151,17 @@ const MyProjectsComponent = (props) => {
         maskClosable={false}
         width={800}
         bodyStyle={{ maxHeight: 500 }}
-        centered 
-        destroyOnClose>
-        <ProjectInformation project={projectID} handleCancel={handleCancelProjectInfo} />
+        centered
+        destroyOnClose
+      >
+        <ProjectInformation
+          project={projectID}
+          handleCancel={handleCancelProjectInfo}
+        />
       </Modal>
 
-      <Modal title="New Project"
+      <Modal
+        title="New Project"
         visible={isModalVisibleAddProject}
         onOk={handleOkAddProject}
         onCancel={handleCancelAddProject}
@@ -145,17 +170,30 @@ const MyProjectsComponent = (props) => {
         width={800}
         bodyStyle={{ maxHeight: 500 }}
         centered
-        destroyOnClose >
+        destroyOnClose
+      >
         <AddNewProject handleCancel={handleCancelAddProject} />
       </Modal>
 
-      {
-        menuProjectsView.find(menu => menu.key === selectedKey()) ?
-          menuProjectsView.find(menu => menu.key === selectedKey()).component
-          : null
-      }
+      {menuProjectsView.find((menu) => menu.key === selectedKey())
+        ? menuProjectsView.find((menu) => menu.key === selectedKey()).component
+        : null}
 
+      <div className={styles.button} onClick={handleAddTask}>
+        <span>+</span>
+      </div>
 
+      {showCreateTask && (
+        <CreateTask
+          showCreateTask={showCreateTask}
+          handleOk={handleOk}
+          handleCancel={handleCancel}
+          project={-1}
+          list={-1}
+          closeCreateTask={closeCreateTask}
+          // addNewTask={addNewTask}
+        />
+      )}
     </>
   );
 };
@@ -167,7 +205,6 @@ const mapStateToProps = (state) => ({
 
 const mapActionToProps = {
   showProjectInformation,
+};
 
-}
-
-export default connect(mapStateToProps, mapActionToProps)(MyProjectsComponent)
+export default connect(mapStateToProps, mapActionToProps)(MyProjectsComponent);
