@@ -151,6 +151,10 @@ const CreateTask = (props) => {
   };
 
   const submitSubtask = () => {
+    if (!addSubtask) {
+      message.error("Cannot add your subtask!");
+      return;
+    }
     const sub = [...subTask];
     sub.push({
       nameSubTask: addSubtask,

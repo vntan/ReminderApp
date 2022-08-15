@@ -36,7 +36,7 @@ const AddNewProject = (props) => {
       rules={[
         {
           required: true,
-          message: 'Please input your name list !!!',
+          message: 'Please input your project name !!!',
         },
       ]}
     >
